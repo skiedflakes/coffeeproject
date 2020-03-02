@@ -88,7 +88,7 @@ componentDidMount(){
 coordinate={{  latitude: 14.60,
               longitude: 120.9842, }}
 title="Aron"
-onPress={() => Alert.alert( 'Delivery',
+onPress={() => Alert.alert( 'test Delivery',
 'Update Delivery Status',
 [
  
