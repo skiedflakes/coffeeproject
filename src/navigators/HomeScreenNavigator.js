@@ -1,6 +1,4 @@
 import * as React from 'react';
-
-import { View, Text, TouchableOpacity,Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FeedScreen from '../screens/FeedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
