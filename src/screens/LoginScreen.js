@@ -29,6 +29,7 @@ export default class  LoginScreen extends React.Component{
               placeholder = "Password"
               placeholderTextColor = "#9a73ef"
               autoCapitalize = "none"
+              secureTextEntry = {true}
               onChangeText = {(text) => this.password = text}/>
           <Button
             title="Login"
