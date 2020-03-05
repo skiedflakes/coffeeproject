@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput } from 'react-native';
+import { Button, View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 
 export default class  LoginScreen extends React.Component{
   
