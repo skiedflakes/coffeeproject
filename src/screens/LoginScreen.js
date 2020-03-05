@@ -17,7 +17,7 @@ export default class  LoginScreen extends React.Component{
       return(
       <View style={styles.Layout}>
         <View style={styles.loginLayout}>
-        <Text style={{textAlign:"center", marginBottom: 10}}>Coffe Project</Text>
+        <Text style={{textAlign:"center", marginBottom: 10}}>Cafe Project</Text>
         <TextInput style = {styles.input}
               underlineColorAndroid = "transparent"
               placeholder = "Email"

@@ -1,16 +1,13 @@
 import * as React from 'react';
-import { Button, Text, View } from 'react-native';
-
+import { StyleSheet,Button, Text, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
+import { Marker } from "react-native-maps";
 
 export default class ProfileScreen extends React.Component {
     render() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text>ProfileScreen</Text>
-    <Button
-      title="Go to Feed"
-      onPress={() => this.props.navigation.navigate('Feed')}
-    />
-  </View>
+  <>
+  <Text>Profile Screen</Text>
+  </>
   );
 }}
