@@ -41,7 +41,7 @@ export default class  LoginScreen extends React.Component{
   }
 
   loginFetch(){
-    fetch('http://192.168.1.105/schednotes_2020/login_test.php', {
+    fetch('http://192.168.1.105/cafeproject/login.php', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
