@@ -19,13 +19,7 @@ export default class HomeScreenNavigator extends React.Component{
             <Icon name="home" color={color} size={size} />
           ),
         }} />
-            <Tab.Screen name="Profile" component={ProfileScreen} 
-            options={{
-              tabBarLabel: 'Profile',
-              tabBarIcon: ({ color, size }) => (
-                <Icon name="user-circle" color={color} size={size} />
-              ),
-            }}/>
+         
              <Tab.Screen name="Products" component={ProductsScreen} 
             options={{
               tabBarLabel: 'Products',
@@ -39,6 +33,13 @@ export default class HomeScreenNavigator extends React.Component{
               tabBarLabel: 'Orders',
               tabBarIcon: ({ color, size }) => (
                 <Icon name="list-ul" color={color} size={size} />
+              ),
+            }}/>
+            <Tab.Screen name="Profile" component={ProfileScreen} 
+            options={{
+              tabBarLabel: 'Profile',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="user-circle" color={color} size={size} />
               ),
             }}/>
             </Tab.Navigator>
