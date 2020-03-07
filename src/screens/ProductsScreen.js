@@ -24,7 +24,7 @@ export default class ProductsScreen extends React.Component{
   render(){
     return (
       <View style={styles.container}>
-        <View>
+
         <View style={{ flexDirection: 'row' }}>
           {/*Tags*/}
           <TouchableOpacity
@@ -41,14 +41,6 @@ export default class ProductsScreen extends React.Component{
         </View>
           {this.renderElement()}
         </View>
-
-render(){
-    return(
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Products Screen</Text>
-
-
-      </View>
     );
   }
 }
