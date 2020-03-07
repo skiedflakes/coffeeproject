@@ -4,6 +4,7 @@ import Tags from './Products/Tags.js';
 import Input_Products from './Products/Input_Products.js';
 
 export default class ProductsScreen extends React.Component{
+
   constructor(props) {
     super(props);
     this.state = { 
@@ -40,6 +41,13 @@ export default class ProductsScreen extends React.Component{
         </View>
           {this.renderElement()}
         </View>
+
+render(){
+    return(
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Products Screen</Text>
+
+
       </View>
     );
   }

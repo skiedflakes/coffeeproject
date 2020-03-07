@@ -57,10 +57,11 @@ export default class  LoginScreen extends React.Component{
             const first = responseJson.login_response[0]
       
             if(first.status == 'success'){
-              this.props.navigation.navigate('Home')
+              this.props.navigation.navigate('MainProfile')
             } else {
               Alert.alert('failed !');
             }
+
 
           }).catch((error) => {
             console.error(error);
