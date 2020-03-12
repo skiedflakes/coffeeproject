@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FeedScreen from '../screens/FeedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -10,7 +11,33 @@ const Tab = createBottomTabNavigator();
 
 
 export default class HomeScreenNavigator extends React.Component{
+
+
+  constructor() {
+    super();
+    //Setting up global variable
+    global.g_user_id = '';
+    global.g_name = '';
+    global.g_user_type_id = '';
+  }
+
     render(){
+          //get session
+          const getMultiple = async () => {
+              let values
+              try {
+                  values = await AsyncStorage.multiGet(['user_id', 'name','user_type_id'])
+                  const user_id = values[0][1];
+                  const name = values[1][1];
+                  const user_type_id = values[2][1];
+                  global.g_user_id = user_id;
+                  global.g_name = name;
+                  global.g_user_type_id = user_type_id;
+              } catch(e) {
+              }
+          }
+          getMultiple();
+
         return(
             <Tab.Navigator>
             <Tab.Screen name="Feed" component={FeedScreen} options={{

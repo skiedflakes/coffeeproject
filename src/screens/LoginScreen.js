@@ -1,20 +1,11 @@
 import * as React from 'react';
 import { Button, View, Text, TextInput, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+export default function LoginScreen({navigation}){
 
-export default class  LoginScreen extends React.Component{
-  
-  constructor(props){
-    super(props);
-    this.state = {
-      isLoading: true,
-      dataSource: [],
-      userName: '',
-      password: ''
-    }
-  }
-
-  render(){
-      return(
+  const [username, u_onChangeText] = React.useState("");
+  const [password, p_onChangeText] = React.useState("");
+  return(
       <View style={styles.Layout}>
         <View style={styles.loginLayout}>
         <Text style={{textAlign:"center", marginBottom: 10}}>Cafe Project</Text>
@@ -23,51 +14,76 @@ export default class  LoginScreen extends React.Component{
               placeholder = "Email"
               placeholderTextColor = "#9a73ef"
               autoCapitalize = "none"
-              onChangeText = {(text) => this.userName = text}/>
+              onChangeText={text => u_onChangeText(text)}
+              username={username}/>
         <TextInput style = {styles.input}
               underlineColorAndroid = "transparent"
               placeholder = "Password"
               placeholderTextColor = "#9a73ef"
               autoCapitalize = "none"
               secureTextEntry = {true}
-              onChangeText = {(text) => this.password = text}/>
+              password ={password}
+              onChangeText={text => p_onChangeText(text)}/>
           <Button
             title="Login"
-            onPress={() => this.loginFetch()}
+            onPress={() => loginFetch(username,password,navigation)}
           />
         </View>
       </View>
       );
   }
 
-  loginFetch(){
-    fetch('http://192.168.1.105/cafeproject/login.php', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: this.userName,
-        password: this.password
-      })
-    }).then((response) => response.json())
-          .then((responseJson) => {
+const loginFetch = (userName,password,navigation) =>{
 
-            const first = responseJson.login_response[0]
+     //functions to store session using async storage
+      const multiSet = async (name,user_id,user_type_id) => {
+        const save_user_id = ["user_id", user_id]
+        const save_name = ["name", name]
+        const save_user_type_id = ["user_type_id", user_type_id]
+        try {
+          await AsyncStorage.multiSet([save_user_id, save_name,save_user_type_id])
+        } catch(e) {
+          //save error
+        }
       
-            if(first.status == 'success'){
-              this.props.navigation.navigate('MainProfile')
-            } else {
-              Alert.alert('failed !');
-            }
+        console.log("Done.")
+      }
+
+  fetch('http://192.168.1.105/cafeproject/login.php', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: userName,
+      password: password
+    })
+  }).then((response) => response.json())
+        .then((responseJson) => {
+
+          const first = responseJson.login_response[0]
+    
+          if(first.status == 'success'){
+            //call function multiset to save data to async storage
+            multiSet(first.name,first.user_id,first.user_type_id);
+            global.g_user_id = first.user_id;
+            global.g_name = first.name;
+            global.g_user_type_id = first.user_type_id;
+            navigation.navigate('Profile_Main', {
+              name: first.name,
+              user_id:first.user_id,
+              user_type_id:first.user_type_id,
+            })
+          } else {
+            Alert.alert('failed !');
+          }
 
 
-          }).catch((error) => {
-            console.error(error);
-          });
-    }
-}
+        }).catch((error) => {
+          console.error(error);
+        });
+  };
 
 const styles = StyleSheet.create({
   Layout:{
