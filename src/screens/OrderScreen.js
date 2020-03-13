@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet,Button, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import { Marker } from "react-native-maps";
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class OrderScreen extends React.Component {
     render() {
