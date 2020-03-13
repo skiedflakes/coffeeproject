@@ -1,15 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Text, View,Alert,StyleSheet,TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 export default function FeedScreen () {
 
    const [test] = useState('test');
 
   return (
     <View style={{ flex: 6, alignItems: 'center', justifyContent: 'center',flexDirection:"column"}}>
-    <Text>{global.g_name}</Text>
-    <Button title='test' onPress={()=>alert()}></Button>
+      <View style={{flexDirection:'row', padding:20}}>
+
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <View style={{flexDirection:'column', padding:20,alignItems: 'center', justifyContent: 'center'}}>
+            <Feather name="coffee" size={50} color={"#642A05"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            <Text style={{fontSize: 19,fontWeight: 'bold',color:'#393939',textAlign:'center',marginLeft:10}}>Coffee</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+          <View style={{flexDirection:'column', padding:20,alignItems: 'center', justifyContent: 'center'}}>
+            <MCI name="glass-flute" size={50} color={"#F69455"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            <Text style={{fontSize: 19,fontWeight: 'bold',color:'#393939',textAlign:'center',marginLeft:10}}>Milk Tea</Text>
+          </View>
+        </TouchableOpacity>
+
+      </View>
+
+
+      <View style={{flexDirection:'row', padding:20}}>
+
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <View style={{flexDirection:'column', padding:20,alignItems: 'center', justifyContent: 'center'}}>
+            <MCI name="cup-water" size={50} color={"#24BFCC"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            <Text style={{fontSize: 19,fontWeight: 'bold',color:'#393939',textAlign:'center',marginLeft:10}}>Beverages</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <View style={{flexDirection:'column', padding:20,alignItems: 'center', justifyContent: 'center'}}>
+            <MCI name="food-fork-drink" size={50} color={"#454545"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            <Text style={{fontSize: 19,fontWeight: 'bold',color:'#393939',textAlign:'center',marginLeft:10}}>Others</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
