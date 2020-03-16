@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+
+//import screens 
 import FeedScreen from '../screens/FeedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ProductsScreen from '../screens/ProductsScreen';
 import OrderScreen from '../screens/OrderScreen';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import MenuScreen from '../screens/MenuScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,13 +45,21 @@ export default class HomeScreenNavigator extends React.Component{
         return(
             <Tab.Navigator>
             <Tab.Screen name="Feed" component={FeedScreen} options={{
-          tabBarLabel: 'Feed',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home" color={color} size={size} />
-          ),
-        }} />
+            tabBarLabel: 'Feed',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="home" color={color} size={size} />
+            ),
+            }} />
+
+            <Tab.Screen name="Menu" component={MenuScreen} 
+            options={{
+              tabBarLabel: 'Menu',
+              tabBarIcon: ({ color, size }) => (
+                <Entypo name="grid" color={color} size={size} />
+              ),
+            }}/>
          
-             <Tab.Screen name="Products" component={ProductsScreen} 
+            <Tab.Screen name="Products" component={ProductsScreen} 
             options={{
               tabBarLabel: 'Products',
               tabBarIcon: ({ color, size }) => (

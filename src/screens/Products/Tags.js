@@ -31,7 +31,8 @@ export default class Tags extends React.Component {
           data={ this.state.dataSource }
           ItemSeparatorComponent = {this.FlatListItemSeparator}
           renderItem={this.renderItem}
-          keyExtractor={(item, index) => index}
+          // keyExtractor={(item, index) => index}
+          keyExtractor={item => item.product_category_id.toString()}
         />
       </View>
     );
