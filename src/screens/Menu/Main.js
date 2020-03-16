@@ -1,44 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+// import Feather from 'react-native-vector-icons/Feather';
+// import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 
 //import content
 import Content from './Content';
-
-
-const DATA = [
-    {
-        id:1,
-      title: 'Coffee',
-    },
-    {
-        id:2,
-      title: 'Milk Tea',
-    },
-    {
-        id:3,
-      title: 'Shakes',
-    },
-  ];
-
-
-  function Item({ title,product_category_id}) {
-    return (
-        <TouchableOpacity onPress={() => (null)}>
-            <View style={styles.item}>
-                <Text style={styles.title}>{title} {product_category_id}</Text>
-            </View>
-        </TouchableOpacity>
-    );
-  }
   
 
 export default function Main ({route,navigation,body_content}) {
   const [menu_list, setMenu_list] = React.useState(null);
-  var [content, setcontent] = React.useState(<Content category_id={0}/>);
+  var [content, setcontent] = React.useState(null);
   
   useFocusEffect(
     React.useCallback(() => {
@@ -65,20 +38,40 @@ export default function Main ({route,navigation,body_content}) {
     }, [])
   );
 
-function Test ({ title,product_category_id}) {
- 
+function RowItem ({ title,product_category_id}) {
     return (
-        <TouchableOpacity onPress={() => passData(product_category_id)}>
+        <TouchableOpacity onPress={() => getContent(product_category_id)}>
             <View style={styles.item}>
-                <Text style={styles.title}>{title} {product_category_id}</Text>
+                <Text style={styles.title}>{title}</Text>
             </View>
         </TouchableOpacity>
     );
 }
 
-function passData (product_category_id){
-setcontent(<Content category_id={product_category_id}/>);
-}
+function getContent(product_category_id){
+  fetch('http://192.168.1.105/cafeproject/menu/get_menu_details.php', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      product_category_id: product_category_id
+    })
+  }).then((response) => response.json())
+        .then((responseJson) => {
+          var data = responseJson.product_data.map(function(item) {
+            return {
+              product_id: item.product_id,
+              product_name: item.product_name
+            };
+          });
+         
+          setcontent(<Content content_data={data}/>);
+        }).catch((error) => {
+          console.error(error);
+        });
+  }
 
   return (
     <View style={styles.main}>
@@ -99,7 +92,7 @@ setcontent(<Content category_id={product_category_id}/>);
             data={menu_list}
             renderItem={
               ({ item }) => 
-              <Test title={item.product_type_name} product_category_id={item.product_category_id} />
+              <RowItem title={item.product_type_name} product_category_id={item.product_category_id} />
               }
             keyExtractor={item => item.product_category_id.toString()}
             horizontal={true}
@@ -107,9 +100,9 @@ setcontent(<Content category_id={product_category_id}/>);
     </View>
     
     <View style={styles.body}>
-      <View style={{flex:6,}} >
+   
       {content}
-      </View>
+
     </View>
     </View>
   );
