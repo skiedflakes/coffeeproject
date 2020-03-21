@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View,Image,StyleSheet,TouchableOpacity,Dimensions,FlatList,SafeAreaView } from 'react-native';
+import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 const deviceWidth = Dimensions.get('window').width;
+import ViewMoreText from 'react-native-view-more-text';
 
-export default function Content({content_data}){
+export default function Content({navigation,route}){
+var { content_data,title,user_type_id } = route.params;
+
+navigation.setOptions({ title: title });
 console.log.apply(content_data)
 return (
-    <View>
-    <FlatList
-            style={{alignContent:"center",alignSelf:"center"}}
+    <View style={{alignContent:"center",alignItems:"center"}}>
+        <FlatList
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
             numColumns={2}
             data={content_data}
             renderItem={
               ({ item }) => 
-              <Item title={item.product_name} product_id={item.product_id} />
+              <Item title={item.product_name} product_id={item.product_id} price={item.price} />
               }
             keyExtractor={item => item.product_id.toString()}
         />
@@ -21,31 +26,81 @@ return (
 );
 }
 
-function Item({ id, title, selected, onSelect }) {
+function Item({ id, title,price, selected, onSelect }) {
     return (
-    //     <TouchableOpacity
-    //         onPress={() => null}
-    //         style={
-    //         { backgroundColor: selected ? '#6e3b6e' : '#f9c2ff' }
-    //         }
-    //     >
-    //          <Image style={{flex: 1}} resizeMode='cover' source={{ uri:'http://192.168.1.105/cafeproject/assets/product_image/test.jpeg'}}></Image>
-    //     <Text>{title}</Text>
-    //   </TouchableOpacity>
-
-<TouchableOpacity>
-<View style={{
-    backgroundColor:'#ffff',
-    flex:6,
-    margin:5,
-    alignContent:"center",
-
-}}>
-<Image style={{width: deviceWidth / 2,
-    height: deviceWidth / 2, alignSelf: 'center' }} resizeMode='contain' source={{ uri: 'http://192.168.1.105/cafeproject/assets/product_image/test.jpeg' }}></Image>
-<Text>{title}</Text>
-</View>
+<TouchableOpacity onPress={() =>  Alert.alert('Simple Button pressed')}>
+    <View style={{
+        backgroundColor:'#ffff',
+        alignItems:'stretch',
+        alignContent:"center",
+        padding:1
+   
+    }}>
+        <Image 
+            style={{width: deviceWidth / 2.05, height: deviceWidth / 2, alignSelf: 'center'}} 
+            resizeMode='contain' 
+            source={{ uri: 'http://192.168.1.105/cafeproject/assets/product_image/test.jpeg' }}>
+        </Image>
+        
+        <View style={{flex:6,flexDirection:'column',padding:5}}>
+            <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row'}}>
+                <Text style={{fontWeight:"bold",fontSize:18}}>{title}</Text>
+                </View>
+            <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row'}}>
+                <Text>P {price}</Text>
+            </View>
+            <View style={{width:deviceWidth/2.5}}>
+            <ViewMoreText
+            numberOfLines={3}
+            renderViewMore={renderViewMore}
+            renderViewLess={renderViewLess}
+            >
+            <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.  Duis aute irure dolor
+              in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum
+            </Text>
+          </ViewMoreText>
+            </View>
+        </View>
+    </View>
 </TouchableOpacity>
 
+
     );
+ 
+}
+
+function renderViewMore(onPress){
+    return(
+      <Text style={{color:"#616060" ,fontWeight:"bold"}} onPress={onPress}>Read more ▼</Text>
+    )
   }
+ function renderViewLess(onPress){
+    return(
+      <Text style={{color:"#616060",fontWeight:"bold"}} onPress={onPress}>Hide ▲</Text>
+    )
+  }
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.05)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    card: {
+      marginHorizontal: 10,
+      padding: 10,
+      borderRadius: 3,
+      borderColor: 'rgba(0,0,0,0.1)',
+      borderWidth: 1,
+      backgroundColor: '#fff',
+    },
+    cardText: {
+      fontSize: 14,
+    },
+  });

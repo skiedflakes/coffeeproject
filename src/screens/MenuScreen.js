@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
-import Main from './Menu/Main';
-
+import MainScreen from './Menu/Main';
+import ContentScreen from './Menu/Content';
 const Stack = createStackNavigator();
 export default class MenuScreen extends React.Component {
     state = {
@@ -11,7 +11,7 @@ export default class MenuScreen extends React.Component {
     componentDidMount(){
         this.getAllTags()
       }
-    
+
   render() {
     //  console.log(this.state.dataSource)
   return (
@@ -19,10 +19,18 @@ export default class MenuScreen extends React.Component {
 
       <Stack.Screen
         name="Main"
-        component={Main}
+        component={MainScreen}
         options={{ headerShown: false }}
         initialParams={{menu_list:this.state.dataSource}}
+ 
       />
+
+      <Stack.Screen
+        name="Content"
+        component={ContentScreen}
+        options={{ title: 'My home' }}
+      />
+
     </Stack.Navigator>
   );
 }
