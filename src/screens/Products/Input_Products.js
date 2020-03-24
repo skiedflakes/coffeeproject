@@ -1,6 +1,7 @@
 import * as React from 'react';
 import ImagePicker from 'react-native-image-picker';
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native';
+import { Dropdown } from 'react-native-material-dropdown';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
 
 export default class Input_Products extends React.Component {
   constructor(props) {
@@ -12,7 +13,8 @@ export default class Input_Products extends React.Component {
       },
       fileData: '',
       fileUri: '',
-      productName: ''
+      productName: '',
+      selectTags: '',
     }
   }
   
@@ -40,10 +42,86 @@ export default class Input_Products extends React.Component {
               onChangeText = {(text) => this.productName = text}/>
         </View>
 
-
+        <Dropdown style={{flex: 1}}
+              underlineColorAndroid="transparent"
+              label={'Select Tags'}
+              labelFontSize={12}
+              labelTextStyle={styles.dropdownLabel}
+              itemTextStyle={styles.dropdownItem}
+              style={styles.dropdownMainText}                         
+              style = {{color: '#252525'}}
+              baseColor={'#252525'}
+              value={'Paper'}
+              data={[
+                {
+                  value: 'Banana', id: '1',
+                }, {
+                  value: 'Mango', id: '2',
+                }, {
+                  value: 'Pear', id: '3',
+                }]}
+              onChangeText={this.onChangeText}
+          />
+          
+          <Button
+            title="Save"
+            onPress={() => this.saveProduct()}
+          />
 
       </View>
     );
+  }
+
+  onChangeText = (value, index, data) => {
+    const cityId = data[index].id;
+    this.selectTags = cityId
+  };
+
+  saveProduct(){
+    Alert.alert(this.productName+" "+this.selectTags);
+
+    const formData = new FormData();
+          formData.append('image', {
+            uri: this.state.fileUri,
+            name: 'my_photo.png',
+            type: 'image/png'
+          });
+          formData.append('Content-Type', 'image/png');
+
+    fetch('http://192.168.1.219/cafeproject/save_product.php',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+          console.log(responseJson.text);     
+        })
+        .catch((error) => {
+          console.log(error);
+      });
+  }
+
+  test(){
+    fetch('http://192.168.1.219/cafeproject/test.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_type_name: this.tags_name
+      })
+    }).then((response) => response.json())
+          .then((responseJson) => {
+
+            console.log(responseJson);
+
+          }).catch((error) => {
+            console.error(error);
+          });
   }
 
   chooseImage = () => {
@@ -73,7 +151,7 @@ export default class Input_Products extends React.Component {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         // alert(JSON.stringify(response));s
-        console.log('response', JSON.stringify(response));
+        console.log('responseuri', JSON.stringify(response.uri));
         this.setState({
           filePath: response,
           fileData: response.data,
@@ -144,8 +222,6 @@ export default class Input_Products extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 24,
   },
   paragraph: {
@@ -158,5 +234,16 @@ const styles = StyleSheet.create({
   logo: {
     height: 50,
     width: 50,
-  }
+  },
+  dropdownLabel: {
+    textTransform: 'uppercase',
+    color: '#252525',
+  },
+  dropdownItem: {
+    fontSize: 12,
+    color: '#252525',
+  },
+  dropdownMainText: {
+  },
 });
+
