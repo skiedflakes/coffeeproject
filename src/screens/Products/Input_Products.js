@@ -13,6 +13,7 @@ export default class Input_Products extends React.Component {
       },
       fileData: '',
       fileUri: '',
+      fileType: '',
       productName: '',
       selectTags: '',
     }
@@ -78,26 +79,27 @@ export default class Input_Products extends React.Component {
   };
 
   saveProduct(){
-    Alert.alert(this.productName+" "+this.selectTags);
+    Alert.alert(this.state.fileType);
 
     const formData = new FormData();
           formData.append('image', {
             uri: this.state.fileUri,
-            name: 'my_photo.png',
-            type: 'image/png'
+            name: 'my_photo',
+            type: this.state.fileType
           });
-          formData.append('Content-Type', 'image/png');
+    formData.append('Content-Type', this.state.fileType);
 
     fetch('http://192.168.1.219/cafeproject/save_product.php',{
         method: 'POST',
         headers: {
-            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data'
           },
           body: formData
       })
       .then((response) => response.json())
       .then((responseJson) => {
-          console.log(responseJson.text);     
+          console.log(responseJson);     
         })
         .catch((error) => {
           console.log(error);
@@ -112,7 +114,7 @@ export default class Input_Products extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        product_type_name: this.tags_name
+        product_type_name: this.fileData
       })
     }).then((response) => response.json())
           .then((responseJson) => {
@@ -151,11 +153,12 @@ export default class Input_Products extends React.Component {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         // alert(JSON.stringify(response));s
-        console.log('responseuri', JSON.stringify(response.uri));
+        console.log('response', JSON.stringify(response.type));
         this.setState({
           filePath: response,
           fileData: response.data,
-          fileUri: response.uri
+          fileUri: response.uri,
+          fileType: response.type
         });
       }
     });
@@ -180,11 +183,12 @@ export default class Input_Products extends React.Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
-        console.log('response', JSON.stringify(response));
+        console.log('response_uri', JSON.stringify(response.data));
         this.setState({
           filePath: response,
           fileData: response.data,
-          fileUri: response.uri
+          fileUri: response.uri,
+          fileType: response.type
         });
       }
     });
@@ -209,11 +213,12 @@ export default class Input_Products extends React.Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
-        console.log('response', JSON.stringify(response));
+        console.log('response', JSON.stringify(response.type));
         this.setState({
           filePath: response,
           fileData: response.data,
-          fileUri: response.uri
+          fileUri: response.uri,
+          fileType: response.type
         });
       }
     });
