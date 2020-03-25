@@ -64,15 +64,17 @@ export default class Tags extends React.Component {
   }
 
   saveTag(){
-    fetch('http://192.168.1.105/cafeproject/tags_save.php', {
+    const formData = new FormData();
+    formData.append('product_type_name', this.tags_name);
+
+    fetch('http://192.168.1.219/cafeproject/save_tags.php', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data'
       },
-      body: JSON.stringify({
-        product_type_name: this.tags_name
-      })
+      body: formData
+
     }).then((response) => response.json())
           .then((responseJson) => {
 
@@ -93,10 +95,10 @@ export default class Tags extends React.Component {
     }
 
     getAllTags(){
-      fetch('http://192.168.1.105/cafeproject/tags_get_all.php')
+      fetch('http://192.168.1.219/cafeproject/get_all_tags.php')
       .then((response) => response.json())
             .then((responseJson) => {
-              var data = responseJson.product_data.map(function(item) {
+              var data = responseJson.array_tags.map(function(item) {
                 return {
                   product_category_id: item.product_category_id,
                   product_type_name: item.product_type_name

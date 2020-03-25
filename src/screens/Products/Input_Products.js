@@ -16,7 +16,13 @@ export default class Input_Products extends React.Component {
       fileType: '',
       productName: '',
       selectTags: '',
+      price: '',
+      dataSource: [],
     }
+  }
+
+  componentDidMount(){
+    this.getAllTags()
   }
   
   render() {
@@ -43,6 +49,14 @@ export default class Input_Products extends React.Component {
               onChangeText = {(text) => this.productName = text}/>
         </View>
 
+        <View style={{marginTop: 10}}>
+        <TextInput
+              placeholder = "Enter price here..."
+              placeholderTextColor = "#9a73ef"
+              autoCapitalize = "none"
+              onChangeText = {(text) => this.price = text}/>
+        </View>
+
         <Dropdown style={{flex: 1}}
               underlineColorAndroid="transparent"
               label={'Select Tags'}
@@ -52,15 +66,8 @@ export default class Input_Products extends React.Component {
               style={styles.dropdownMainText}                         
               style = {{color: '#252525'}}
               baseColor={'#252525'}
-              value={'Paper'}
-              data={[
-                {
-                  value: 'Banana', id: '1',
-                }, {
-                  value: 'Mango', id: '2',
-                }, {
-                  value: 'Pear', id: '3',
-                }]}
+              value={'Select'}
+              data={this.state.dataSource}
               onChangeText={this.onChangeText}
           />
           
@@ -74,56 +81,79 @@ export default class Input_Products extends React.Component {
   }
 
   onChangeText = (value, index, data) => {
-    const cityId = data[index].id;
-    this.selectTags = cityId
+    const tag_id = data[index].id;
+    this.selectTags = tag_id
+    console.log(tag_id)
   };
 
-  saveProduct(){
-    Alert.alert(this.state.fileType);
-
-    const formData = new FormData();
-          formData.append('image', {
-            uri: this.state.fileUri,
-            name: 'my_photo',
-            type: this.state.fileType
-          });
-    formData.append('Content-Type', this.state.fileType);
-
-    fetch('http://192.168.1.219/cafeproject/save_product.php',{
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data'
-          },
-          body: formData
-      })
-      .then((response) => response.json())
-      .then((responseJson) => {
-          console.log(responseJson);     
-        })
-        .catch((error) => {
-          console.log(error);
+  getAllTags(){
+    fetch('http://192.168.1.219/cafeproject/get_all_tags.php')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      var data = responseJson.array_tags.map(function(item) {
+        return {
+          id: item.product_category_id,
+          value: item.product_type_name
+        };
       });
+      console.log(data)
+      this.setState({
+        dataSource: data
+      })
+
+    }).catch((error) => {
+      console.error(error);
+      Alert.alert('Connection Error');
+    });
   }
 
-  test(){
-    fetch('http://192.168.1.219/cafeproject/test.php', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        product_type_name: this.fileData
-      })
-    }).then((response) => response.json())
-          .then((responseJson) => {
-
-            console.log(responseJson);
-
-          }).catch((error) => {
-            console.error(error);
-          });
+  saveProduct(){
+    if(!this.productName){
+      Alert.alert('Please enter Product name');
+    } else if(!this.price){
+      Alert.alert('Please enter Product price');
+    } else if(!this.selectTags){
+      Alert.alert('Please select tag');
+    } else {
+      const formData = new FormData();
+      formData.append('product_name', this.productName);
+      formData.append('product_category_id', this.selectTags);
+      formData.append('price', this.price);
+      formData.append('image', {
+              uri: this.state.fileUri,
+              name: 'my_photo',
+              type: this.state.fileType
+            });
+      // formData.append('Content-Type', this.state.fileType);
+  
+      fetch('http://192.168.1.219/cafeproject/save_product.php',{
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            },
+            body: formData
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          
+            const first = responseJson.response[0]
+            console.log(first)
+            if(first.status == 'success'){
+              Alert.alert('Success !');
+            } 
+            else if(first.status == 'duplicate'){
+              Alert.alert('Duplicate !');
+            }
+            else {
+              Alert.alert('Failed !');
+            }    
+          })
+          .catch((error) => {
+            console.log(error);
+            Alert.alert('Connection Error');
+        });
+    }
   }
 
   chooseImage = () => {
