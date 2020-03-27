@@ -66,7 +66,6 @@ export default class Tags extends React.Component {
   saveTag(){
     const formData = new FormData();
     formData.append('product_type_name', this.tags_name);
-
     fetch(global.global_url+'save_tags.php', {
       method: 'POST',
       headers: {

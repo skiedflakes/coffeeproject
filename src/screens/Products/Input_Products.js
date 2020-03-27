@@ -125,8 +125,9 @@ export default class Input_Products extends React.Component {
               type: this.state.fileType
             });
       // formData.append('Content-Type', this.state.fileType);
-  
+
       fetch(global.global_url+'save_product.php',{
+
           method: 'POST',
           headers: {
               'Accept': 'application/json',
