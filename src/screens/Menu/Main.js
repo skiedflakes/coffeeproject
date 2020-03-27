@@ -19,10 +19,10 @@ export default function Main ({route,navigation,body_content}) {
       setcontent(<Content category_id={0}/>);
       // Do something when the screen is focused
       const fetchUser = async () => {
-            fetch('http://192.168.1.105/cafeproject/tags_get_all.php')
+            fetch(global.global_url+'get_all_tags.php')
             .then((response) => response.json())
                   .then((responseJson) => {
-                    var data = responseJson.product_data.map(function(item) {
+                    var data = responseJson.array_tags.map(function(item) {
                       return {
                         product_category_id: item.product_category_id,
                         product_type_name: item.product_type_name
@@ -39,48 +39,6 @@ export default function Main ({route,navigation,body_content}) {
     }, [])
   );
 
-function RowItem ({ title,product_category_id}) {
-    return (
-        <TouchableOpacity onPress={() => getContent(title,product_category_id)}>
-            <View style={styles.item}>
-              <View style={{flex:3,flexDirection:'row'}}>
-              <MCI name="food" size={25} color={"#393737"}/>
-                <Text style={styles.title}>{title}</Text>
-              </View>
-             
-                <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
-            </View>
-        </TouchableOpacity>
-    );
-}
-
-function getContent(title,product_category_id){
-  fetch('http://192.168.1.105/cafeproject/menu/get_menu_details.php', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      product_category_id: product_category_id
-    })
-  }).then((response) => response.json())
-        .then((responseJson) => {
-          var data = responseJson.product_data.map(function(item) {
-            return {
-              product_id: item.product_id,
-              product_name: item.product_name,
-              price: item.price
-            };
-          });
-          console.log(data);
-
-          navigation.navigate("Content",{title,content_data:data});
-          // setcontent(<Content content_data={data}/>);
-        }).catch((error) => {
-          console.error(error);
-        });
-  }
   return (
     <View style={styles.main}>
     <View style={styles.header} >
@@ -108,7 +66,9 @@ function getContent(title,product_category_id){
             renderItem={
               ({ item }) => 
               <RowItem
-               title={item.product_type_name} product_category_id={item.product_category_id} />
+                navigation={navigation}
+                title={item.product_type_name} 
+                product_category_id={item.product_category_id} />
               }
             keyExtractor={item => item.product_category_id.toString()}
         />
@@ -118,6 +78,52 @@ function getContent(title,product_category_id){
     </View>
     </View>
   );
+}
+
+
+function RowItem ({navigation,title,product_category_id}) {
+  return (
+      <TouchableOpacity onPress={() => getContent(navigation,title,product_category_id)}>
+          <View style={styles.item}>
+            <View style={{flex:3,flexDirection:'row'}}>
+            <MCI name="food" size={25} color={"#393737"}/>
+              <Text style={styles.title}>{title}</Text>
+            </View>
+           
+              <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
+          </View>
+      </TouchableOpacity>
+  );
+}
+
+function getContent(navigation,title,product_category_id){
+const formData = new FormData();
+formData.append('product_category_id',product_category_id);
+
+
+fetch(global.global_url+'menu/get_menu_details.php', {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'multipart/form-data',
+    },
+    body: formData
+}).then((response) => response.json())
+      .then((responseJson) => {
+        var data = responseJson.product_details.map(function(item) {
+          return {
+            product_id: item.product_id,
+            product_name: item.product_name,
+            price: item.price,
+            image_url: item.image_url
+          };
+        });
+        console.log(data)
+        navigation.navigate("Content",{title,content_data:data});
+        // setcontent(<Content content_data={data}/>);
+      }).catch((error) => {
+        console.error(error);
+      });
 }
 
 const styles = StyleSheet.create({
@@ -151,10 +157,11 @@ const styles = StyleSheet.create({
         paddingLeft:10,
         backgroundColor:'#ffff',
         padding:5,
+        alignContent:"center"
       },
       title: {
         color:'#4A4A4A',
-        padding:5,
+        padding:10,
         fontSize: 18,
       },
 })

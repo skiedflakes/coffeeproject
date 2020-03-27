@@ -31,15 +31,17 @@ export default class MenuScreen extends React.Component {
         options={{ title: 'My home' }}
       />
 
+ 
+
     </Stack.Navigator>
   );
 }
 
 getAllTags(){
-    fetch('http://192.168.1.105/cafeproject/tags_get_all.php')
+    fetch(global.global_url+'get_all_tags.php')
     .then((response) => response.json())
           .then((responseJson) => {
-            var data = responseJson.product_data.map(function(item) {
+            var data = responseJson.array_tags.map(function(item) {
               return {
                 product_category_id: item.product_category_id,
                 product_type_name: item.product_type_name
@@ -57,11 +59,5 @@ getAllTags(){
 
 }
 
-
-
-const styles = StyleSheet.create({
-  
-  
-})
 
 

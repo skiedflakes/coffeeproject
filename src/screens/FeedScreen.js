@@ -10,7 +10,7 @@ export default function FeedScreen () {
 
   return (
     <View style={{ flex: 6, alignItems: 'center', justifyContent: 'center',flexDirection:"column"}}>
-  
+      <Text>test</Text>
     </View>
   );
 }

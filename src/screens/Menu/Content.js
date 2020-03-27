@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet } from 'react-native';
+import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet,Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 const deviceWidth = Dimensions.get('window').width;
 import ViewMoreText from 'react-native-view-more-text';
@@ -10,7 +10,7 @@ var { content_data,title,user_type_id } = route.params;
 navigation.setOptions({ title: title });
 console.log.apply(content_data)
 return (
-    <View style={{alignContent:"center",alignItems:"center"}}>
+    <View style={{flexDirection: 'column',flex: 1}}>
         <FlatList
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
@@ -18,37 +18,37 @@ return (
             data={content_data}
             renderItem={
               ({ item }) => 
-              <Item title={item.product_name} product_id={item.product_id} price={item.price} />
+              <Item title={item.product_name} product_id={item.product_id} price={item.price} image_url={item.image_url} />
               }
             keyExtractor={item => item.product_id.toString()}
+           
         />
+        <Button title="View your cart"></Button>
     </View>
 );
 }
 
-function Item({ id, title,price, selected, onSelect }) {
+function Item({ id, title,price,image_url, selected, onSelect }) {
+ 
     return (
 <TouchableOpacity onPress={() =>  Alert.alert('Simple Button pressed')}>
     <View style={{
         backgroundColor:'#ffff',
-        alignItems:'stretch',
-        alignContent:"center",
         padding:1
-   
     }}>
         <Image 
-            style={{width: deviceWidth / 2.05, height: deviceWidth / 2, alignSelf: 'center'}} 
+            style={{width: deviceWidth / 2.06, height: deviceWidth / 2, alignSelf: 'center'}} 
             resizeMode='contain' 
-            source={{ uri: 'http://192.168.1.105/cafeproject/assets/product_image/test.jpeg' }}>
+            source={{ uri: global.global_url+image_url}}>
         </Image>
         
-        <View style={{flex:6,flexDirection:'column',padding:5}}>
+        <View style={{flex:6,flexDirection:'column',padding:5,
+          borderBottomWidth :1,
+          borderBottomColor: '#B3B2B2',}}>
             <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row'}}>
                 <Text style={{fontWeight:"bold",fontSize:18}}>{title}</Text>
                 </View>
-            <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row'}}>
-                <Text>P {price}</Text>
-            </View>
+          
             <View style={{width:deviceWidth/2.5}}>
             <ViewMoreText
             numberOfLines={3}
@@ -61,9 +61,12 @@ function Item({ id, title,price, selected, onSelect }) {
               nisi ut aliquip ex ea commodo consequat.  Duis aute irure dolor
               in reprehenderit in voluptate velit esse cillum dolore eu fugiat
               nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum
+              sunt in culpa qui officia deserunt mollit anim id est laborumrr
             </Text>
           </ViewMoreText>
+            <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row-reverse',marginTop:5}}>
+                <Text style={{  fontSize: 18,}}>P {price}</Text>
+            </View>
             </View>
         </View>
     </View>
