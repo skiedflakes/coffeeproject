@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Image, TextInput, Button, Alert, FlatList } from 'react-native';
+import { Text, View, StyleSheet, Image, TextInput, Button, Alert, FlatList, TouchableOpacity } from 'react-native';
 
 export default class Tags extends React.Component {
   constructor(props) {
     super(props);
       this.state = {
         tags_name: '',
-        dataSource: []
+        dataSource: [],
+        tag_id: '',
       }
   }
 
@@ -40,16 +41,17 @@ export default class Tags extends React.Component {
 
   renderItem = ({item}) => {
     return (
+      <TouchableOpacity onPress={() => this._onPress(item.product_category_id)}>
       <View>
-        <Text>
-        {item.product_type_name} 
-        </Text>
-        <Text>
-        {item.product_category_id} 
-        </Text>
+        <Text>{item.product_type_name}</Text>
       </View>
+      </TouchableOpacity>
     )
   }
+
+  _onPress(tag_id){
+    Alert.alert(tag_id);
+  };
 
   FlatListItemSeparator = () => {
     return (
@@ -64,33 +66,37 @@ export default class Tags extends React.Component {
   }
 
   saveTag(){
-    const formData = new FormData();
-    formData.append('product_type_name', this.tags_name);
-    fetch(global.global_url+'save_tags.php', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'multipart/form-data'
-      },
-      body: formData
+    if(!this.tags_name){
+      Alert.alert('Please enter name');
+    } else {
+      const formData = new FormData();
+      formData.append('product_type_name', this.tags_name);
+      fetch(global.global_url+'save_tags.php', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
+        },
+        body: formData
 
-    }).then((response) => response.json())
-          .then((responseJson) => {
+      }).then((response) => response.json())
+        .then((responseJson) => {
 
-            const first = responseJson.save_response[0]
-            console.log(first)
-            if(first.status == 'success'){
-              Alert.alert('Success !');
-              this.getAllTags()
-            } else if(first.status == 'failed'){
-              Alert.alert('failed !');
-            } else {
-              Alert.alert('Duplicate name !');
-            }
+          const first = responseJson.save_response[0]
+          console.log(first)
+          if(first.status == 'success'){
+            Alert.alert('Success !');
+            this.getAllTags()
+          } else if(first.status == 'failed'){
+            Alert.alert('failed !');
+          } else {
+            Alert.alert('Duplicate name !');
+          }
 
-          }).catch((error) => {
-            console.error(error);
-          });
+        }).catch((error) => {
+          console.error(error);
+        });
+      }
     }
 
     getAllTags(){
