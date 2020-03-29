@@ -9,20 +9,15 @@ export default class Tags extends React.Component {
         dataSource: [],
         tag_id: '',
         get_tag: '',
+        back_tag: '',
         selected_list: '',
-        isShow: false,
+        show: true,
+        selected_product: '',
       }
   }
 
   componentDidMount(){
     this.getAllTags(this.get_tag)
-  }
-
-  toggleStatus(){
-    this.setState({
-      isShow:!this.state.isShow
-    });
-    console.log('toggle button handler: '+ this.state.isShow);
   }
 
   render() {
@@ -37,20 +32,18 @@ export default class Tags extends React.Component {
             title="Save tag"
             onPress={() => this.saveTag()}
           />
+          
+
+        {this.state.show ? (
           <Button
-            title="Back"
-            onPress={() => this.backButton()}
-          />
-          {renderIf(this.state.status)(
-          <Text style={styles.welcome}>
-            I am dynamic text View
-          </Text>
-          )}
-          <TouchableHighlight onPress={()=>this.toggleStatus()}>
-          <Text>
-            touchme
-          </Text>
-        </TouchableHighlight>
+          title="Back"
+          onPress={() => this.backButton()}
+        />
+        ) : null}
+
+        {/* <Button title="Hide/Show Component" onPress={this.ShowHideComponent} /> */}
+        
+        <Text>{this.state.selected_product}</Text>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={ this.state.dataSource }
@@ -63,9 +56,17 @@ export default class Tags extends React.Component {
     );
   }
 
+  ShowHideComponent = () => {
+    if (this.state.show == true) {
+      this.setState({ show: false });
+    } else {
+      this.setState({ show: true });
+    }
+  };
+
   renderItem = ({item}) => {
     return (
-      <TouchableOpacity onPress={() => this._onPress(item.product_category_id, item.selected)}>
+      <TouchableOpacity style={{width: 300}} onPress={() => this._onPress(item.product_category_id, item.selected, item.product_type_name)}>
       <View>
         <Text>{item.product_type_name}</Text>
       </View>
@@ -73,9 +74,10 @@ export default class Tags extends React.Component {
     )
   }
 
-  _onPress(tag_id, selected_list){
+  _onPress(tag_id, selected_list, selected_product){
     this.get_tag = selected_list;
     this.tag_id = tag_id;
+    this.state.selected_product += " > "+selected_product;
     if(selected_list != ''){
       this.getAllTags(this.get_tag)
     }
@@ -94,7 +96,14 @@ export default class Tags extends React.Component {
   }
 
   backButton(){
+    this.state.selected_product = '';
+    if(this.get_tag == 'header'){
+      this.back_tag = '';
+    } else if(this.get_tag == 'details'){
+      this.back_tag = 'header';
+    }
 
+    this.getAllTags('')
   }
 
   saveTag(){
