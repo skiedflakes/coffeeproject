@@ -12,7 +12,9 @@ export default class Tags extends React.Component {
         back_tag: '',
         selected_list: '',
         show: true,
+        isTagsEmpty: false,
         selected_product: '',
+        click_array: [],
       }
   }
 
@@ -36,6 +38,8 @@ export default class Tags extends React.Component {
         {/* <Button title="Hide/Show Component" onPress={this.ShowHideComponent} /> */}
         
         <Text style={{marginTop: 20}}>{this.state.selected_product}</Text>
+
+        {this.state.isTagsEmpty ? (
         <FlatList
           showsVerticalScrollIndicator={false}
           data={ this.state.dataSource }
@@ -44,9 +48,11 @@ export default class Tags extends React.Component {
           // keyExtractor={(item, index) => index}
           keyExtractor={item => item.product_category_id.toString()}
         />
+        ) : <Text style={{alignItems: "center", margin: 50}}>No data found...</Text>}
+
         {this.state.show ? (
           <Button
-          title="Back"
+          title="Refresh"
           onPress={() => this.backButton()}
         />
         ) : null}
@@ -76,8 +82,13 @@ export default class Tags extends React.Component {
     this.get_tag = selected_list;
     this.tag_id = tag_id;
 
-    this.state.selected_product += " > "+selected_product;
+    let array=this.state.click_array;
+    array.push(this.tag_id);
+    this.setState({array})
+    console.log(array)
+
     if(selected_list != ''){
+      this.state.selected_product += " > "+selected_product;
       this.getAllTags(this.get_tag)
     }
   };
@@ -95,15 +106,12 @@ export default class Tags extends React.Component {
   }
 
   backButton(){
-    
-    this.state.selected_product = '';
     if(this.get_tag == 'header'){
       this.back_tag = '';
       this.get_tag = '';
     } else if(this.get_tag == 'details'){
       this.back_tag = 'header';
     }
-
     this.getAllTags('')
   }
 
@@ -187,7 +195,14 @@ export default class Tags extends React.Component {
                 dataSource: data
               })
 
+              if (this.state.dataSource && this.state.dataSource.length) {
+                this.setState({ isTagsEmpty: true });
+              } else {
+                this.setState({ isTagsEmpty: false });
+              }
+
               if(!get_tag){
+                this.state.selected_product = '';
                 this.setState({ show: false });
               } else {
                 this.setState({ show: true });
