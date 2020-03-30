@@ -23,27 +23,19 @@ export default class Tags extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <TextInput
-              placeholder = "Enter tag name here..."
-              placeholderTextColor = "#9a73ef"
-              autoCapitalize = "none"
-              onChangeText = {(text) => this.tags_name = text}/>
+        <TextInput style={styles.input}
+          placeholder = "Enter tag name here..."
+          placeholderTextColor = "#9a73ef"
+          autoCapitalize = "none"
+          onChangeText = {(text) => this.tags_name = text}/>
         <Button
             title="Save tag"
             onPress={() => this.saveTag()}
           />
-          
-
-        {this.state.show ? (
-          <Button
-          title="Back"
-          onPress={() => this.backButton()}
-        />
-        ) : null}
-
+        
         {/* <Button title="Hide/Show Component" onPress={this.ShowHideComponent} /> */}
         
-        <Text>{this.state.selected_product}</Text>
+        <Text style={{marginTop: 20}}>{this.state.selected_product}</Text>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={ this.state.dataSource }
@@ -52,6 +44,12 @@ export default class Tags extends React.Component {
           // keyExtractor={(item, index) => index}
           keyExtractor={item => item.product_category_id.toString()}
         />
+        {this.state.show ? (
+          <Button
+          title="Back"
+          onPress={() => this.backButton()}
+        />
+        ) : null}
       </View>
     );
   }
@@ -66,7 +64,7 @@ export default class Tags extends React.Component {
 
   renderItem = ({item}) => {
     return (
-      <TouchableOpacity style={{width: 300}} onPress={() => this._onPress(item.product_category_id, item.selected, item.product_type_name)}>
+      <TouchableOpacity style={{width: 300, height: 30}} onPress={() => this._onPress(item.product_category_id, item.selected, item.product_type_name)}>
       <View>
         <Text>{item.product_type_name}</Text>
       </View>
@@ -77,6 +75,7 @@ export default class Tags extends React.Component {
   _onPress(tag_id, selected_list, selected_product){
     this.get_tag = selected_list;
     this.tag_id = tag_id;
+
     this.state.selected_product += " > "+selected_product;
     if(selected_list != ''){
       this.getAllTags(this.get_tag)
@@ -96,9 +95,11 @@ export default class Tags extends React.Component {
   }
 
   backButton(){
+    
     this.state.selected_product = '';
     if(this.get_tag == 'header'){
       this.back_tag = '';
+      this.get_tag = '';
     } else if(this.get_tag == 'details'){
       this.back_tag = 'header';
     }
@@ -157,9 +158,11 @@ export default class Tags extends React.Component {
       if(!get_tag){
         formData.append('get_tag', "product");
         formData.append('id', "");
+        this.setState({ show: false });
       } else {
         formData.append('get_tag', get_tag);
         formData.append('id', this.tag_id);
+        this.setState({ show: true });
       }
 
       fetch(global.global_url+'get_all_tags.php',{
@@ -183,6 +186,12 @@ export default class Tags extends React.Component {
               this.setState({
                 dataSource: data
               })
+
+              if(!get_tag){
+                this.setState({ show: false });
+              } else {
+                this.setState({ show: true });
+              }
   
             }).catch((error) => {
               console.error(error);
@@ -196,4 +205,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
+  input: {
+    marginBottom: 5,
+    height: 40,
+    borderColor: '#7a42f4',
+    borderWidth: 1
+ },
 });

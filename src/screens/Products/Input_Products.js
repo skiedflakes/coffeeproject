@@ -109,7 +109,7 @@ export default class Input_Products extends React.Component {
   };
 
   getAllTags(){
-    fetch(global.global_url+'get_all_tags.php')
+    fetch(global.global_url+'get_tags_dropdrown.php')
     .then((response) => response.json())
     .then((responseJson) => {
       var data = responseJson.array_tags.map(function(item) {
