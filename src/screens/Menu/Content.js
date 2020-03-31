@@ -5,10 +5,9 @@ const deviceWidth = Dimensions.get('window').width;
 import ViewMoreText from 'react-native-view-more-text';
 
 export default function Content({navigation,route}){
-var { content_data,title,user_type_id } = route.params;
-
+var { content_data,title,product_category_id } = route.params;
 navigation.setOptions({ title: title });
-console.log.apply(content_data)
+
 return (
     <View style={{flexDirection: 'column',flex: 1}}>
         <FlatList
@@ -18,7 +17,13 @@ return (
             data={content_data}
             renderItem={
               ({ item }) => 
-              <Item title={item.product_name} product_id={item.product_id} price={item.price} image_url={item.image_url} />
+              <Item 
+              navigation={navigation} 
+              title={item.product_name} 
+              product_id={item.product_id} 
+              price={item.price} 
+              image_url={item.image_url}
+              product_category_id ={product_category_id} />
               }
             keyExtractor={item => item.product_id.toString()}
            
@@ -28,12 +33,13 @@ return (
 );
 }
 
-function Item({ id, title,price,image_url, selected, onSelect }) {
- 
+function Item({navigation, product_id, title,price,image_url,product_category_id}) {
+  
     return (
-<TouchableOpacity onPress={() =>  Alert.alert('Simple Button pressed')}>
+<TouchableOpacity onPress={() => open_content_details(navigation,product_id,product_category_id)}>
     <View style={{
         backgroundColor:'#ffff',
+        paddingTop:5,
         padding:1
     }}>
         <Image 
@@ -86,6 +92,39 @@ function renderViewMore(onPress){
     return(
       <Text style={{color:"#616060",fontWeight:"bold"}} onPress={onPress}>Hide ▲</Text>
     )
+  }
+
+  function open_content_details(navigation,product_id,product_category_id){
+
+
+    const formData = new FormData();
+    formData.append('product_category_id',product_category_id);
+    
+    
+    fetch(global.global_url+'menu/get_dropdown_details.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        },
+        body: formData
+    }).then((response) => response.json())
+          .then((responseJson) => {
+            var data = responseJson.dropdown_details.map(function(item) {
+              return {
+                dropdown_header_id: item.dropdown_header_id,
+                title: item.name,
+                required: item.required,
+                data: item.data,
+              };
+            });
+            console.log(data)
+
+            navigation.navigate("Content Details",{product_id,product_category_id,content_data:data});
+          }).catch((error) => {
+            console.error(error);
+          });
+
   }
 
   const styles = StyleSheet.create({

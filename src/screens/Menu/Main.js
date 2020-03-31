@@ -44,11 +44,12 @@ export default function Main ({route,navigation,body_content}) {
     <View style={styles.header} >
     <View style={{  flexDirection: 'row', padding:2,}} >
         <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-        <Icon name="comments" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
         <Icon name="cart-plus" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <Icon name="comments" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+        </TouchableOpacity>
+
     </View>
     <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
       <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>Menu</Text>
@@ -118,9 +119,7 @@ fetch(global.global_url+'menu/get_menu_details.php', {
             image_url: item.image_url
           };
         });
-        console.log(data)
-        navigation.navigate("Content",{title,content_data:data});
-        // setcontent(<Content content_data={data}/>);
+        navigation.navigate("Content",{title,content_data:data,product_category_id});
       }).catch((error) => {
         console.error(error);
       });

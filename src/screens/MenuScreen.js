@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MainScreen from './Menu/Main';
 import ContentScreen from './Menu/Content';
+import Content_DetailsScreen from './Menu/Content_details';
 const Stack = createStackNavigator();
 export default class MenuScreen extends React.Component {
     state = {
@@ -31,14 +32,16 @@ export default class MenuScreen extends React.Component {
         options={{ title: 'My home' }}
       />
 
- 
-
+      <Stack.Screen
+        name="Content Details"
+        component={Content_DetailsScreen}
+      />
     </Stack.Navigator>
   );
 }
 
 getAllTags(){
-    fetch(global.global_url+'get_all_tags.php')
+    fetch(global.global_url+'menu/get_all_tags.php')
     .then((response) => response.json())
           .then((responseJson) => {
             var data = responseJson.array_tags.map(function(item) {
