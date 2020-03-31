@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ImagePicker from 'react-native-image-picker';
 import { Dropdown } from 'react-native-material-dropdown';
-import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
+import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, Button, Alert, ScrollView } from 'react-native';
 
 export default class Input_Products extends React.Component {
   constructor(props) {
@@ -17,6 +17,7 @@ export default class Input_Products extends React.Component {
       productName: '',
       selectTags: '',
       price: '',
+      details: '',
       dataSource: [],
     }
   }
@@ -27,37 +28,43 @@ export default class Input_Products extends React.Component {
   
   render() {
     return (
+      <ScrollView>
       <View style={styles.container}>
-
-        <TouchableOpacity onPress={this.chooseImage}>
-          <Text>Choose File</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={this.launchCamera}>
+        
+        {/* <TouchableOpacity onPress={this.launchCamera}>
           <Text>Directly Launch Camera</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={this.launchImageLibrary}>
           <Text>Directly Launch Image Library</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        <View style={{marginTop: 10}}>
-        <TextInput
+        <View style={{marginBottom: 15}}>
+          {this.renderFileUri()}
+          <TouchableOpacity style={{alignSelf: "center", marginTop: 5}} onPress={this.chooseImage}>
+          <Text>Choose File</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TextInput style={styles.input}
               placeholder = "Enter name here..."
               placeholderTextColor = "#9a73ef"
               autoCapitalize = "none"
               onChangeText = {(text) => this.productName = text}/>
-        </View>
 
-        <View style={{marginTop: 10}}>
-        <TextInput
+        <TextInput style={styles.input}
               placeholder = "Enter price here..."
               placeholderTextColor = "#9a73ef"
               autoCapitalize = "none"
               onChangeText = {(text) => this.price = text}/>
-        </View>
 
-        <Dropdown style={{flex: 1}}
+        <TextInput style={styles.input}
+              placeholder = "Enter details here..."
+              placeholderTextColor = "#9a73ef"
+              autoCapitalize = "none"
+              onChangeText = {(text) => this.details = text}/>
+
+        <Dropdown
               underlineColorAndroid="transparent"
               label={'Select Tags'}
               labelFontSize={12}
@@ -77,7 +84,22 @@ export default class Input_Products extends React.Component {
           />
 
       </View>
+      </ScrollView>
     );
+  }
+
+  renderFileUri() {
+    if (this.state.fileUri) {
+      return <Image
+        source={{ uri: this.state.fileUri }}
+        style={styles.images}
+      />
+    } else {
+      return <Image
+        // source={require('./src/assets/galeryImages.jpg')}
+        style={styles.images}
+      />
+    }
   }
 
   onChangeText = (value, index, data) => {
@@ -87,7 +109,7 @@ export default class Input_Products extends React.Component {
   };
 
   getAllTags(){
-    fetch(global.global_url+'get_all_tags.php')
+    fetch(global.global_url+'get_tags_dropdrown.php')
     .then((response) => response.json())
     .then((responseJson) => {
       var data = responseJson.array_tags.map(function(item) {
@@ -114,10 +136,13 @@ export default class Input_Products extends React.Component {
       Alert.alert('Please enter Product price');
     } else if(!this.selectTags){
       Alert.alert('Please select tag');
+    } else if(!this.state.fileUri){
+      Alert.alert('Please select image');
     } else {
       const formData = new FormData();
       formData.append('product_name', this.productName);
       formData.append('product_category_id', this.selectTags);
+      formData.append('product_details', this.details);
       formData.append('price', this.price);
       formData.append('image', {
               uri: this.state.fileUri,
@@ -127,7 +152,6 @@ export default class Input_Products extends React.Component {
       // formData.append('Content-Type', this.state.fileType);
 
       fetch(global.global_url+'save_product.php',{
-
           method: 'POST',
           headers: {
               'Accept': 'application/json',
@@ -159,7 +183,7 @@ export default class Input_Products extends React.Component {
 
   chooseImage = () => {
     let options = {
-      title: 'Select Image',
+      title: 'Select Image as',
       // customButtons: [
       //   { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
       // ],
@@ -244,7 +268,7 @@ export default class Input_Products extends React.Component {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
-        console.log('response', JSON.stringify(response.type));
+        console.log('response', JSON.stringify(this.state.filepath));
         this.setState({
           filePath: response,
           fileData: response.data,
@@ -281,4 +305,18 @@ const styles = StyleSheet.create({
   },
   dropdownMainText: {
   },
+  images: {
+    width: 150,
+    height: 150,
+    borderColor: 'black',
+    borderWidth: 1,
+    marginHorizontal: 3,
+    alignSelf: "center"
+  },
+  input: {
+    marginBottom: 5,
+    height: 40,
+    borderColor: '#7a42f4',
+    borderWidth: 1
+ }
 });
