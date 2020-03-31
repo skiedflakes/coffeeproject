@@ -204,8 +204,15 @@ export default class Tags extends React.Component {
               if(!get_tag){
                 this.state.selected_product = '';
                 this.setState({ show: false });
+                //Alert.alert('product')
               } else {
                 this.setState({ show: true });
+
+                if(get_tag == 'header'){
+                  //Alert.alert('header')
+                } else if(get_tag == 'details'){
+                  //Alert.alert('details')
+                }
               }
   
             }).catch((error) => {
