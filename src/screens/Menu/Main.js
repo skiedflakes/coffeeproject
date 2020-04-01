@@ -19,7 +19,7 @@ export default function Main ({route,navigation,body_content}) {
       setcontent(<Content category_id={0}/>);
       // Do something when the screen is focused
       const fetchUser = async () => {
-            fetch(global.global_url+'get_all_tags.php')
+            fetch(global.global_url+'menu/get_all_tags.php')
             .then((response) => response.json())
                   .then((responseJson) => {
                     var data = responseJson.array_tags.map(function(item) {
