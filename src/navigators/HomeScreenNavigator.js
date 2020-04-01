@@ -22,8 +22,8 @@ export default class HomeScreenNavigator extends React.Component{
     //Setting up global variable
     global.g_user_id = '';
     global.g_name = '';
-    global.g_user_type_id = '';
-    global.global_url = 'http://192.168.1.219/cafeproject/';
+    global.g_user_type_id = ''; 
+    global.global_url = 'http://skiedflakes.site/projects/cafeproject/';
   }
 
     render(){
