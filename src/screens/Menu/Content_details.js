@@ -21,32 +21,37 @@ export default function Content_details ({navigation,route}) {
        
          const formatted_array = mitem.data.map(item =>{
             if (id == item.details_id){
-              // console.log(item.selected);
+              console.log(item.selected);
               return{
-                item,
+                ...item,
                 selected: !item.selected,
               };
+            }else{
+              return{
+                ...item,
+                
+              };
             }
-            return{item};
+         
           })
 
           return{
             ...mitem,
             data: formatted_array,
-          };;
+          };
         }),
       ];
       
 
       setData(newData);
 
-      newData.map(mitem =>{
+      // newData.map(mitem =>{
   
-        mitem.data.map(item =>{
-          console.log('L63 mew data == ',item.selected);
-        })
+      //   mitem.data.map(item =>{
+      //     console.log('L63 mew data == ',item.selected);
+      //   })
       
-      })
+      // })
   
     });
   
