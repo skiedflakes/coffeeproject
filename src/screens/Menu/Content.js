@@ -36,7 +36,7 @@ return (
 function Item({navigation, product_id, title,price,image_url,product_category_id}) {
   
     return (
-<TouchableOpacity onPress={() => open_content_details(navigation,product_id,product_category_id)}>
+<TouchableOpacity onPress={() => open_content_details(navigation,product_id,price,product_category_id)}>
     <View style={{
         backgroundColor:'#ffff',
         paddingTop:5,
@@ -94,7 +94,7 @@ function renderViewMore(onPress){
     )
   }
 
-  function open_content_details(navigation,product_id,product_category_id){
+  function open_content_details(navigation,product_id,price,product_category_id){
 
 
     const formData = new FormData();
@@ -110,17 +110,27 @@ function renderViewMore(onPress){
         body: formData
     }).then((response) => response.json())
           .then((responseJson) => {
-            var data = responseJson.dropdown_details.map(function(item) {
+            var data_header = responseJson.header.map(function(item) {
               return {
-                dropdown_header_id: item.dropdown_header_id,
-                title: item.name,
+                header_id: item.header_id,
+                header_name: item.name,
                 required: item.required,
-                data: item.data,
+             
               };
             });
-            console.log(data)
 
-            navigation.navigate("Content Details",{product_id,product_category_id,content_data:data});
+            var data_details = responseJson.details.map(function(item) {
+              return {
+                header_id: item.header_id,
+                details_id: item.details_id,
+                details_name: item.name,
+                price:item.price,
+                selected:false
+              };
+            });
+       
+
+            navigation.navigate("Content Details",{price,product_id,product_category_id,data_header:data_header,data_details:data_details});
           }).catch((error) => {
             console.error(error);
           });

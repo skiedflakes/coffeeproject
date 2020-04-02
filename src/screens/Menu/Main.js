@@ -6,7 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { useFocusEffect } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-community/async-storage';
 //import content
 import Content from './Content';
 
@@ -16,6 +16,7 @@ export default function Main ({route,navigation,body_content}) {
   
   useFocusEffect(
     React.useCallback(() => {
+      AsyncStorage.clear();
       setcontent(<Content category_id={0}/>);
       // Do something when the screen is focused
       const fetchUser = async () => {
