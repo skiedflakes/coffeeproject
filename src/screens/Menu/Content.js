@@ -8,6 +8,9 @@ export default function Content({navigation,route}){
 var { content_data,title,product_category_id } = route.params;
 navigation.setOptions({ title: title });
 
+const view_cart = () => {
+  navigation.navigate('Cart');
+}
 return (
     <View style={{flexDirection: 'column',flex: 1}}>
         <FlatList
@@ -18,6 +21,7 @@ return (
             renderItem={
               ({ item }) => 
               <Item 
+              product_name = {item.product_name}
               navigation={navigation} 
               title={item.product_name} 
               product_id={item.product_id} 
@@ -28,15 +32,15 @@ return (
             keyExtractor={item => item.product_id.toString()}
            
         />
-        <Button title="View your cart"></Button>
+        <Button title="View your cart" onPress={view_cart}></Button>
     </View>
 );
 }
 
-function Item({navigation, product_id, title,price,image_url,product_category_id}) {
+function Item({product_name,navigation, product_id, title,price,image_url,product_category_id}) {
   
     return (
-<TouchableOpacity onPress={() => open_content_details(navigation,product_id,price,product_category_id)}>
+<TouchableOpacity onPress={() => open_content_details(product_name,navigation,product_id,price,product_category_id)}>
     <View style={{
         backgroundColor:'#ffff',
         paddingTop:5,
@@ -94,7 +98,7 @@ function renderViewMore(onPress){
     )
   }
 
-  function open_content_details(navigation,product_id,price,product_category_id){
+  function open_content_details(product_name,navigation,product_id,price,product_category_id){
 
 
     const formData = new FormData();
@@ -129,8 +133,7 @@ function renderViewMore(onPress){
               };
             });
        
-
-            navigation.navigate("Content Details",{price,product_id,product_category_id,data_header:data_header,data_details:data_details});
+            navigation.navigate("Content Details",{product_name,price,product_id,product_category_id,data_header:data_header,data_details:data_details});
           }).catch((error) => {
             console.error(error);
           });

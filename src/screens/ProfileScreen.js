@@ -6,7 +6,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './LoginScreen';
 import MainProfileScreen from './Profile/Profile_Main';
-import OrderScreen from './Profile/Order';
+
 import SignoutScreen from './Profile/Signed_out';
 const Stack = createStackNavigator();
 export default class ProfileScreen extends React.Component {
@@ -28,11 +28,6 @@ export default class ProfileScreen extends React.Component {
         component={LoginScreen} 
         />
 
-      <Stack.Screen 
-        name="My Orders" 
-        component={OrderScreen} 
-        initialParams={{ name:'',user_id:'',user_type_id:''}}
-      />
       <Stack.Screen 
         name="Sign out" 
         component={SignoutScreen} 

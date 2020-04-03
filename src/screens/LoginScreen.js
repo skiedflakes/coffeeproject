@@ -35,20 +35,15 @@ export default function LoginScreen({navigation}){
 
 const loginFetch = (userName,password,navigation) =>{
 
-     //functions to store session using async storage
-      const multiSet = async (name,user_id,user_type_id) => {
-        const save_user_id = ["user_id", user_id]
-        const save_name = ["name", name]
-        const save_user_type_id = ["user_type_id", user_type_id]
+  
+   const setItemStorage = async (key,value) => {
         try {
-          await AsyncStorage.multiSet([save_user_id, save_name,save_user_type_id])
-        } catch(e) {
-          //save error
+          await AsyncStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+          // Error saving data
         }
-      
-        console.log("Done.")
-      }
-      console.log(password)
+      };
+
 
   const formData = new FormData();
   formData.append('username',userName);
@@ -69,15 +64,19 @@ const loginFetch = (userName,password,navigation) =>{
     
           if(first.status == 'success'){
             //call function multiset to save data to async storage
-            multiSet(first.name,first.user_id,first.user_type_id);
+            setItemStorage('user_details',{'user_details':1,'user_id':first.user_id,'name': first.name,'user_type_id':first.user_type_id})
+    
             global.g_user_id = first.user_id;
             global.g_name = first.name;
             global.g_user_type_id = first.user_type_id;
-            navigation.navigate('Profile_Main', {
-              name: first.name,
-              user_id:first.user_id,
-              user_type_id:first.user_type_id,
-            })
+            // navigation.navigate('Profile_Main', {
+            //   name: first.name,
+            //   user_id:first.user_id,
+            //   user_type_id:first.user_type_id,
+            // })
+
+            navigation.goBack()
+
           } else {
             Alert.alert('failed !');
           }

@@ -7,7 +7,6 @@ import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
-//import content
 import Content from './Content';
 
 export default function Main ({route,navigation,body_content}) {
@@ -16,7 +15,29 @@ export default function Main ({route,navigation,body_content}) {
   
   useFocusEffect(
     React.useCallback(() => {
-      AsyncStorage.clear();
+        const removeItems  = async (key) => {
+          console.log('main == ',key)
+          await AsyncStorage.removeItem(key);
+        }
+
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+            stores.map((result, i, store) => {
+              let key = store[i][0];
+              var jsonPars = JSON.parse(store[i][1]);
+              if(jsonPars.selected_additions==1){
+              
+                removeItems(key)
+              }else{
+               
+              }
+            
+            });
+          });
+
+        });
+
+
       setcontent(<Content category_id={0}/>);
       // Do something when the screen is focused
       const fetchUser = async () => {
@@ -44,7 +65,7 @@ export default function Main ({route,navigation,body_content}) {
     <View style={styles.main}>
     <View style={styles.header} >
     <View style={{  flexDirection: 'row', padding:2,}} >
-        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <TouchableOpacity onPress={() =>   navigation.navigate('Cart')}>
         <Icon name="cart-plus" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
@@ -87,7 +108,7 @@ function RowItem ({navigation,title,product_category_id}) {
   return (
       <TouchableOpacity onPress={() => getContent(navigation,title,product_category_id)}>
           <View style={styles.item}>
-            <View style={{flex:3,flexDirection:'row'}}>
+            <View style={{flex:3,flexDirection:'row',alignItems:"center"}}>
             <MCI name="food" size={25} color={"#393737"}/>
               <Text style={styles.title}>{title}</Text>
             </View>
@@ -128,6 +149,9 @@ fetch(global.global_url+'menu/get_menu_details.php', {
 
 const styles = StyleSheet.create({
     main:{
+        alignItems:"center",
+        alignContent:"center",
+        alignSelf:"center",
         flex:6,
         backgroundColor: '#ffff',
         alignContent:"center",
@@ -135,6 +159,9 @@ const styles = StyleSheet.create({
     },
 
     header:{
+        alignItems:"center",
+        alignContent:"center",
+        alignSelf:"center",
         flexDirection:'row-reverse',
         padding:2,
         flex:0.6,
@@ -157,7 +184,8 @@ const styles = StyleSheet.create({
         paddingLeft:10,
         backgroundColor:'#ffff',
         padding:5,
-        alignContent:"center"
+        alignContent:"center",
+        alignItems:"center"
       },
       title: {
         color:'#4A4A4A',

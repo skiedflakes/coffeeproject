@@ -23,26 +23,34 @@ export default class HomeScreenNavigator extends React.Component{
     global.g_user_id = '';
     global.g_name = '';
     global.g_user_type_id = '';
+    //online
     global.global_url = 'http://projects.skiedflakes.site/cafeproject/';
 
+    //local
+    // global.global_url = 'http://192.168.189.1/cafeproject/';
   }
 
     render(){
-          //get session
-          const getMultiple = async () => {
-              let values
-              try {
-                  values = await AsyncStorage.multiGet(['user_id', 'name','user_type_id'])
-                  const user_id = values[0][1];
-                  const name = values[1][1];
-                  const user_type_id = values[2][1];
-                  global.g_user_id = user_id;
-                  global.g_name = name;
-                  global.g_user_type_id = user_type_id;
-              } catch(e) {
+
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+            stores.map((result, i, store) => {
+              let key = store[i][0];
+              var jsonPars = JSON.parse(store[i][1]);
+              if(jsonPars.user_details==1){
+                global.g_user_id = jsonPars.user_id;
+                global.g_name = jsonPars.name;
+                global.g_user_type_id = jsonPars.user_type_id;
+                
+              }else{
+               
               }
-          }
-          getMultiple();
+            
+            });
+          });
+
+        });
+          
 
         return(
             <Tab.Navigator>

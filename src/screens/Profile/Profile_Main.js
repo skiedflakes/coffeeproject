@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image} from 'react-native';
+import React, { useState, useEffect,} from 'react';
+import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image,BackHandler} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 //import components
-
+import { useFocusEffect } from '@react-navigation/native';
 export default function Profile_Main({route,navigation}) {
-    //get values from route
-    var { name,user_id,user_type_id } = route.params;
-    if(name==''){
-        name = global.g_name;
-    }
+    // //get values from route
+    // var { name,user_id,user_type_id } = route.params;
+    // if(name==''){
+    //     name = global.g_name;
+    // }
+
+    var [name,set_name] = useState('');
+
+    useFocusEffect(
+        React.useCallback(() => {
+            set_name(global.g_name);
+        }, [])
+      );
+
     return (
         <View style={{flex:6,backgroundColor: '#ffff',}}>
                {global.g_user_id>0?
@@ -211,11 +220,28 @@ function onpress(){
 }
 
 function signed_out(navigation){
-    AsyncStorage.clear();
+    const removeItems  = async (key) => {
+        console.log('main == ',key)
+        await AsyncStorage.removeItem(key);
+      }
+      
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+            stores.map((result, i, store) => {
+              let key = store[i][0];
+              var jsonPars = JSON.parse(store[i][1]);
+              if(jsonPars.user_details==1){
+                removeItems(key)
+              }else{
+              }
+            });
+          });
+        });
+
     global.g_name = '';
     global.g_user_id='';
     global.g_user_type_id='';
-    navigation.navigate('Sign out');
+    BackHandler.exitApp();
 }
 
 const styles = StyleSheet.create({
