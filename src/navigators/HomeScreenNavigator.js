@@ -7,7 +7,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 //import screens 
 import FeedScreen from '../screens/FeedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import ProductsScreen from '../screens/ProductsScreen';
+import ProductsScreen from '../screens/ProductScreen';
 import OrderScreen from '../screens/OrderScreen';
 import MenuScreen from '../screens/MenuScreen';
 
@@ -24,10 +24,10 @@ export default class HomeScreenNavigator extends React.Component{
     global.g_name = '';
     global.g_user_type_id = '';
     //online
-    global.global_url = 'http://projects.skiedflakes.site/cafeproject/';
+    // global.global_url = 'http://projects.skiedflakes.site/cafeproject/';
 
     //local
-    // global.global_url = 'http://192.168.189.1/cafeproject/';
+    global.global_url = 'http://192.168.189.1/cafeproject/';
   }
 
     render(){
