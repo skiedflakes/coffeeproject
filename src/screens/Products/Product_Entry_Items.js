@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+//etc
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { TextInput } from 'react-native-paper';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
+
+
+//icons
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+
 const FlatListItemSeparator = () => {
     return (
       <View
@@ -20,7 +28,6 @@ const FlatListItemSeparator = () => {
       />
     );
   }
-
 
 export default function Product_Entry_Items ({navigation,route}) {
     const {name,id} = route.params;
@@ -65,51 +72,6 @@ export default function Product_Entry_Items ({navigation,route}) {
     }, [])
   );
 
-  const add_side_header = () =>{
-    if(!CurrentSideName){
-        Alert.alert('Please enter name');
-      } else {
-        const formData = new FormData();
-        formData.append('name', CurrentSideName);
-        formData.append('product_category_id', id);
-        fetch(global.global_url+'product_settings/add_side_header.php', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data'
-          },
-          body: formData
-  
-        }).then((response) => response.json())
-          .then((responseJson) => {
-            console.log(responseJson);
-            var save_response_data = responseJson.save_response[0];
-            
-            if(save_response_data.status == 'success'){
-
-                //get current data
-                var data = responseJson.side_header.map(function(item,index) {
-                    return {
-                    key:item.dropdown_header_id,
-                    name: item.name
-                    };
-                    });
-                  
-                    setModalVisible(!modalVisible);
-                    setcurrent_list_data(data);
-                    
-            } else if(save_response_data.status == 'failed'){
-              Alert.alert('failed !');
-            } else {
-              Alert.alert('Duplicate name !');
-            }
-  
-          }).catch((error) => {
-            console.error(error);
-          });
-        }
-  }
-
 const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
         rowMap[rowKey].closeRow();
@@ -121,7 +83,6 @@ const closeRow = (rowMap, rowKey) => {
 const onRowDidOpen = rowKey => {
     // console.log('row open' + !allow_navigation);
     // setallow_navigation(!allow_navigation);
-    
 };
 
 const deleteRow = (rowMap, rowKey) => {
@@ -156,7 +117,6 @@ const deleteRow = (rowMap, rowKey) => {
       });
 };
 
-
 const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
         <TouchableOpacity
@@ -182,72 +142,34 @@ const renderHiddenItem = (data, rowMap) => (
 
     </View>
 );
-
-
-
     return (
     <View style={styles.main}>
-
-    <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setCurrentSideName('');
-            }}
-        >
-            <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-                    <View style={{flexDirection:"column",height: 150,width:200}}>
-                    <TextInput style={{height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="Add Side"
-                    onChangeText={text => setCurrentSideName(text)}
-                    ></TextInput>
-
-                    <TouchableHighlight
-                        style={{ ...styles.openButton, backgroundColor: "#2196F3",marginTop:15}}
-                        onPress={() => {
-                            add_side_header();
-                        }}
-                    >   
-                    <Text style={styles.textStyle}>Add</Text>
-                    </TouchableHighlight>
-
-                    <TouchableHighlight
-                        style={{ ...styles.openButton, backgroundColor: "#787878",marginTop:15}}
-                        onPress={() => {
-                        setModalVisible(!modalVisible);
-                        setCurrentSideName('');
-                        }}
-                    >   
-                    <Text style={styles.textStyle}>Cancel</Text>
-                    </TouchableHighlight>
-                    </View>
-            </View>
-            </View>
-        </Modal>
-
     <View style={styles.header} >
-
-    <TouchableOpacity style={{ flex:6,  flexDirection: 'row', padding:2,}} onPress={() => {
+        <View style={{  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {
          navigation.navigate("Product Entry Add",{name,id});
         }}>
-      <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>Add New Product</Text>
-    </TouchableOpacity>
-    </View>
+            <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            </TouchableOpacity>
+    
+        </View>
+        
+        <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {navigation.goBack()}}>
+            <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
+            </TouchableOpacity>
+    <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>{name}</Text>
+        </View>
+        </View>
     <View style={styles.body}>
     <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
-
-
-        
         <SwipeListView
             data={current_list_data}
             renderItem={  ({ item }) => 
             <RowItem
               navigation={navigation}
               title={item.name}
-              id={item.key} 
-        
+              id={item.key}
               />
             }
             rightOpenValue={-225}

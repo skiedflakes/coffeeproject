@@ -1,23 +1,84 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet,Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-const deviceWidth = Dimensions.get('window').width;
+
+
+//icons
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
+//etc
 import ViewMoreText from 'react-native-view-more-text';
+const deviceWidth = Dimensions.get('window').width;
 
 export default function Content({navigation,route}){
-var { content_data,title,product_category_id } = route.params;
-navigation.setOptions({ title: title });
+var {title,product_category_id } = route.params;
+const [current_list_data, setcurrent_list_data] = useState('');
 
-const view_cart = () => {
-  navigation.navigate('Cart');
-}
+useFocusEffect(
+  React.useCallback(() => {
+    const formData = new FormData();
+    formData.append('product_category_id',product_category_id);
+    fetch(global.global_url+'menu/get_menu_details.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        },
+        body: formData
+    }).then((response) => response.json())
+          .then((responseJson) => {
+            var data = responseJson.product_details.map(function(item) {
+              return {
+                product_id: item.product_id,
+                product_name: item.product_name,
+                price: item.price,
+                image_url: item.image_url
+              };
+            });
+            setcurrent_list_data(data);
+          
+          }).catch((error) => {
+            console.error(error);
+          });
+
+    return () => {
+    };
+  }, [])
+);
+
+
 return (
-    <View style={{flexDirection: 'column',flex: 1}}>
+  <View style={styles.main}>
+    <View style={styles.header} >
+    <View style={{  flexDirection: 'row', padding:2,}} >
+        <TouchableOpacity onPress={() =>   navigation.navigate('Cart')}>
+        <Icon name="cart-plus" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
+        <Icon name="comments" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+        </TouchableOpacity>
+
+    </View>
+    
+    <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
+        <TouchableOpacity onPress={() => {navigation.goBack()}}>
+        <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
+        </TouchableOpacity>
+        <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>{title}</Text>
+    </View>
+    </View>
+    <View style={styles.body}>
+    <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
+        {/* <Text>{user}</Text> */}
         <FlatList
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             numColumns={2}
-            data={content_data}
+            data={current_list_data}
             renderItem={
               ({ item }) => 
               <Item 
@@ -32,8 +93,12 @@ return (
             keyExtractor={item => item.product_id.toString()}
            
         />
-        <Button title="View your cart" onPress={view_cart}></Button>
+    </View>     
+      {/* {content} */}
+
     </View>
+    </View>
+ 
 );
 }
 
@@ -140,22 +205,50 @@ function renderViewMore(onPress){
 
   }
 
-  const styles = StyleSheet.create({
-    container: {
+  
+const styles = StyleSheet.create({
+  main:{
+      alignItems:"center",
+      alignContent:"center",
+      alignSelf:"center",
+      flex:6,
+      backgroundColor: '#ffff',
+      alignContent:"center",
+      flexDirection:'column'
+  },
+
+  header:{
+      alignItems:"center",
+      alignContent:"center",
+      alignSelf:"center",
+      flexDirection:'row-reverse',
+      padding:2,
+      flex:0.6,
+      backgroundColor: '#3490DD',
+      alignContent:"center",
+  },
+  body:{
+      flex:5.4,
+      backgroundColor: '#DADCDC',
+      alignContent:"center",
+      alignItems:"center",
+      
+  },
+  container: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.05)',
-      alignItems: 'center',
-      justifyContent: 'center',
+      marginTop:5,
     },
-    card: {
-      marginHorizontal: 10,
-      padding: 10,
-      borderRadius: 3,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderWidth: 1,
-      backgroundColor: '#fff',
+    item: {
+      flexDirection:'row',
+      paddingLeft:10,
+      backgroundColor:'#ffff',
+      padding:5,
+      alignContent:"center",
+      alignItems:"center"
     },
-    cardText: {
-      fontSize: 14,
+    title: {
+      color:'#4A4A4A',
+      padding:10,
+      fontSize: 18,
     },
-  });
+})

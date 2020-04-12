@@ -32,6 +32,7 @@ export default class ProfileScreen extends React.Component {
         />
         <Stack.Screen
         name="Category" 
+        options={{ headerShown: false }}
         component={CateogryScreen} 
         />
 
@@ -43,13 +44,13 @@ export default class ProfileScreen extends React.Component {
         <Stack.Screen
         name="Side Header" 
         component={SideHeaderScreen} 
-        options={({ route }) => ({title: "Category : "+route.params.name })}
+        options={{ headerShown: false }}
         />
 
         <Stack.Screen
         name="Side Details" 
         component={SideDetailsScreen} 
-        options={({ route }) => ({ title: route.params.name })}
+        options={{ headerShown: false }}
         />
         <Stack.Screen
         name="Product Entry" 
@@ -59,7 +60,7 @@ export default class ProfileScreen extends React.Component {
         <Stack.Screen
         name="Product Entry Items" 
         component={ProductEntryItemsScreen} 
-        options={({ route }) => ({ title: "Category : "+ route.params.name })}
+        options={{ headerShown: false }}
         />
 
         <Stack.Screen

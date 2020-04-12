@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet,Image,View } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MainScreen from './Menu/Main';
 import ContentScreen from './Menu/Content';
@@ -7,11 +7,13 @@ import CartScreen from './CartScreen';
 import Content_DetailsScreen from './Menu/Content_details';
 import LoginScreen from './LoginScreen';
 const Stack = createStackNavigator();
+
 export default class MenuScreen extends React.Component {
     state = {
         dataSource: ''
       }
 
+      
   render() {
     //  console.log(this.state.dataSource)
   return (
@@ -28,7 +30,7 @@ export default class MenuScreen extends React.Component {
       <Stack.Screen
         name="Content"
         component={ContentScreen}
-        options={{ title: 'My home' }}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
@@ -37,7 +39,7 @@ export default class MenuScreen extends React.Component {
         options={{ title: 'My Cart' }}
       />
 
-<Stack.Screen 
+<     Stack.Screen 
         name="Login" 
         component={LoginScreen} 
         />

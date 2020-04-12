@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+//etc
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
+
+//icons
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+
+
 const FlatListItemSeparator = () => {
     return (
       <View
@@ -178,7 +186,6 @@ const clear_modal_data = () =>{
 }
     return (
     <View style={styles.main}>
-
     <Modal
             animationType="fade"
             transparent={true}
@@ -231,13 +238,21 @@ const clear_modal_data = () =>{
         </Modal>
 
     <View style={styles.header} >
-
-    <TouchableOpacity style={{ flex:6,  flexDirection: 'row', padding:2,}} onPress={() => {
-        setModalVisible(true);
-        }}>
-      <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>Add Details</Text>
-    </TouchableOpacity>
+        <View style={{  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {setModalVisible(true);}}>
+            <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            </TouchableOpacity>
+        </View>
+        
+        <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {navigation.goBack()}}>
+            <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
+            </TouchableOpacity>
+            <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>{name}</Text>
+        </View>
     </View>
+
+
     <View style={styles.body}>
     <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
 

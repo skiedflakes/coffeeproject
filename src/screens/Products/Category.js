@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput,Image,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 import ImagePicker from 'react-native-image-picker';
+
+//icon 
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+
 const FlatListItemSeparator = () => {
     return (
       <View
@@ -35,6 +41,7 @@ export default function Category ({navigation}) {
   const [Category_name, setCategory_name] = useState('');
   const [current_list_data, setcurrent_list_data] = useState('');
 
+  //image constants
   const [image_preview,Setimage_preview] = useState(false);
   const [imageUri,SetimageUri] = useState('');
   const [image_file_type,Setimage_file_type] = useState('');
@@ -227,8 +234,9 @@ export default function Category ({navigation}) {
     }
 
     return (
-    <View style={styles.main}>
-        <Modal
+
+        <View style={styles.main}>
+                    <Modal
         animationType="fade"
         transparent={true}
         visible={modalVisible}
@@ -249,7 +257,7 @@ export default function Category ({navigation}) {
                 { renderImage()}
                 </TouchableOpacity>
 
-                <TextInput style={{height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10,marginTop:10}} placeholder="Category Name"
+                <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10,marginTop:10}} placeholder="Category Name"
                 onChangeText={text => setCategory_name(text)}
                 ></TextInput>
 
@@ -277,38 +285,44 @@ export default function Category ({navigation}) {
         </View>
       </Modal>
 
-    <View style={styles.header} >
-
-    <TouchableOpacity style={{ flex:6,  flexDirection: 'row', padding:2,}} onPress={() => {
-          setModalVisible(true);
-        }}>
-      <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>Add Category</Text>
-    </TouchableOpacity>
-    </View>
-    <View style={styles.body}>
-    <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
-
-        <SwipeListView
-            data={current_list_data}
-            renderItem={  ({ item }) => 
-            <RowItem
-              navigation={navigation}
-              title={item.product_type_name} 
-              />
-            }
-            rightOpenValue={-150}
-            previewOpenValue={-40}
-            previewOpenDelay={3000}
-            renderHiddenItem={renderHiddenItem}
-            keyExtractor={item => item.key.toString()}
-            ItemSeparatorComponent = { FlatListItemSeparator }
-        />
-    </View> 
+        <View style={styles.header} >
+        <View style={{  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {
+            setModalVisible(true);
+            }}>
+            <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+            </TouchableOpacity>
+    
+        </View>
         
-      {/* {content} */}
+        <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
+            <TouchableOpacity onPress={() => {navigation.goBack()}}>
+            <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
+            </TouchableOpacity>
+            <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>Category</Text>
+        </View>
+        </View>
+        <View style={styles.body}>
+            <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
 
-    </View>
-    </View>
+                <SwipeListView
+                    data={current_list_data}
+                    renderItem={  ({ item }) => 
+                    <RowItem
+                    navigation={navigation}
+                    title={item.product_type_name} 
+                    />
+                    }
+                    rightOpenValue={-150}
+                    previewOpenValue={-40}
+                    previewOpenDelay={3000}
+                    renderHiddenItem={renderHiddenItem}
+                    keyExtractor={item => item.key.toString()}
+                    ItemSeparatorComponent = { FlatListItemSeparator }
+                />
+            </View> 
+        </View>
+        </View>
   );
 }
 
