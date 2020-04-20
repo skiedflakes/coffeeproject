@@ -15,6 +15,9 @@ import SideHeaderScreen from './Products/Side_header';
 import SideDetailsScreen from './Products/Side_details';
 
 //product entry
+import ProductSizeScreen from './Products/Product_Size';
+import ProductSizeSizeScreen from './Products/Product_Size_Add';
+import ProductSizeSelectScreen from './Products/Product_Size_Select';
 import ProductEntryScreen from './Products/Product_Entry';
 import ProductEntryItemsScreen from './Products/Product_Entry_Items';
 import ProductEntryAddScreen from './Products/Product_Entry_add';
@@ -55,6 +58,21 @@ export default class ProfileScreen extends React.Component {
         <Stack.Screen
         name="Product Entry" 
         component={ProductEntryScreen} 
+        />
+
+        <Stack.Screen
+        name="Size" 
+        component={ProductSizeScreen} 
+        />
+        <Stack.Screen
+        name="Size Select" 
+        component={ProductSizeSelectScreen} 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen
+        name="Size Add" 
+        component={ProductSizeSizeScreen} 
+        options={{ headerShown: false }}
         />
 
         <Stack.Screen
