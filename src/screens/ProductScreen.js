@@ -16,6 +16,8 @@ import SideDetailsScreen from './Products/Side_details';
 
 //product entry
 import ProductSizeScreen from './Products/Product_Size';
+import ProductSizeSizeListScreen from './Products/Product_Size_Add_List';
+import ProductSizeSizeEditScreen from './Products/Product_Size_Edit';
 import ProductSizeSizeScreen from './Products/Product_Size_Add';
 import ProductSizeSelectScreen from './Products/Product_Size_Select';
 import ProductEntryScreen from './Products/Product_Entry';
@@ -72,6 +74,16 @@ export default class ProfileScreen extends React.Component {
         <Stack.Screen
         name="Size Add" 
         component={ProductSizeSizeScreen} 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen
+        name="Size Add List" 
+        component={ProductSizeSizeListScreen} 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen
+        name="Size Edit" 
+        component={ProductSizeSizeEditScreen} 
         options={{ headerShown: false }}
         />
 

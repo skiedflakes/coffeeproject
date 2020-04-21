@@ -119,7 +119,7 @@ function RowItem ({navigation,title,id}) {
 }
 
 function navigate_side_details(navigation,name,id){
-    navigation.navigate("Size Add",{name,id});
+    navigation.navigate("Size Add List",{name,id});
 }
   
 
