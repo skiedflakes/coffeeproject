@@ -106,8 +106,8 @@ function RowItem ({navigation,title,id}) {
   );
 }
 
-function get_side_header(navigation,name,id){
-  navigation.navigate("Size Select",{name,id});
+function get_side_header(navigation,name,category_id){
+  navigation.navigate("Size Select",{name,category_id});
 }
 
 const styles = StyleSheet.create({

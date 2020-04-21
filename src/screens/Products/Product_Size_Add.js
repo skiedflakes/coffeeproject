@@ -4,21 +4,10 @@ import ImagePicker from 'react-native-image-picker';
 const deviceWidth = Dimensions.get('window').deviceWidth;
 const deviceHeight = Dimensions.get('window').deviceHeight;
 
-function MultiLineInput(props) {
-    return (
-      <TextInput
-      style={{borderColor: 'gray',borderWidth: 0.5,borderRadius:10,margin:10,paddingLeft:20}}
-        {...props} // Inherit any props passed to it; e.g., multiline, numberOfLines below
-        editable
-        placeholder="Descrption"
-        maxLength={40}
-      />
-    );
-  }
 
 export default function Product_Size_Add ({navigation,route}) {
     //navigation route parameters
-    const {name,id} = route.params; //product_category_id
+    const {name,id,category_id} = route.params; //product_category_id
 
     //input text parameters
     const [item_name, setName] = React.useState('');
@@ -29,7 +18,8 @@ export default function Product_Size_Add ({navigation,route}) {
             Alert.alert('Please enter name');
           } else {
             const formData = new FormData();
-            formData.append('product_category_id', id);
+            formData.append('product_id', id);
+            formData.append('category_id', category_id);
             formData.append('item_name', item_name);
             formData.append('item_price', price);
 

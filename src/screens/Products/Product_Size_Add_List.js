@@ -30,7 +30,7 @@ const FlatListItemSeparator = () => {
   }
 
 export default function Product_Size_Add_List ({navigation,route}) {
-    const {name,id} = route.params;
+    const {name,id,category_id} = route.params;
     const [current_list_data, setcurrent_list_data] = useState('');
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -61,7 +61,7 @@ export default function Product_Size_Add_List ({navigation,route}) {
                     size_price: item.size_price,
                     };
                     });
-                     
+                    
                     setcurrent_list_data(data);
   
           }).catch((error) => {
@@ -165,7 +165,7 @@ const renderHiddenItem = (data, rowMap) => (
     <View style={styles.header} >
         <View style={{  flexDirection: 'row', padding:2,}} >
             <TouchableOpacity onPress={() => {
-         navigation.navigate("Size Add",{name,id});
+         navigation.navigate("Size Add",{name,id,category_id});
         }}>
             <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
             </TouchableOpacity>

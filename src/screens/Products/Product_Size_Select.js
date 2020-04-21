@@ -30,7 +30,7 @@ const FlatListItemSeparator = () => {
   }
 
 export default function Product_Size_Select ({navigation,route}) {
-    const {name,id} = route.params;
+    const {name,category_id} = route.params;
     const [current_list_data, setcurrent_list_data] = useState('');
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -41,7 +41,7 @@ export default function Product_Size_Select ({navigation,route}) {
     useFocusEffect(
         React.useCallback(() => {
             const formData = new FormData();
-            formData.append('product_category_id', id);
+            formData.append('product_category_id', category_id);
             fetch(global.global_url+'product_settings/get_product_entry_items.php', {
             method: 'POST',
             headers: {
@@ -94,6 +94,7 @@ export default function Product_Size_Select ({navigation,route}) {
                 navigation={navigation}
                 title={item.name}
                 id={item.key}
+                category_id={category_id}
                 />
                 }
                 keyExtractor={item => item.key.toString()}
@@ -105,9 +106,9 @@ export default function Product_Size_Select ({navigation,route}) {
     );
 }
 
-function RowItem ({navigation,title,id}) {
+function RowItem ({navigation,title,id,category_id}) {
   return (
-       <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id)}>
+       <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,category_id)}>
           <View style={styles.item}>
             <View style={{flex:3,flexDirection:'row',alignItems:"center"}}>
               <Text style={styles.title}>{title}</Text>
@@ -118,8 +119,8 @@ function RowItem ({navigation,title,id}) {
   );
 }
 
-function navigate_side_details(navigation,name,id){
-    navigation.navigate("Size Add List",{name,id});
+function navigate_side_details(navigation,name,id,category_id){
+    navigation.navigate("Size Add List",{name,id,category_id});
 }
   
 
