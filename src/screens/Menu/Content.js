@@ -36,6 +36,7 @@ useFocusEffect(
                 product_id: item.product_id,
                 product_name: item.product_name,
                 price: item.price,
+                product_details: item.product_details,
                 image_url: item.image_url
               };
             });
@@ -88,6 +89,7 @@ return (
               product_id={item.product_id} 
               price={item.price} 
               image_url={item.image_url}
+              product_details={item.product_details}
               product_category_id ={product_category_id} />
               }
             keyExtractor={item => item.product_id.toString()}
@@ -102,7 +104,7 @@ return (
 );
 }
 
-function Item({product_name,navigation, product_id, title,price,image_url,product_category_id}) {
+function Item({product_name,navigation, product_id, title,price,image_url,product_category_id,product_details}) {
   
     return (
 <TouchableOpacity onPress={() => open_content_details(product_name,navigation,product_id,price,product_category_id)}>
@@ -130,17 +132,9 @@ function Item({product_name,navigation, product_id, title,price,image_url,produc
             renderViewMore={renderViewMore}
             renderViewLess={renderViewLess}
             >
-            <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.  Duis aute irure dolor
-              in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborumrr
-            </Text>
+              <Text>{product_details}</Text>
           </ViewMoreText>
             <View style={{width:deviceWidth/2.5,flex:3,flexDirection:'row-reverse',marginTop:5}}>
-                <Text style={{  fontSize: 18,}}>P {price}</Text>
             </View>
             </View>
         </View>
