@@ -35,6 +35,7 @@ export default function Side_header ({navigation,route}) {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [CurrentSideName, setCurrentSideName] = useState(false);
+    const [CurrentRequiredName, setCurrentRequiredName] = useState(false);
 
     const [allow_navigation, setallow_navigation] =useState(true);
   useFocusEffect(
@@ -73,11 +74,12 @@ export default function Side_header ({navigation,route}) {
   );
 
   const add_side_header = () =>{
-    if(!CurrentSideName){
+    if(!CurrentSideName||!CurrentRequiredName){ // bug, need to check if ''
         Alert.alert('Please enter name');
       } else {
         const formData = new FormData();
         formData.append('name', CurrentSideName);
+        formData.append('required', CurrentRequiredName);
         formData.append('product_category_id', id);
         fetch(global.global_url+'product_settings/add_side_header.php', {
           method: 'POST',
@@ -113,8 +115,8 @@ export default function Side_header ({navigation,route}) {
   
           }).catch((error) => {
             console.error(error);
-          });
-        }
+        });
+      }
   }
 
 const closeRow = (rowMap, rowKey) => {
@@ -162,6 +164,18 @@ const deleteRow = (rowMap, rowKey) => {
       });
 };
 
+function dialogBox(rowMap, rowKey, name){
+  Alert.alert(
+    'DELETE',
+    'Are you sure you want to delete '+name+' ?',
+    [
+      {text: 'OK', onPress: () => deleteRow(rowMap, rowKey)},
+      {text: 'NO', onPress: () => console.log('NO Pressed'), 
+      style: 'cancel'},
+    ],
+    { cancelable: false }
+  );
+}
 
 const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
@@ -174,7 +188,7 @@ const renderHiddenItem = (data, rowMap) => (
 
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnLeft]}
-            onPress={() => deleteRow(rowMap, data.item.key)}
+            onPress={() => dialogBox(rowMap, data.item.key, data.item.name)}
         >
             <Text style={styles.backTextWhite}>Delete</Text>
         </TouchableOpacity>
@@ -189,9 +203,20 @@ const renderHiddenItem = (data, rowMap) => (
     </View>
 );
 
+function dialogBox_add(){
+  Alert.alert(
+    'SAVE',
+    'Are you sure you want to save ?',
+    [
+      {text: 'OK', onPress: () => add_side_header()},
+      {text: 'NO', onPress: () => console.log('NO Pressed'), 
+      style: 'cancel'},
+    ],
+    { cancelable: false }
+  );
+}
 
-
-    return (
+  return (
     <View style={styles.main}>
 
     <Modal
@@ -201,19 +226,24 @@ const renderHiddenItem = (data, rowMap) => (
             onRequestClose={() => {
             Alert.alert("Modal has been closed.");
             setCurrentSideName('');
+            setCurrentRequiredName('');
             }}
         >
             <View style={styles.centeredView}>
             <View style={styles.modalView}>
-                    <View style={{flexDirection:"column",height: 150,width:200}}>
+                    <View style={{flexDirection:"column",height: 200,width:200}}>
                     <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="  Add Side"
                     onChangeText={text => setCurrentSideName(text)}
+                    ></TextInput>
+
+                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="  Required"
+                    onChangeText={text => setCurrentRequiredName(text)}
                     ></TextInput>
 
                     <TouchableHighlight
                         style={{ ...styles.openButton, backgroundColor: "#2196F3",marginTop:15}}
                         onPress={() => {
-                            add_side_header();
+                          dialogBox_add();
                         }}
                     >   
                     <Text style={styles.textStyle}>Add</Text>

@@ -55,6 +55,19 @@ export default function Product_Size_Edit ({navigation,route}) {
         });
     }
 
+    function dialogBox(){
+        Alert.alert(
+          'UPDATE',
+          'Are you sure you want to update ?',
+          [
+            {text: 'OK', onPress: () => add_item()},
+            {text: 'NO', onPress: () => console.log('NO Pressed'), 
+            style: 'cancel'},
+          ],
+          { cancelable: false }
+        );
+    }
+
     return (
     <View style={styles.header} >
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -76,7 +89,7 @@ export default function Product_Size_Edit ({navigation,route}) {
             />
             </View>
             
-            <Button title="Update" onPress={() => { add_item() }}></Button>
+            <Button title="Update" onPress={() => { dialogBox() }}></Button>
       </ScrollView>
 
     </View>
