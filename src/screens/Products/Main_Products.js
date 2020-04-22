@@ -20,6 +20,10 @@ const mydata = [
     id:"3",
     name:"Sides",
 },
+{
+    id:"4",
+    name:"Size",
+},
 
 ];
 
@@ -106,7 +110,9 @@ function getContent(navigation,name,id){
         navigation.navigate("Product Entry");
     }else if(id==3){ // load sides
         navigation.navigate("Sides");
-    }
+    }else if(id==4){ // load sides
+      navigation.navigate("Size");
+  }
 }
 
 
