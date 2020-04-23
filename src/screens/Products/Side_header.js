@@ -74,10 +74,7 @@ export default function Side_header ({navigation,route}) {
   );
 
   const add_side_header = () =>{
-    if(!CurrentSideName||!CurrentRequiredName){ // bug, need to check if ''
-        Alert.alert('Please enter name');
-      } else {
-        const formData = new FormData();
+      const formData = new FormData();
         formData.append('name', CurrentSideName);
         formData.append('required', CurrentRequiredName);
         formData.append('product_category_id', id);
@@ -115,8 +112,7 @@ export default function Side_header ({navigation,route}) {
   
           }).catch((error) => {
             console.error(error);
-        });
-      }
+      });
   }
 
 const closeRow = (rowMap, rowKey) => {
@@ -204,16 +200,23 @@ const renderHiddenItem = (data, rowMap) => (
 );
 
 function dialogBox_add(){
-  Alert.alert(
-    'SAVE',
-    'Are you sure you want to save ?',
-    [
-      {text: 'OK', onPress: () => add_side_header()},
-      {text: 'NO', onPress: () => console.log('NO Pressed'), 
-      style: 'cancel'},
-    ],
-    { cancelable: false }
-  );
+  if(CurrentSideName == ""){ 
+      Alert.alert('Please enter name');
+  } else if (CurrentRequiredName == "") {
+      Alert.alert('Please enter required');
+  }
+  else {
+      Alert.alert(
+        'SAVE',
+        'Are you sure you want to save ?',
+        [
+          {text: 'OK', onPress: () => add_side_header()},
+          {text: 'NO', onPress: () => console.log('NO Pressed'), 
+          style: 'cancel'},
+        ],
+        { cancelable: false }
+    );
+  }
 }
 
   return (

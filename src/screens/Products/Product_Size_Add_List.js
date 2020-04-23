@@ -188,6 +188,7 @@ const renderHiddenItem = (data, rowMap) => (
               navigation={navigation}
               title={item.name}
               id={item.key}
+              price={item.size_price}
               />
             }
             rightOpenValue={-225}
@@ -207,9 +208,7 @@ const renderHiddenItem = (data, rowMap) => (
 
 
 
-function RowItem ({navigation,title,id}) {
-
-    
+function RowItem ({navigation,title,id,price}) {
   return (
     //   <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,allow_nav,true)}>
      <TouchableNativeFeedback>
@@ -217,6 +216,7 @@ function RowItem ({navigation,title,id}) {
             <View style={{flex:3,flexDirection:'row',alignItems:"center"}}>
               <Text style={styles.title}>{title}</Text>
             </View>
+            <Text style={styles.title_price}>{price}</Text>
             <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
           </View>
       </TouchableNativeFeedback>
@@ -272,6 +272,11 @@ const styles = StyleSheet.create({
         color:'#4A4A4A',
         padding:15,
         fontSize: 20,
+      },
+      title_price: {
+        color:'#4A4A4A',
+        padding:15,
+        fontSize: 15,
       },
       centeredView: {
         flex: 1,
