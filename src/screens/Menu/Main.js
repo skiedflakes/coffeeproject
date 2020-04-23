@@ -17,27 +17,6 @@ export default function Main ({route,navigation,body_content}) {
   
   useFocusEffect(
     React.useCallback(() => {
-        const removeItems  = async (key) => {
-          console.log('main == ',key)
-          await AsyncStorage.removeItem(key);
-        }
-
-      AsyncStorage.getAllKeys((err, keys) => {
-        AsyncStorage.multiGet(keys, (err, stores) => {
-            stores.map((result, i, store) => {
-              let key = store[i][0];
-              var jsonPars = JSON.parse(store[i][1]);
-              if(jsonPars.selected_additions==1){
-              
-                removeItems(key)
-              }else{
-               
-              }
-            
-            });
-          });
-
-        });
       setcontent(<Content category_id={0}/>);
       fetch(global.global_url+'menu/get_all_tags.php')
             .then((response) => response.json())

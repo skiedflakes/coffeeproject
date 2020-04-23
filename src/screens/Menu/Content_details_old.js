@@ -58,8 +58,6 @@ export default function Content_details ({navigation,route}) {
 
   const callback = () =>{
     try{
-
-
       AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (err, stores) => {
           const newData = stores.map((result, i, store) => {
@@ -83,8 +81,6 @@ export default function Content_details ({navigation,route}) {
           
           }catch(error){}
         });
-
-
       });
 
     }catch(error){}
@@ -226,7 +222,6 @@ function Item({onSelect,selected,details_name,price,details_id,header_id,item_he
   }
 }
 
-
 //php get data
 
 function getContent(navigation,title,product_category_id){
@@ -283,5 +278,19 @@ const styles = StyleSheet.create({
 
   title2: {
     fontSize: 25,
+  },
+  
+  add_plus:{
+    width:30,
+    height:35,
+    alignItems:'center',
+    alignContent:"center",
+    alignSelf:"center",
+    color:'#4A4A4A',
+    padding:5,
+    fontSize: 20,
+    borderRadius: 5,
+    borderColor:'black',
+    borderWidth:1.5,
   },
 });

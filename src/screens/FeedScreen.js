@@ -46,7 +46,7 @@ export default function Content_details () {
 
      const formData = new FormData();
     formData.append('product_category_id',2);
-
+    formData.append('product_id',2);
     fetch(global.global_url+'menu/get_dropdown_details_v2.php', {
       method: 'POST',
       headers: {

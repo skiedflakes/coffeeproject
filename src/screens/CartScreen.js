@@ -1,13 +1,29 @@
-import React, { Component ,useState} from 'react';
-import { View,Button,FlatList,Text,StyleSheet,TouchableOpacity, Alert} from 'react-native';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
-import AsyncStorage from '@react-native-community/async-storage';
+import React,{useState,useRef} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  SectionList,
+  TouchableOpacity,
+  TouchableHighlight,
+  Alert
+} from "react-native";
+import { SwipeListView } from 'react-native-swipe-list-view';
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
+//icons
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 
-export default function CartScreen ({navigation}) {
-  const [selectedItems, setselectedItems] = useState();
-  const [mycart,setmycart] = useState([]);
-  const [total_price,set_total_price] = useState('');
+
+
+export default function CartScreen () {
+  const [listData, setListData] = useState('');
 
   useFocusEffect(
     React.useCallback(() => {
@@ -27,15 +43,44 @@ export default function CartScreen ({navigation}) {
           });
           try{
             var filtered_newData = newData.filter(e => e != null);
-            console.log(filtered_newData);
-            var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
-            set_total_price(total);
-            setmycart(filtered_newData);
+            var counter =-1;
+              var data = filtered_newData.map(function(item2) {
+              var data_title = filtered_newData.map(function(item) {
+              
+                if(item2.id==item.id){
+                  ++counter;
+                  return {
+                    section:counter,
+                    id: item.id,
+                    product_name: item.product_name,
+                    price: item.price,
+                    base_price:item.base_price,
+                    add_on_price:item.add_on_price,
+                    qty:item.qty
+                  };
+                }else{return null}
+              });
+              var f_data_title = data_title.filter(e => e != null);
+
+              return {
+                id: item2.id,
+                product_id: item2.product_id,
+                product_name: item2.product_name,
+                qty:item2.qty,
+                price:item2.price,
+                data_title:f_data_title,
+                data:item2.data,
+              };
+            });
+            setListData(data);
+            // console.log(data);
+       
 
           }catch(error){}
          
         });
       });
+
 
       return () => {
 
@@ -44,101 +89,189 @@ export default function CartScreen ({navigation}) {
     }, [])
   );
 
+const closeRow = (rowMap, rowKey) => {
 
-  const clear_async = ()=> {
-    console.log(mycart);
-    const removeItems  = async (key) => {
-      console.log('main == ',key)
-      await AsyncStorage.removeItem(key);
-    }
-    
-    AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (err, stores) => {
-          stores.map((result, i, store) => {
-            let key = store[i][0];
-            var jsonPars = JSON.parse(store[i][1]);
-            if(jsonPars.add_to_cart==1){
-              removeItems(key)
-            }else{
-            }
+  if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+  }
+};
+
+const deleteRow = (rowKey,id) => {
+  const newData = [...listData];
+  const prevIndex = listData.findIndex(item => item.key === rowKey);
+  newData.splice(prevIndex, 1);
+  setListData(newData);
+
+    //ASYNC STORAGE REMOVE ALL PRE-SELECTED ADDITIONS
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+            stores.map((result, i, store) => {
+              let key = store[i][0];
+              var jsonPars = JSON.parse(store[i][1]);
+              if(key==id){
+                removeItems(key)
+              }else{
+              }
+            });
           });
+      });
+
+};
+
+  //SET ITEM STORAGE
+  const setItemStorage = async (key,value) => {
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
+  //DELETE ITEM STORAGE
+ const removeItems  = async (key) => {
+      await AsyncStorage.removeItem(key);
+  }
+
+const add_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,qty) => {
+  const newData = [...listData];
+  const prevIndex = listData.findIndex(item => item.key === rowKey);
+  var added_qty = ++qty;
+
+
+  console.log(base_price + "/ " + add_on_price +" /"+added_qty)
+  var t_price = (+base_price + +add_on_price)* +added_qty;
+  newData[section].data_title.splice(prevIndex, 1,
+    { 
+      section: section,
+      id: id,
+      product_name: product_name,
+      price: t_price,
+      base_price:base_price,
+      add_on_price:add_on_price,
+      qty:added_qty});
+  setListData(newData);
+  update_cart(id,added_qty);
+
+};
+
+const minus_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,qty) => {
+  const newData = [...listData];
+  const prevIndex = listData.findIndex(item => item.key === rowKey);
+  var added_qty = --qty;
+
+  if(added_qty>0){
+    var t_price = (+base_price * +add_on_price)* +added_qty;
+
+    console.log(base_price + "/ " + add_on_price +" /"+added_qty)
+  
+    newData[section].data_title.splice(prevIndex, 1,
+      { 
+        section: section,
+        id: id,
+        product_name: product_name,
+        price: t_price,
+        base_price:base_price,
+        add_on_price:add_on_price,
+        qty:added_qty});
+    setListData(newData);
+    update_cart(id,added_qty);
+  }else{ //delete
+    deleteRow(rowKey,id);
+  }
+};
+
+
+const update_cart = (my_key,my_qty) =>{ //add pre selected is add to cart key == 0
+  AsyncStorage.getAllKeys((err, keys) => {
+    AsyncStorage.multiGet(keys, (err, stores) => {
+        stores.map((result, i, store) => {
+          let key = store[i][0];
+          var jsonPars = JSON.parse(store[i][1]);
+
+          if(key==my_key){
+            setItemStorage(key,{
+              'id':jsonPars.id,
+              'add_to_cart':1,
+              'product_id':jsonPars.product_id,
+              'product_name': jsonPars.product_name,
+              'qty':my_qty,
+              'add_on_price':jsonPars.add_on_price,
+              'base_price':jsonPars.base_price,
+              'price':jsonPars.data,
+              'data':jsonPars.data});
+          }
         });
       });
-    setmycart(null);
-  }
-  const FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "100%",
-          backgroundColor: "#000",
-        }}
-      />
-    );
-  }
+    });
+}
 
-  const save_products = () =>{
-    if( global.g_user_id!=''){
-      var stringify_cart = JSON.stringify(mycart);
-      const formData = new FormData();
-      formData.append('user_id',global.g_user_id);
-      formData.append('total_price',total_price);
-      formData.append('mycart',stringify_cart);
-      
-      fetch(global.global_url+'cart/save_product.php', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-          },
-          body: formData
-      }).then((response) => response.json())
-            .then((responseJson) => {
-              
-             responseJson.save_response.map(function(item) {
-                 Alert.alert(item.status);
-                 if(item.status=='success'){
-                    // clear asnyc
-                    clear_async();
-                     navigation.goBack()
-                 }
-              });
-    
-                 }).catch((error) => {
-              console.error(error);
-            });
-    
-    
-      }else{
-        navigation.navigate('Login');
-       }
-  }
+const onRowDidOpen = rowKey => {
+  console.log('This row opened', rowKey);
+};
 
 
+const renderHiddenItem = (data, rowMap) => (
+  <View style={styles.rowBack}>
+      <TouchableOpacity
+          style={[styles.backRightBtn, styles.backRightBtnLeft]}
+          onPress={() => closeRow(rowMap, data.item.id+data.item.product_name)}
+      >
+          <Text style={styles.backTextWhite}>Close</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+          style={[styles.backRightBtn, styles.backRightBtnRight]}
+          onPress={() => deleteRow(data.item.key,data.item.id)}
+      >
+          <Text style={styles.backTextWhite}>Delete</Text>
+      </TouchableOpacity>
+  </View>
+);
 
-  return (
-    <View style={styles.main}>
-        <Button title="clear cart" onPress={clear_async}></Button>
- 
-        <FlatList
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            style={{alignContent:"center",margin:2}}
-            data={mycart}
-            renderItem={
-              ({ item }) => 
-              <RowItem 
-              product_name = {item.product_name}
+  return(
+    <View style={styles.container}>
+ <View style={{flex:6}}>
+    <SectionList
+      sections={listData}
+      keyExtractor={(item, index) => item + index}
+      renderItem={({ item,section }) =>
+       <Item 
+       header_name = {item.header_name}
+       title={item.name} 
+       price={item.price} 
+       required={section.required}
+       />
+      }
+      renderSectionHeader={({ section: { title,data_title } }) => (
+       <View>
+        <SwipeListView
+            
+            data={data_title}
+            renderItem={({ item }) => 
+            <RowItem
+              section={item.section}
+              minus_qty={minus_qty}
+              add_qty={add_qty}
+              qty={item.qty}
+              title={item.product_name}
+              id={item.id}
               price = {item.price}
-              qty = {item.qty}
+              base_price = {item.base_price}
+              add_on_price = {item.add_on_price}
               />
-              }
-            keyExtractor={item => item.id}
-            ItemSeparatorComponent = { FlatListItemSeparator }
+            }
+            rightOpenValue={-225}
+            previewOpenValue={-40}
+            previewOpenDelay={0}
+            renderHiddenItem={renderHiddenItem}
+            keyExtractor={item => item.id+item.product_name}
+            onRowDidOpen={onRowDidOpen}
         />
-
-        <TouchableOpacity
+   </View>
+      )}
+    />
+    </View>
+    <View>
+      <TouchableOpacity
         onPress={() => save_products()}
          style={styles.place_order}>
          <View style={{flex:6,flexDirection:"row"}}>
@@ -149,32 +282,71 @@ export default function CartScreen ({navigation}) {
            <Text style={styles.place_order_text}>Place Order</Text>
           </View>
           <View style={{flex:2,flexDirection:"row-reverse",marginHorizontal:20}}>
-            <Text style={styles.place_order_text}>P {total_price}</Text>
+            <Text style={styles.place_order_text}></Text>
           </View>
          </View>
         </TouchableOpacity>
-      </View>
-  );
+        </View>
+  </View>
+  )
 }
 
-function RowItem({id,product_name,qty,price}){
-  return(
-      <TouchableOpacity onPress={() => null}>
-          <View style={styles.item}>
-            <View style={{flex:3,flexDirection:"row"}}>
-            <Text style={styles.qty}>{qty}</Text>
-            <Text style={styles.title}>{product_name}</Text>
+
+function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,minus_qty}) {
+  var t_price =(+base_price+ +add_on_price)* +qty;
+  return (
+    //   <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,allow_nav,true)}>
+ 
+          <View style={styles.row_item}>
+            <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
+            <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+              <Text style={{fontSize:18}}>+</Text>
+            </TouchableNativeFeedback>
+            <Text style={styles.title}>{qty}x</Text>
+
+            <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+              <Text style={{fontSize:18}}>-</Text>
+            </TouchableNativeFeedback>
             </View>
-            <View style={{flex:3,flexDirection:"row-reverse",marginHorizontal:20}}>
-            <Text style={styles.title}>P {price}</Text> 
+            <View style={{flex:3.5,flexDirection:'row',alignItems:"center"}}>
+            <Text style={styles.row_title}>{title}</Text>
+            </View>
+
+            <View style={{flex:1.5,flexDirection:'row',alignItems:"center"}}>
+            <Text style={styles.title}>{t_price}</Text>
+            <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
             </View>
           </View>
-      </TouchableOpacity>
   );
 }
 
+const Item = ({title,header_name,price,id,required}) => (
+  <View style={styles.item}>
+    <View style={{flex:3,flexDirection:'row',alignItems:"center"}}>
+    <Text style={styles.item_text}>{header_name} : {title}</Text>
+    </View>
+    <Text style={styles.item_text}>{price}</Text>
+  </View>
+);
+
+
 const styles = StyleSheet.create({
+  
+  place_order_text: {
+    padding:8,
+    fontSize: 18,
+    color:"#FFFFFF",
+  },
+  place_order:{
+    marginHorizontal:20,
+    marginVertical:10,
+    flexDirection:'row',
+    borderRadius:5,
+    backgroundColor:'#179DEA'},
   main:{
+      alignItems:"center",
+      alignContent:"center",
+      alignSelf:"center",
       flex:6,
       backgroundColor: '#ffff',
       alignContent:"center",
@@ -182,6 +354,9 @@ const styles = StyleSheet.create({
   },
 
   header:{
+      alignItems:"center",
+      alignContent:"center",
+      alignSelf:"center",
       flexDirection:'row-reverse',
       padding:2,
       flex:0.6,
@@ -196,43 +371,142 @@ const styles = StyleSheet.create({
       
   },
   container: {
-      flex: 1,
-      marginTop:5,
+    flex:6,
+    backgroundColor: '#ffff',
+    alignContent:"center",
+    flexDirection:'column'
+    },
+
+    row_title:{
+      color:'black',
+      padding:5,
+      fontSize: 20,
+      fontWeight: "500",
     },
     item: {
-      flex:6,
+      paddingBottom:10,
       flexDirection:'row',
-      paddingLeft:10,
+      paddingLeft:25,
       backgroundColor:'#ffff',
+      paddingRight:35,
+      alignContent:"center",
+      alignItems:"center"
+    },
+    item_text: {
+      flexDirection:'row',
+      backgroundColor:'#ffff',
+      alignContent:"center",
+      alignItems:"center",
+      color:"#858181"
+    },
+    row_item: {
+      borderTopColor:"gray",
+      borderTopWidth:1,
+      flexDirection:'row',
+      paddingLeft:20,
+      paddingTop:5,
       padding:5,
-      alignContent:"center"
+      backgroundColor:'#ffff',
+      alignContent:"center",
+      alignItems:"center",
+      elevation:6
     },
     title: {
       color:'#4A4A4A',
       padding:10,
-      fontSize: 18,
+      fontSize: 20,
     },
 
-    qty: {
-      color:"#179DEA",
-      padding:8,
-      fontSize: 18,
-      borderRadius:5,
-      borderWidth:2,
-      borderColor:'#179DEA',
-      textAlign:"center",
-      fontWeight:"bold"
+    add_plus:{
+      width:30,
+      height:35,
+      alignItems:'center',
+      alignContent:"center",
+      alignSelf:"center",
+      color:'#4A4A4A',
+      padding:5,
+      fontSize: 20,
+      borderRadius: 5,
+      borderColor:'black',
+      borderWidth:1.5,
     },
 
-    place_order_text: {
-      padding:8,
-      fontSize: 18,
-      color:"#FFFFFF",
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22
     },
-    place_order:{
-      marginHorizontal:20,
-      marginVertical:10,
-      flexDirection:'row',
-      borderRadius:5,
-      backgroundColor:'#179DEA'}
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    openButton: {
+      backgroundColor: "#F194FF",
+      borderRadius: 10,
+      padding: 10,
+      elevation: 2
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: "center",
+      height:10
+    },
+
+
+  backTextWhite: {
+      color: '#FFF',
+  },
+  rowFront: {
+      alignItems: 'center',
+      backgroundColor: '#CCC',
+      borderBottomColor: 'black',
+      borderBottomWidth: 1,
+      justifyContent: 'center',
+      height: 50,
+  },
+  rowBack: {
+      alignItems: 'center',
+      backgroundColor: '#DDD',
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingLeft: 15,
+  },
+  backRightBtn: {
+      alignItems: 'center',
+      bottom: 0,
+      justifyContent: 'center',
+      position: 'absolute',
+      top: 0,
+      width: 75,
+  },
+  backRightBtnLeft: {
+      backgroundColor: 'red',
+      right: 75,
+  },
+  backRightBtnRight: {
+      backgroundColor: 'blue',
+      right: 0,
+  },
+  backRightBtnRight_add: {
+      backgroundColor: 'gray',
+      right: 150,
+  },
 })

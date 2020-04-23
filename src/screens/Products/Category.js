@@ -67,7 +67,7 @@ export default function Category ({navigation}) {
       };
     }, [])
   );
-
+ 
     const add_tag = () =>{
         console.log(imageUri);
         if(!Category_name){

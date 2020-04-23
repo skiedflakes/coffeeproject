@@ -8,7 +8,6 @@ import { TextInput } from 'react-native-paper';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 
-
 //icons
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/FontAwesome';

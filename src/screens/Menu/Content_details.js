@@ -6,23 +6,45 @@ import Feather from 'react-native-vector-icons/Feather';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { TouchableNativeFeedback } from 'react-native-gesture-handler';
+
 import CircleCheckBox, {LABEL_POSITION} from 'react-native-circle-checkbox'; 
 import { call, set, min } from 'react-native-reanimated';
 
 export default function Content_details ({navigation,route}) {
-  const {product_name,price,product_id,product_category_id,data_details,data_header} = route.params;
-  var [current_price,setprice] = useState(price);
-  var [current_qty,setqty] = useState(1);
-  var [current_additional,setcurrent_additional] = useState(0);
+  const {product_name,product_id,product_category_id} = route.params;
 
-//new
+  var [current_qty,setqty] = useState(1);
+  
+  //new const
   const [listData, setListData] = useState('');
+  const [base_price,setbase_price] = useState(0);
+  const [add_on_price,setadd_on_price] = useState(0);
+  const [final_price,setfinal_price] = useState(0);
+  const [addtocart_array,setaddtocart_array] = useState('')
 
   useFocusEffect(
     React.useCallback(() => {
+    //ASYNC STORAGE REMOVE ALL PRE-SELECTED ADDITIONS
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (err, stores) => {
+          stores.map((result, i, store) => {
+            let key = store[i][0];
+            var jsonPars = JSON.parse(store[i][1]);
+            if(jsonPars.selected_additions==1){
+              removeItems(key)
+            }else{
+            
+            }
+          
+          });
+        });
+    });
 
-     const formData = new FormData();
-    formData.append('product_category_id',2);
+    // LOAD SELECTIONS
+    const formData = new FormData();
+    formData.append('product_category_id',product_category_id);
+    formData.append('product_id',product_id);
 
     fetch(global.global_url+'menu/get_dropdown_details_v2.php', {
       method: 'POST',
@@ -34,32 +56,35 @@ export default function Content_details ({navigation,route}) {
     }).then((response) => response.json())
           .then((responseJson) => {
             var data = responseJson.all_data.map(function(item) {
-         
               return {
                 header_id: item.header_id,
                 title: item.title,
                 current_checked:0,
                 required: item.required,
+                max_limit: item.max_limit,
                 data:item.data,
               };
-            });
-            
+            }); 
             console.log(data);
             setListData(data);
-
             }).catch((error) => {
             console.error(error);
           });
-
 
       return () => {
       };
     }, [])
   );
-  
-  const setItemStorage = async (key,value) => {
- 
 
+  //DELETE ITEM STORAGE
+  const removeItems  = async (key) => {
+    await AsyncStorage.removeItem(key);
+    update_price('selection');
+  }
+
+
+  //SET ITEM STORAGE
+  const setItemStorage = async (key,value) => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
@@ -67,39 +92,283 @@ export default function Content_details ({navigation,route}) {
     }
   };
 
-  const add_to_cart = () =>{
-    var d = new Date();
-    var n = d.getTime();
-    setItemStorage(n.toString(),{'id':n.toString(),'selected_additions':0,'add_to_cart':1,'product_id':product_id,'product_name': product_name,'qty':current_qty,'price':current_price})
-    getContent(navigation,product_name,product_category_id);
+  //add SELECTED
+  const add_pre_selected = (h_id,d_id,name,price,required,header) =>{ //add pre selected is add to cart key == 0
+    var n = new Date().getTime(); // get unique ID
+    setItemStorage(n.toString(),
+    {'id':n.toString(),
+    'selected_additions':1,
+    'h_id':h_id,
+    'd_id': d_id,
+    'header_name':header,
+    'name':name,
+    'price':price,
+    'required':required})
+  }
+  //delete PRE-SELECTED many
+  const delete_pre_selected_req_many = (h_id,d_id) =>{ //add pre selected is add to cart key == 0
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (err, stores) => {
+          stores.map((result, i, store) => {
+            let key = store[i][0];
+            var jsonPars = JSON.parse(store[i][1]);
+            if(jsonPars.selected_additions==1 &&jsonPars.h_id==h_id&jsonPars.d_id==d_id){
+              removeItems(key)
+         
+            }else{
+            }
+          });
+        });
+    });
   }
 
-  const update_total_price = (minus_plus) =>{
-    var qty = current_qty;
-
-    if(minus_plus=='plus'){
-        qty = ++current_qty;
-        var total = (+price * +current_qty)+ +current_additional;
-        setprice(total);
-    }else if(minus_plus=='minus'){
-      if(current_qty>1){
-        qty = --current_qty;
-        var total = (+price * +current_qty)+ +current_additional;
-        setprice(total);
-      }else{
-      }
-    }else{
-      setcurrent_additional(minus_plus);
-        setprice((+price* +1)+ +minus_plus);
-    }
-    setqty(qty);
-  }
-
-  const callback = () =>{
-    try{
+    //delete PRE-SELECTED one
+const delete_pre_selected_req_1 = (h_id,d_id) =>{ //add pre selected is add to cart key == 0
       AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (err, stores) => {
-          const newData = stores.map((result, i, store) => {
+            stores.map((result, i, store) => {
+              let key = store[i][0];
+              var jsonPars = JSON.parse(store[i][1]);
+              if(jsonPars.selected_additions==1 &&jsonPars.h_id==h_id&&jsonPars.d_id){
+                removeItems(key)
+           
+              }else{
+              }
+            });
+          });
+      });
+}
+
+    //update PRE-SELECTED one
+const update_pre_selected_req_1 = (h_id,d_id,name,price,required,header) =>{ //add pre selected is add to cart key == 0
+          AsyncStorage.getAllKeys((err, keys) => {
+            AsyncStorage.multiGet(keys, (err, stores) => {
+                stores.map((result, i, store) => {
+                  let key = store[i][0];
+                  var jsonPars = JSON.parse(store[i][1]);
+                  if(jsonPars.selected_additions==1&&jsonPars.h_id==h_id&&jsonPars.d_id){
+                    setItemStorage(key,
+                      {'id':key,
+                      'selected_additions':1,
+                      'h_id':h_id,
+                      'd_id': d_id,
+                      'header_name':header,
+                      'name':name,
+                      'price':price,
+                      'required':required})
+                    update_price('selection')
+                  }else{
+                  }
+                });
+              });
+          });
+}
+
+
+  //new updating sectionlist with select button
+  const updateRow = (h_id,d_id,rowKey,myname,checked,required,myprice,limit,header) => {
+    // UPDATE UI AND DATA ON TOGGLE
+      const [section] = rowKey.split('.');
+      const newData = [...listData];
+      const prevIndex = listData[section].data.findIndex(
+          item => item.key === rowKey
+      );
+
+      if(limit>=required){
+        if(required>0){
+          if(required==1){ // if one required
+            var check_has_true = newData[section].data.map(function(item,index) {
+              if(item.checked==true){
+                return true;
+              }else{
+                return false;
+              }
+            
+            });
+            
+            check_has_true = check_has_true.includes(true);
+            //set all to false
+            newData[section].data.map(function(item,index) {
+              newData[section].data.splice(index, 1,{key:item.key,text:item.text,checked:false,price:item.price,h_id:item.h_id,d_id:item.d_id});
+              });
+      
+            //SAVE ASYNC STORAGE
+            //IF CHECK IS FALSE
+            if(check_has_true==false||checked==undefined){ // add to async storage PRE-SELECTED ADDITIONS
+              //set only one true
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id}); 
+              add_pre_selected(h_id,d_id,myname,myprice,required,header);
+              if(h_id=='0'){ //static Size
+                setbase_price(myprice);
+              }
+              update_price('selection');
+            }else if(check_has_true==true&&checked==false){ //update selected
+              //set only one true
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id});
+              if(h_id=='0'){//static Size
+                setbase_price(myprice);
+              }
+              update_pre_selected_req_1(h_id,d_id,myname,myprice,required,header);
+              //if Size add as base price
+            }else{ //remove from async storage+
+                          //if Size add as base price
+              delete_pre_selected_req_1(h_id,d_id);
+
+              if(h_id=='0'){//static Size
+                setbase_price(0);
+              }
+              update_price('selection');
+            } 
+    
+  
+        }else{ //if two or more required
+          
+            newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id});
+            var result = newData[section].data.filter(obj => {
+              return obj.checked == true
+            })
+            
+            if(result.length>required){ // check if more than required
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:checked,price:myprice,h_id:h_id,d_id:d_id}); // set to default
+  
+            }else{
+            //SAVE ASYNC STORAGE
+            //IF CHECK IS FALSE
+            if(checked==false||checked==undefined){ // add to async storage PRE-SELECTED ADDITIONS
+              add_pre_selected(h_id,d_id,myname,myprice,1,header)
+              update_price('selection')
+            }else{ //remove from async storage
+              delete_pre_selected_req_many(h_id,d_id);
+            } 
+            }
+  
+        }
+        }else{
+        if(limit==1){ // if one required
+            var check_has_true = newData[section].data.map(function(item,index) {
+              if(item.checked==true){
+                return true;
+              }else{
+                return false;
+              }
+            
+            });
+  
+            check_has_true = check_has_true.includes(true);
+            //set all to false
+            newData[section].data.map(function(item,index) {
+              newData[section].data.splice(index, 1,{key:item.key,text:item.text,checked:false,price:item.price,h_id:item.h_id,d_id:item.d_id});
+              });
+      
+            //SAVE ASYNC STORAGE
+            //IF CHECK IS FALSE
+            if(check_has_true==false||checked==undefined){ // add to async storage PRE-SELECTED ADDITIONS
+              //set only one true
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id}); 
+              add_pre_selected(h_id,d_id,myname,myprice,0,header);
+              update_price('selection');
+            }else if(check_has_true==true&&checked==false){ //update selected
+              //set only one true
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id});
+              update_pre_selected_req_1(h_id,d_id,myname,myprice,0,header);
+  
+            }else{ //remove from async storage+
+              delete_pre_selected_req_1(h_id,d_id);
+              update_price('selection');
+            } 
+    
+  
+        }else{ //if two or more required
+          
+            newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked,price:myprice,h_id:h_id,d_id:d_id});
+            var result = newData[section].data.filter(obj => {
+              return obj.checked == true
+            })
+            
+            if(result.length>limit){ // check if more than required
+              newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:checked,price:myprice,h_id:h_id,d_id:d_id}); // set to default
+  
+            }else{
+            //SAVE ASYNC STORAGE
+            //IF CHECK IS FALSE
+            if(checked==false||checked==undefined){ // add to async storage PRE-SELECTED ADDITIONS
+              add_pre_selected(h_id,d_id,myname,myprice,0,header)
+              update_price('selection')
+            }else{ //remove from async storage
+              delete_pre_selected_req_many(h_id,d_id);
+            } 
+            }
+  
+        }
+        }
+      }else{ //cannot be
+
+      }
+
+      setListData(newData);
+
+    //END
+     
+};
+
+const update_show_price = (base_price,add_on_price,qty) =>{
+
+  setfinal_price((+base_price+ +add_on_price)* +qty);
+}
+
+
+const update_price = (minus_plus) => {
+  console.log(minus_plus);
+  var qty = current_qty;
+  if(minus_plus=='plus'){
+    qty = ++current_qty;
+    setqty(qty);
+    update_show_price(base_price,add_on_price,qty)
+
+  }else if(minus_plus=='minus'){
+    if(qty>1){
+      qty = --current_qty;
+      setqty(qty);
+      update_show_price(base_price,add_on_price,qty)
+    }
+
+  }else if(minus_plus=='selection'){
+    try{
+
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+          const final_price_data = stores.map((result, i, store) => {
+            // get at each store's key/value so you can work with it
+            let key = store[i][0];
+            var jsonPars = JSON.parse(store[i][1]);
+            if(jsonPars.selected_additions==1&&jsonPars.h_id!=0){
+              return JSON.parse(store[i][1]);
+            }else{
+              return null;
+            }
+
+          });
+   
+          if(final_price_data!=null){
+            try{
+              
+              var filtered_newData = final_price_data.filter(e => e != null);
+              var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
+              setadd_on_price(total);
+              
+            }catch(error){
+              setadd_on_price('0.00')
+            }
+          }else{
+            setadd_on_price('0.00')
+          }
+        });
+      });
+    
+
+      AsyncStorage.getAllKeys((err, keys) => {
+        AsyncStorage.multiGet(keys, (err, stores) => {
+          const final_price_data = stores.map((result, i, store) => {
             // get at each store's key/value so you can work with it
             let key = store[i][0];
             var jsonPars = JSON.parse(store[i][1]);
@@ -110,69 +379,103 @@ export default function Content_details ({navigation,route}) {
             }
 
           });
-
-          try{
-
-            var filtered_newData = newData.filter(e => e != null);
-            var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
-            update_total_price(total);
-            console.log(total);
-          
-          }catch(error){}
+   
+          if(final_price_data!=null){
+            try{
+              
+              var filtered_newData = final_price_data.filter(e => e != null);
+              var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
+              setfinal_price(+total*+current_qty);
+   
+            }catch(error){
+              setfinal_price(0.00);
+            }
+          }else{
+            setfinal_price(0.00);
+          }
         });
-
-
       });
 
     }catch(error){}
+
   }
 
+}
 
 
-  //new 
-  const updateRow = (rowKey,myname,checked,required) => {
-    // console.log([true,false,true,false,true].filter(v => v).length);
-    const [section] = rowKey.split('.');
-    const newData = [...listData];
-    const prevIndex = listData[section].data.findIndex(
-        item => item.key === rowKey
-    );
+const add_to_cart = () =>{
 
-    if(required==1){ // if one required
+  
+  var d = new Date();
+  var add_to_cart_key = d.getTime();
+  // set key id for selected
+ 
+  AsyncStorage.getAllKeys((err, keys) => {
+    AsyncStorage.multiGet(keys, (err, stores) => {
+      const newData= stores.map((result, i, store) => {
+          let key = store[i][0];
+          var jsonPars = JSON.parse(store[i][1]);
+          if(jsonPars.selected_additions==1){
+           return jsonPars;
+          }else{
+           
+          }
+        });
 
-      //set all to false
-      newData[section].data.map(function(item,index) {
-        newData[section].data.splice(index, 1,{key:item.key,text:item.text,checked:false});
+        const cart_data= stores.map((result, i, store) => {
+          let key = store[i][0];
+          var jsonPars = JSON.parse(store[i][1]);
+          if(jsonPars.add_to_cart==1){
+            return jsonPars;
+          }else{
+          }
+
+        });
+        try{
+          //remove null and sort by header_id
+          var filtered_newData = newData.filter(e => e != null).sort(function(a, b) { 
+            return a.h_id - b.h_id  ||  a.h_id.localeCompare(b.h_id);
+          });
+          console.log(base_price);
+
+           setItemStorage(add_to_cart_key.toString(),{
+             'id':add_to_cart_key.toString(),
+             'add_to_cart':1,
+             'product_id':product_id,
+             'product_name': product_name,
+             'qty':current_qty,
+             'add_on_price':add_on_price,
+             'base_price':base_price,
+             'price':final_price,
+             'data':filtered_newData});
+           getContent(navigation,product_name,product_category_id);
+        }catch(error){}
+       
       });
+    });
+}
 
-      //set only one true
-      newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked});
-
-    }else{ //if two or more required
-      
-      newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:!checked});
-      var result = newData[section].data.filter(obj => {
-        return obj.checked == true
-      })
-      
-      if(result.length>required){ // check if more than required
-        newData[section].data.splice(prevIndex, 1,{key:rowKey,text:myname,checked:checked}); // set to default
-      }
-    }
-
-    setListData(newData);
-};
-
-
-const Item = ({title,selected,updateRow,id,required}) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-    <CircleCheckBox
+const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header}) => (
+  <View  style={[
+    styles.item,{marginHorizontal:15}
+  ]} >
+<View style={{flex:6,flexDirection:"row",alignContent:"center",alignItems:"center"}}>
+<View style = {{flex:3}}>
+<CircleCheckBox
             checked={selected ? true :false}
             labelPosition={LABEL_POSITION.RIGHT}
-            onToggle={() => updateRow(id,title,selected,required)}
+            onToggle={() => updateRow(h_id,d_id,id,title,selected,required,price,limit,header)}
+            label={title}
           />
+</View>
+<View style = {{flex:3,flexDirection:"row-reverse"}}>
+  <View>
+<Text style={styles.title}>+ {price}</Text>
   </View>
+</View>
+</View>
+</View>
+
 );
 
   return (
@@ -182,6 +485,9 @@ const Item = ({title,selected,updateRow,id,required}) => (
 
       <SectionList
       sections={listData}
+      renderSectionHeader={({section: {title}}) => (
+        <Text style={{fontWeight: 'bold'}}>{title}</Text>
+      )}
       keyExtractor={(item, index) => item + index}
       renderItem={({ item,section }) =>
        <Item 
@@ -189,11 +495,16 @@ const Item = ({title,selected,updateRow,id,required}) => (
        selected={item.checked}
        updateRow = {updateRow}
         id = {item.key}
+        h_id = {item.h_id}
+        d_id = {item.d_id}
+        price = {item.price}
         required={section.required}
+        limit = {section.max_limit}
+        header = {section.title}
        />
       }
       renderSectionHeader={({ section: { title } }) => (
-        <Text style={styles.header}>{title}</Text>
+        <Text style={styles.header}>{title} </Text>
       )}
     />
 
@@ -202,13 +513,19 @@ const Item = ({title,selected,updateRow,id,required}) => (
       <View style={{flex:6,alignContent:"center"}}>
 
         <View style={{flex:3,flexDirection:"row",alignItems:"center",paddingVertical:10}}>
-          <View style={{flex:2.5,flexDirection:"row-reverse",alignContent:"center",alignItems:"center",alignSelf:"center"}}>
-            <Button title="+" onPress={() => update_total_price('plus')}></Button>
-          <Text style={{textAlign:"center",marginHorizontal:10}}>{current_qty}</Text>
-            <Button title="-" onPress={() => update_total_price('minus')}></Button>
+          <View style={{flex:2.5,flexDirection:'row',alignItems:"center"}}>
+            <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('plus')}>
+              <Text style={{fontSize:18}}>+</Text>
+            </TouchableNativeFeedback>
+            <Text style={{color:'#4A4A4A',padding:10,fontSize: 20,}}>{current_qty}x</Text>
+
+            <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('minus')}>
+              <Text style={{fontSize:18}}>-</Text>
+            </TouchableNativeFeedback>
           </View>
+
           <View style={{flex:1.5,flexDirection:"row-reverse",marginLeft:20}}>
-          <Text style={{fontSize:18}}>P {current_price}</Text>
+           <Text style={{fontSize:18}}> P {final_price}</Text>
           </View>
         </View>
 
@@ -223,10 +540,6 @@ const Item = ({title,selected,updateRow,id,required}) => (
   
   );
 }
-
-
-//php get data
-
 function getContent(navigation,title,product_category_id){
   const formData = new FormData();
   formData.append('product_category_id',product_category_id);
@@ -255,15 +568,16 @@ function getContent(navigation,title,product_category_id){
         });
   }
   
-
 const styles = StyleSheet.create({
   container: {
     flex: 6,
     margin:10,
 
   },
+  header: {
+    fontSize: 20,
 
-    
+  },
   header_item: {
     marginVertical: 8,
     marginHorizontal: 16,
@@ -271,6 +585,7 @@ const styles = StyleSheet.create({
   },
   
   item: {
+    fontSize: 20,
     padding: 10,
   },
 
@@ -281,5 +596,18 @@ const styles = StyleSheet.create({
 
   title2: {
     fontSize: 25,
+  },
+  add_plus:{
+    width:30,
+    height:35,
+    alignItems:'center',
+    alignContent:"center",
+    alignSelf:"center",
+    color:'#4A4A4A',
+    padding:5,
+    fontSize: 20,
+    borderRadius: 5,
+    borderColor:'black',
+    borderWidth:1.5,
   },
 });

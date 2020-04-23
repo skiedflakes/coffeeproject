@@ -72,6 +72,8 @@ export default function Product_Entry_add ({navigation,route}) {
 
       }
 
+
+
     function renderImage(){
         if(image_preview==false){
             return (
