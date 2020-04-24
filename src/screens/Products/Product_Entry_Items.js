@@ -57,7 +57,6 @@ export default function Product_Entry_Items ({navigation,route}) {
                     return {
                     key:item.product_id,
                     name: item.product_name,
-                    price: item.price,
                     product_details: item.product_details,
                     image_url: item.image_url
                     };
@@ -150,7 +149,7 @@ const renderHiddenItem = (data, rowMap) => (
 
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnRight]}
-            onPress={() =>  navigate_edit(navigation, data.item.name, data.item.key, data.item.product_details, data.item.price, data.item.image_url)}
+            onPress={() =>  navigate_edit(navigation, data.item.name, data.item.key, data.item.product_details, data.item.image_url)}
         >
             <Text style={styles.backTextWhite}>Edit</Text>
         </TouchableOpacity>
@@ -158,8 +157,8 @@ const renderHiddenItem = (data, rowMap) => (
     </View>
 );
 
-function navigate_edit(navigation,name,product_id,details,product_price,img_url){
-  navigation.navigate("Product Entry Edit",{name,id,product_id,details,product_price,img_url});
+function navigate_edit(navigation,name,product_id,details,img_url){
+  navigation.navigate("Product Entry Edit",{name,id,product_id,details,img_url});
 }
 
 return (
