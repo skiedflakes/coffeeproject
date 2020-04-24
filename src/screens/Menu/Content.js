@@ -10,49 +10,16 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-
 //etc
 import ViewMoreText from 'react-native-view-more-text';
 const deviceWidth = Dimensions.get('window').width;
-import { Avatar, Badge, withBadge } from 'react-native-elements'
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Content({navigation,route}){
 var {title,product_category_id } = route.params;
 const [current_list_data, setcurrent_list_data] = useState('');
 
-//badge
-var [badge_val, setbadge_val] = React.useState(null);
-var [badge_hidden, setbadge_hidden] = React.useState(false);
-
 useFocusEffect(
   React.useCallback(() => {
-
-    //check cart
-AsyncStorage.getAllKeys((err, keys) => {
-  AsyncStorage.multiGet(keys, (err, stores) => {
-    const newData= stores.map((result, i, store) => {
-        let key = store[i][0];
-        var jsonPars = JSON.parse(store[i][1]);
-        if(jsonPars.add_to_cart==1){
-          // setItemStorage(n.toString(),{'id':n.toString(),'selected_additions':0,'add_to_cart':1,'product_id':product_id,'product_name': product_name,'qty':current_qty,'price':current_price})
-            return jsonPars;
-        }
-      });
-      try{
-        var filtered_newData = newData.filter(e => e != null);
-   
-        if(filtered_newData.length==0){
-          setbadge_hidden(true);
-        }else{
-          
-          setbadge_val(filtered_newData.length);
-          setbadge_hidden(false);
-        }
-      }catch(error){}
-    });
-});
-
     const formData = new FormData();
     formData.append('product_category_id',product_category_id);
     fetch(global.global_url+'menu/get_menu_details.php', {
@@ -91,7 +58,6 @@ return (
     <View style={{  flexDirection: 'row', padding:2,}} >
         <TouchableOpacity onPress={() =>   navigation.navigate('Cart')}>
         <Icon name="cart-plus" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
-        {badge_hidden ? null : (<Badge value={badge_val} status="error" containerStyle={styles.badgeStyle}/>)}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
         <Icon name="comments" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
@@ -278,10 +244,5 @@ const styles = StyleSheet.create({
       color:'#4A4A4A',
       padding:10,
       fontSize: 18,
-    },
-    badgeStyle: { 
-      position: 'absolute',
-      top: 0,
-      right: -4 
     },
 })
