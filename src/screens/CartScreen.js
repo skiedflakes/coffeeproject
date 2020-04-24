@@ -103,12 +103,12 @@ const closeRow = (rowMap, rowKey) => {
   }
 };
 
-const deleteRow = (rowKey,id) => {
+const deleteRow = (id) => {
   const newData = [...listData];
-  const prevIndex = listData.findIndex(item => item.key === rowKey);
+  const prevIndex = newData.findIndex(item => item.id === id);
+  console.log(prevIndex);
   newData.splice(prevIndex, 1);
-  setListData(newData);
-
+   
     //ASYNC STORAGE REMOVE ALL PRE-SELECTED ADDITIONS
       AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (err, stores) => {
@@ -125,6 +125,7 @@ const deleteRow = (rowKey,id) => {
           });
       });
 
+      setListData(newData);
 };
 
   //SET ITEM STORAGE
