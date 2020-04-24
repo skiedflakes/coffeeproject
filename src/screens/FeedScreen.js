@@ -8,10 +8,22 @@ import {
   Alert
 } from "react-native";
 
+import GetLocation from 'react-native-get-location'
 
-export default function Content_details () {
+
+export default function FeedScreen () {
   const [listData, setListData] = useState('');
-
+GetLocation.getCurrentPosition({
+    enableHighAccuracy: true,
+    timeout: 15000,
+})
+.then(location => {
+    console.log(location);
+})
+.catch(error => {
+    const { code, message } = error;
+    console.warn(code, message);
+})
   return(
     <SafeAreaView style={styles.container}>
    

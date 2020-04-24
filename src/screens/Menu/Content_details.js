@@ -476,8 +476,8 @@ const add_to_cart = () =>{
       <View style={{flex:5}}>
 
       <SectionList
+      showsVerticalScrollIndicator={false}
       sections={listData}
-
       keyExtractor={(item, index) => item + index}
       renderItem={({ item,section }) =>
        <Item 
@@ -520,7 +520,7 @@ const add_to_cart = () =>{
             </View>
         </View>
 
-        <View style={{flex:3,alignItems:"center"}}>
+        <View style={{flex:3,alignItems:"center",marginRight:15}}>
           <Button title="add to cart" onPress={()=>add_to_cart()}></Button>
         </View>
       </View>

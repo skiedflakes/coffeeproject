@@ -22,8 +22,9 @@ import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 
 
 
-export default function CartScreen () {
-  const [listData, setListData] = useState('');
+export default function CartScreen ({navigation}) {
+  const [listData, setListData] = useState(null);
+  const [TotalCartPrice, setTotalCartPrice] = useState('0');
 
   useFocusEffect(
     React.useCallback(() => {
@@ -43,6 +44,9 @@ export default function CartScreen () {
           });
           try{
             var filtered_newData = newData.filter(e => e != null);
+            var final_total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
+
+            setTotalCartPrice(final_total);
             var counter =-1;
               var data = filtered_newData.map(function(item2) {
               var data_title = filtered_newData.map(function(item) {
@@ -72,6 +76,9 @@ export default function CartScreen () {
                 data:item2.data,
               };
             });
+
+
+       
             setListData(data);
             // console.log(data);
        
@@ -108,7 +115,9 @@ const deleteRow = (rowKey,id) => {
             stores.map((result, i, store) => {
               let key = store[i][0];
               var jsonPars = JSON.parse(store[i][1]);
+              var basetotal= +jsonPars.base_price+ +jsonPars.add_on_price;
               if(key==id){
+                setTotalCartPrice(+TotalCartPrice- +basetotal);
                 removeItems(key)
               }else{
               }
@@ -150,7 +159,7 @@ const add_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,qt
       add_on_price:add_on_price,
       qty:added_qty});
   setListData(newData);
-  update_cart(id,added_qty);
+  update_cart(id,added_qty,'plus');
 
 };
 
@@ -174,21 +183,28 @@ const minus_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,
         add_on_price:add_on_price,
         qty:added_qty});
     setListData(newData);
-    update_cart(id,added_qty);
+    update_cart(id,added_qty,'minus');
   }else{ //delete
     deleteRow(rowKey,id);
   }
 };
 
 
-const update_cart = (my_key,my_qty) =>{ //add pre selected is add to cart key == 0
+const update_cart = (my_key,my_qty,minus_plus) =>{ //add pre selected is add to cart key == 0
   AsyncStorage.getAllKeys((err, keys) => {
     AsyncStorage.multiGet(keys, (err, stores) => {
         stores.map((result, i, store) => {
           let key = store[i][0];
           var jsonPars = JSON.parse(store[i][1]);
-
+          var total_price = (+jsonPars.base_price+ +jsonPars.add_on_price)* +my_qty;
+          var basetotal= +jsonPars.base_price+ +jsonPars.add_on_price;
           if(key==my_key){
+            if(minus_plus=='plus'){
+              setTotalCartPrice(+TotalCartPrice+ +basetotal);
+            }else{
+              setTotalCartPrice(+TotalCartPrice- +basetotal);
+            }
+           
             setItemStorage(key,{
               'id':jsonPars.id,
               'add_to_cart':1,
@@ -197,7 +213,7 @@ const update_cart = (my_key,my_qty) =>{ //add pre selected is add to cart key ==
               'qty':my_qty,
               'add_on_price':jsonPars.add_on_price,
               'base_price':jsonPars.base_price,
-              'price':jsonPars.data,
+              'price':total_price,
               'data':jsonPars.data});
           }
         });
@@ -272,18 +288,24 @@ const renderHiddenItem = (data, rowMap) => (
     </View>
     <View>
       <TouchableOpacity
-        onPress={() => save_products()}
+        onPress={() => cart_nav({navigation,TotalCartPrice})}
          style={styles.place_order}>
          <View style={{flex:6,flexDirection:"row"}}>
-           <View style={{flex:2}}>
-           <Text style={styles.place_order_text}></Text>
-           </View>
-           <View style={{flex:3}}>
-           <Text style={styles.place_order_text}>Place Order</Text>
-          </View>
-          <View style={{flex:2,flexDirection:"row-reverse",marginHorizontal:20}}>
-            <Text style={styles.place_order_text}></Text>
-          </View>
+      
+            <View style={{flex:3}}>
+              <Text style={{
+                  padding:8,
+                  fontSize: 18,
+                  color:"#FFFFFF",
+                  marginLeft:20
+                }}>Place Order</Text>
+              </View>
+          <Text style={{
+              padding:8,
+              fontSize: 18,
+              color:"#FFFFFF",
+              marginRight:20,
+            }}>{TotalCartPrice}</Text>
          </View>
         </TouchableOpacity>
         </View>
@@ -291,6 +313,10 @@ const renderHiddenItem = (data, rowMap) => (
   )
 }
 
+function cart_nav({navigation,TotalCartPrice}){
+  navigation.navigate("Place Order",{TotalCartPrice:TotalCartPrice});
+  
+}
 
 function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,minus_qty}) {
   var t_price =(+base_price+ +add_on_price)* +qty;
@@ -308,11 +334,11 @@ function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,mi
               <Text style={{fontSize:18}}>-</Text>
             </TouchableNativeFeedback>
             </View>
-            <View style={{flex:3.5,flexDirection:'row',alignItems:"center"}}>
+            <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
             <Text style={styles.row_title}>{title}</Text>
             </View>
 
-            <View style={{flex:1.5,flexDirection:'row',alignItems:"center"}}>
+            <View style={{flex:1.5,flexDirection:'row',alignItems:"center",marginRight:10}}>
             <Text style={styles.title}>{t_price}</Text>
             <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
             </View>
