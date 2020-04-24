@@ -36,6 +36,7 @@ export default function Side_header ({navigation,route}) {
     const [modalVisible, setModalVisible] = useState(false);
     const [CurrentSideName, setCurrentSideName] = useState(false);
     const [CurrentRequiredName, setCurrentRequiredName] = useState(false);
+    const [CurrentMaxLimit, setCurrentMaxLimit] = useState(false);
 
     const [allow_navigation, setallow_navigation] =useState(true);
   useFocusEffect(
@@ -77,6 +78,7 @@ export default function Side_header ({navigation,route}) {
       const formData = new FormData();
         formData.append('name', CurrentSideName);
         formData.append('required', CurrentRequiredName);
+        formData.append('maxLimit', CurrentMaxLimit);
         formData.append('product_category_id', id);
         fetch(global.global_url+'product_settings/add_side_header.php', {
           method: 'POST',
@@ -204,6 +206,8 @@ function dialogBox_add(){
       Alert.alert('Please enter name');
   } else if (CurrentRequiredName == "") {
       Alert.alert('Please enter required');
+  } else if(CurrentMaxLimit == ""){
+      Alert.alert('Please enter max limit');
   }
   else {
       Alert.alert(
@@ -230,17 +234,22 @@ function dialogBox_add(){
             Alert.alert("Modal has been closed.");
             setCurrentSideName('');
             setCurrentRequiredName('');
+            setCurrentMaxLimit('');
             }}
         >
             <View style={styles.centeredView}>
             <View style={styles.modalView}>
-                    <View style={{flexDirection:"column",height: 200,width:200}}>
-                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="  Add Side"
+                    <View style={{flexDirection:"column",height: 260,width:200}}>
+                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10, marginBottom: 5}} placeholder="  Side name"
                     onChangeText={text => setCurrentSideName(text)}
                     ></TextInput>
 
-                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="  Required"
+                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10, marginBottom: 5}} placeholder="  Required"
                     onChangeText={text => setCurrentRequiredName(text)}
+                    ></TextInput>
+
+                    <TextInput style={{paddingLeft:20,height:50,borderColor: 'gray', borderWidth: 0.5,borderRadius:10}} placeholder="  Max limit"
+                    onChangeText={text => setCurrentMaxLimit(text)}
                     ></TextInput>
 
                     <TouchableHighlight
