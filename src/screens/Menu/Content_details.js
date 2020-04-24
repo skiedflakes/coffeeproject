@@ -21,7 +21,9 @@ export default function Content_details ({navigation,route}) {
   const [base_price,setbase_price] = useState(0);
   const [add_on_price,setadd_on_price] = useState(0);
   const [final_price,setfinal_price] = useState(0);
-  const [addtocart_array,setaddtocart_array] = useState('')
+
+  const [required_check,setrequired_check] = useState(''); // from db
+  const [required_checked,setrequired_checked] = useState(''); //user input
 
   useFocusEffect(
     React.useCallback(() => {
@@ -56,17 +58,37 @@ export default function Content_details ({navigation,route}) {
     }).then((response) => response.json())
           .then((responseJson) => {
             var data = responseJson.all_data.map(function(item) {
+              var mymessage = '';
+
+              if(item.required==0&&item.max_limit==0){ //dont show optional any
+                mymessage= 'optional choose any';
+              }else if(item.required ==1 && item.max_limit == 1){ //show limit and required
+                mymessage= 'required '+ item.required;
+              }else if(item.required == item.max_limit){ //show limit and required
+                mymessage= 'required '+ item.required+ ' optional limit '+item.max_limit;
+              }else if(item.required==0&& item.max_limit>0){ //show max
+                mymessage= 'optional limit '+ item.max_limit;
+              }else {
+
+              }
+
               return {
                 header_id: item.header_id,
                 title: item.title,
+                title2: mymessage,
                 current_checked:0,
                 required: item.required,
                 max_limit: item.max_limit,
                 data:item.data,
               };
             }); 
-            console.log(data);
+
+           
             setListData(data);
+            var filtered_data = data.filter(e => e != null);
+            var total_required = filtered_data.map(item => item.required).reduce((prev, next) => +prev + +next);
+            setrequired_check(total_required);
+
             }).catch((error) => {
             console.error(error);
           });
@@ -316,9 +338,7 @@ const update_show_price = (base_price,add_on_price,qty) =>{
   setfinal_price((+base_price+ +add_on_price)* +qty);
 }
 
-
 const update_price = (minus_plus) => {
-  console.log(minus_plus);
   var qty = current_qty;
   if(minus_plus=='plus'){
     qty = ++current_qty;
@@ -385,6 +405,8 @@ const update_price = (minus_plus) => {
               
               var filtered_newData = final_price_data.filter(e => e != null);
               var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
+              var total_required_checked = filtered_newData.map(item => item.required).reduce((prev, next) => +prev + +next);
+              setrequired_checked(total_required_checked);
               setfinal_price(+total*+current_qty);
    
             }catch(error){
@@ -397,14 +419,13 @@ const update_price = (minus_plus) => {
       });
 
     }catch(error){}
-
   }
-
 }
 
 
 const add_to_cart = () =>{
 
+  if(required_check==required_checked){
   
   var d = new Date();
   var add_to_cart_key = d.getTime();
@@ -421,23 +442,11 @@ const add_to_cart = () =>{
            
           }
         });
-
-        const cart_data= stores.map((result, i, store) => {
-          let key = store[i][0];
-          var jsonPars = JSON.parse(store[i][1]);
-          if(jsonPars.add_to_cart==1){
-            return jsonPars;
-          }else{
-          }
-
-        });
         try{
           //remove null and sort by header_id
           var filtered_newData = newData.filter(e => e != null).sort(function(a, b) { 
             return a.h_id - b.h_id  ||  a.h_id.localeCompare(b.h_id);
           });
-          console.log(base_price);
-
            setItemStorage(add_to_cart_key.toString(),{
              'id':add_to_cart_key.toString(),
              'add_to_cart':1,
@@ -453,30 +462,12 @@ const add_to_cart = () =>{
        
       });
     });
+  }else{
+    Alert.alert('Missing required');
+  }
 }
 
-const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header}) => (
-  <View  style={[
-    styles.item,{marginHorizontal:15}
-  ]} >
-<View style={{flex:6,flexDirection:"row",alignContent:"center",alignItems:"center"}}>
-<View style = {{flex:3}}>
-<CircleCheckBox
-            checked={selected ? true :false}
-            labelPosition={LABEL_POSITION.RIGHT}
-            onToggle={() => updateRow(h_id,d_id,id,title,selected,required,price,limit,header)}
-            label={title}
-          />
-</View>
-<View style = {{flex:3,flexDirection:"row-reverse"}}>
-  <View>
-<Text style={styles.title}>+ {price}</Text>
-  </View>
-</View>
-</View>
-</View>
 
-);
 
   return (
 
@@ -485,9 +476,7 @@ const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header
 
       <SectionList
       sections={listData}
-      renderSectionHeader={({section: {title}}) => (
-        <Text style={{fontWeight: 'bold'}}>{title}</Text>
-      )}
+
       keyExtractor={(item, index) => item + index}
       renderItem={({ item,section }) =>
        <Item 
@@ -503,8 +492,11 @@ const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header
         header = {section.title}
        />
       }
-      renderSectionHeader={({ section: { title } }) => (
-        <Text style={styles.header}>{title} </Text>
+      renderSectionHeader={({section}) => (
+       <RenderHeader 
+       title2 = {section.title2}
+        title = {section.title}
+        />
       )}
     />
 
@@ -517,7 +509,7 @@ const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header
             <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('plus')}>
               <Text style={{fontSize:18}}>+</Text>
             </TouchableNativeFeedback>
-            <Text style={{color:'#4A4A4A',padding:10,fontSize: 20,}}>{current_qty}x</Text>
+            <Text style={{color:'#4A4A4A',padding:10,fontSize: 20,}}>{current_qty}</Text>
 
             <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('minus')}>
               <Text style={{fontSize:18}}>-</Text>
@@ -540,6 +532,43 @@ const Item = ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header
   
   );
 }
+
+function RenderHeader({title,title2,}){
+  return(
+    <View style={{flexDirection:'row',alignContent:"center",alignItems:"center"}}>
+     <View style={{flex:3}}>
+    <Text style={{fontWeight: 'bold',fontSize:15}}>{title}</Text>
+    </View>
+    <Text style={{color:"gray",fontWeight: 'bold',fontSize:13,marginRight:25}}> {title2}</Text>
+    </View>
+
+  );
+}
+function Item ({h_id,d_id,title,selected,updateRow,id,price,required,limit,header}){
+  return (
+    <View  style={[
+      styles.item,{marginHorizontal:15}
+    ]} >
+  <View style={{flex:6,flexDirection:"row",alignContent:"center",alignItems:"center"}}>
+  <View style = {{flex:3}}>
+  <CircleCheckBox
+              checked={selected ? true :false}
+              labelPosition={LABEL_POSITION.RIGHT}
+              onToggle={() => updateRow(h_id,d_id,id,title,selected,required,price,limit,header)}
+              label={title}
+            />
+  </View>
+  <View style = {{flex:3,flexDirection:"row-reverse"}}>
+    <View>
+  <Text style={styles.title}>+ {price} {limit}</Text>
+    </View>
+  </View>
+  </View>
+  </View>
+  
+  );
+}
+
 function getContent(navigation,title,product_category_id){
   const formData = new FormData();
   formData.append('product_category_id',product_category_id);
