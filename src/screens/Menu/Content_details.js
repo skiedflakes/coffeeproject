@@ -67,7 +67,7 @@ export default function Content_details ({navigation,route}) {
               }else if(item.required == item.max_limit){ //show limit and required
                 mymessage= 'required '+ item.required+ ' optional limit '+item.max_limit;
               }else if(item.required==0&& item.max_limit>0){ //show max
-                mymessage= 'optional limit '+ item.max_limit;
+                mymessage= 'optional max '+ item.max_limit;
               }else {
 
               }
@@ -537,7 +537,7 @@ function RenderHeader({title,title2,}){
   return(
     <View style={{flexDirection:'row',alignContent:"center",alignItems:"center"}}>
      <View style={{flex:3}}>
-    <Text style={{fontWeight: 'bold',fontSize:15}}>{title}</Text>
+    <Text style={{fontWeight: 'bold',fontSize:18}}>{title}</Text>
     </View>
     <Text style={{color:"gray",fontWeight: 'bold',fontSize:13,marginRight:25}}> {title2}</Text>
     </View>
@@ -560,7 +560,7 @@ function Item ({h_id,d_id,title,selected,updateRow,id,price,required,limit,heade
   </View>
   <View style = {{flex:3,flexDirection:"row-reverse"}}>
     <View>
-  <Text style={styles.title}>+ {price} {limit}</Text>
+  <Text style={styles.title}>+ {price}</Text>
     </View>
   </View>
   </View>
