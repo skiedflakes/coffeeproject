@@ -87,7 +87,7 @@ export default function Product_Size_Select ({navigation,route}) {
         </View>
         <View style={styles.body}>
         <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
-            <SwipeListView
+            <FlatList
                 data={current_list_data}
                 renderItem={  ({ item }) => 
                 <RowItem

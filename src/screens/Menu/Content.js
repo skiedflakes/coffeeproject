@@ -141,7 +141,7 @@ function Item({product_name,navigation, product_id, title,price,image_url,produc
         padding:1
     }}>
         <Image 
-            style={{width: deviceWidth / 2.06, height: deviceWidth / 2, alignSelf: 'center'}} 
+            style={{width: deviceWidth / 2, height: deviceWidth / 2, alignSelf: 'center'}} 
             resizeMode='contain' 
             source={{ uri: global.global_url+image_url}}>
         </Image>
