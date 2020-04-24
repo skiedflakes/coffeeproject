@@ -56,10 +56,13 @@ export default function Product_Entry_Items ({navigation,route}) {
                 var data = responseJson.item_details.map(function(item,index) {
                     return {
                     key:item.product_id,
-                    name: item.product_name
+                    name: item.product_name,
+                    price: item.price,
+                    product_details: item.product_details,
+                    image_url: item.image_url
                     };
                     });
-
+                    
                     setcurrent_list_data(data);
   
           }).catch((error) => {
@@ -116,6 +119,19 @@ const deleteRow = (rowMap, rowKey) => {
       });
 };
 
+function dialogBox(rowMap, rowKey, name){
+  Alert.alert(
+    'DELETE',
+    'Are you sure you want to delete '+name+' ?',
+    [
+      {text: 'OK', onPress: () => deleteRow(rowMap, rowKey)},
+      {text: 'NO', onPress: () => console.log('NO Pressed'), 
+      style: 'cancel'},
+    ],
+    { cancelable: false }
+  );
+}
+
 const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
         <TouchableOpacity
@@ -127,62 +143,67 @@ const renderHiddenItem = (data, rowMap) => (
 
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnLeft]}
-            onPress={() => deleteRow(rowMap, data.item.key)}
+            onPress={() => dialogBox(rowMap, data.item.key, data.item.name)}
         >
             <Text style={styles.backTextWhite}>Delete</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnRight]}
-            onPress={() =>  {Alert.alert("Under Developement")}}
+            onPress={() =>  navigate_edit(navigation, data.item.name, data.item.key, data.item.product_details, data.item.price, data.item.image_url)}
         >
             <Text style={styles.backTextWhite}>Edit</Text>
         </TouchableOpacity>
 
     </View>
 );
-    return (
-    <View style={styles.main}>
-    <View style={styles.header} >
-        <View style={{  flexDirection: 'row', padding:2,}} >
-            <TouchableOpacity onPress={() => {
-         navigation.navigate("Product Entry Add",{name,id});
-        }}>
-            <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
-            </TouchableOpacity>
-    
-        </View>
-        
-        <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
-            <TouchableOpacity onPress={() => {navigation.goBack()}}>
-            <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
-            </TouchableOpacity>
-    <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>{name}</Text>
-        </View>
-        </View>
-    <View style={styles.body}>
-    <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
-        <SwipeListView
-            data={current_list_data}
-            renderItem={  ({ item }) => 
-            <RowItem
-              navigation={navigation}
-              title={item.name}
-              id={item.key}
-              />
-            }
-            rightOpenValue={-225}
-            previewOpenValue={-40}
-            previewOpenDelay={0}
-            renderHiddenItem={renderHiddenItem}
-            keyExtractor={item => item.key.toString()}
-            ItemSeparatorComponent = { FlatListItemSeparator }
-            onRowDidOpen={onRowDidOpen}
-        />
-    </View> 
-    </View>
-    </View>
-  );
+
+function navigate_edit(navigation,name,product_id,details,product_price,img_url){
+  navigation.navigate("Product Entry Edit",{name,id,product_id,details,product_price,img_url});
+}
+
+return (
+  <View style={styles.main}>
+  <View style={styles.header} >
+      <View style={{  flexDirection: 'row', padding:2,}} >
+          <TouchableOpacity onPress={() => {
+        navigation.navigate("Product Entry Add",{name,id});
+      }}>
+          <Entypo name="add-to-list" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
+          </TouchableOpacity>
+  
+      </View>
+      
+      <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
+          <TouchableOpacity onPress={() => {navigation.goBack()}}>
+          <AntDesign name="arrowleft" size={25} color={"#ffff"} style={{marginLeft:10}}/>
+          </TouchableOpacity>
+  <Text style={{color:'#ffff',alignSelf:'center',marginLeft:20,fontSize:20}}>{name}</Text>
+      </View>
+      </View>
+  <View style={styles.body}>
+  <View style={{  flexDirection: 'row',alignContent:"center",alignItems:"center"}} >
+      <SwipeListView
+          data={current_list_data}
+          renderItem={  ({ item }) => 
+          <RowItem
+            navigation={navigation}
+            title={item.name}
+            id={item.key}
+            />
+          }
+          rightOpenValue={-225}
+          previewOpenValue={-40}
+          previewOpenDelay={0}
+          renderHiddenItem={renderHiddenItem}
+          keyExtractor={item => item.key.toString()}
+          ItemSeparatorComponent = { FlatListItemSeparator }
+          onRowDidOpen={onRowDidOpen}
+      />
+  </View> 
+  </View>
+  </View>
+);
 }
 
 

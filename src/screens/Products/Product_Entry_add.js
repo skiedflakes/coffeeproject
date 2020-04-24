@@ -33,42 +33,45 @@ export default function Product_Entry_add ({navigation,route}) {
     const add_item = () =>{
         if(!item_name||!price){
             Alert.alert('Please enter name');
-          } else {
-            const formData = new FormData();
-            formData.append('product_category_id', id);
-            formData.append('item_name', item_name);
-            formData.append('item_price', price);
-            formData.append('item_desc', desc);
-            formData.append('image', {
-                uri: imageUri,
-                name: 'my_photo',
-                type: image_file_type
-              });
-            fetch(global.global_url+'product_settings/add_item.php', {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data'
-              },
-              body: formData
-      
-            }).then((response) => response.json())
-              .then((responseJson) => {
-                console.log(responseJson);
-                var save_response_data = responseJson.save_response[0];
-                
-                if(save_response_data.status == 'success'){
-                    navigation.navigate("Product Entry Items",{name,id});
-                } else if(save_response_data.status == 'failed'){
-                    Alert.alert('failed !');
-                } else {
-                    Alert.alert('Duplicate name !');
-                }
-      
-              }).catch((error) => {
-                console.error(error);
-              });
-            }
+        } else if(!imageUri){
+            Alert.alert('Please select image');
+        }
+        else {
+          const formData = new FormData();
+          formData.append('product_category_id', id);
+          formData.append('item_name', item_name);
+          formData.append('item_price', price);
+          formData.append('item_desc', desc);
+          formData.append('image', {
+              uri: imageUri,
+              name: 'my_photo',
+              type: image_file_type
+            });
+          fetch(global.global_url+'product_settings/add_item.php', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            },
+            body: formData
+    
+          }).then((response) => response.json())
+            .then((responseJson) => {
+              console.log(responseJson);
+              var save_response_data = responseJson.save_response[0];
+              
+              if(save_response_data.status == 'success'){
+                  navigation.navigate("Product Entry Items",{name,id});
+              } else if(save_response_data.status == 'failed'){
+                  Alert.alert('failed !');
+              } else {
+                  Alert.alert('Duplicate name !');
+              }
+    
+            }).catch((error) => {
+              console.error(error);
+            });
+          }
 
       }
 

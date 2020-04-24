@@ -23,6 +23,7 @@ import ProductSizeSelectScreen from './Products/Product_Size_Select';
 import ProductEntryScreen from './Products/Product_Entry';
 import ProductEntryItemsScreen from './Products/Product_Entry_Items';
 import ProductEntryAddScreen from './Products/Product_Entry_add';
+import ProductEntryEditScreen from './Products/Product_Entry_Edit';
 
 const Stack = createStackNavigator();
 export default class ProfileScreen extends React.Component {
@@ -97,6 +98,11 @@ export default class ProfileScreen extends React.Component {
         name="Product Entry Add" 
         component={ProductEntryAddScreen} 
         options={({ route }) => ({ title: "Add new Item"})}
+        />
+        <Stack.Screen
+        name="Product Entry Edit" 
+        component={ProductEntryEditScreen} 
+        options={{ headerShown: false }}
         />
     </Stack.Navigator>
   );
