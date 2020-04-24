@@ -17,9 +17,26 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
+const FlatListItemSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 0.5,
+          width: "100%",
+          backgroundColor: "#000",
+        }}
+      />
+    );
+  }
+
 export default function Product_Size_Select ({navigation,route}) {
     const {name,category_id} = route.params;
     const [current_list_data, setcurrent_list_data] = useState('');
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [CurrentSideName, setCurrentSideName] = useState(false);
+
+    const [allow_navigation, setallow_navigation] =useState(true);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -87,18 +104,6 @@ export default function Product_Size_Select ({navigation,route}) {
         </View>
         </View>
     );
-}
-
-const FlatListItemSeparator = () => {
-  return (
-    <View
-      style={{
-        height: 0.5,
-        width: "100%",
-        backgroundColor: "#000",
-      }}
-    />
-  );
 }
 
 function RowItem ({navigation,title,id,category_id}) {

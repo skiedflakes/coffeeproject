@@ -14,56 +14,41 @@ export default function Product_Size_Add ({navigation,route}) {
     const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
-      const formData = new FormData();
-      formData.append('product_id', id);
-      formData.append('category_id', category_id);
-      formData.append('item_name', item_name);
-      formData.append('item_price', price);
-
-      fetch(global.global_url+'product_settings/add_product_size.php', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data'
-        },
-        body: formData
-
-      }).then((response) => response.json())
-        .then((responseJson) => {
-          console.log(responseJson);
-          var save_response_data = responseJson.save_response[0];
-          
-          if(save_response_data.status == 'success'){
-              //navigation.navigate("Size Add",{name,id});
-              Alert.alert('Success !');
+        if(!item_name||!price){
+            Alert.alert('Please enter name');
           } else {
-              Alert.alert('failed !');
-          }
+            const formData = new FormData();
+            formData.append('product_id', id);
+            formData.append('category_id', category_id);
+            formData.append('item_name', item_name);
+            formData.append('item_price', price);
 
-        }).catch((error) => {
-          console.error(error);
-        });
-      }
-
-      function dialogBox(){
-        if(!item_name){
-          Alert.alert('Please enter name');
-        }
-        else if(!price){
-          Alert.alert('Please enter price');
-        } 
-        else {
-          Alert.alert(
-            'SAVE',
-            'Are you sure you want to save ?',
-            [
-              {text: 'OK', onPress: () => add_item()},
-              {text: 'NO', onPress: () => console.log('NO Pressed'), 
-              style: 'cancel'},
-            ],
-            { cancelable: false }
-          );
-        }
+            fetch(global.global_url+'product_settings/add_product_size.php', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data'
+              },
+              body: formData
+      
+            }).then((response) => response.json())
+              .then((responseJson) => {
+                console.log(responseJson);
+                var save_response_data = responseJson.save_response[0];
+                
+                if(save_response_data.status == 'success'){
+                    //navigation.navigate("Size Add",{name,id});
+                    Alert.alert('Success !');
+                } else if(save_response_data.status == 'failed'){
+                    Alert.alert('failed !');
+                } else {
+                    Alert.alert('Duplicate size name !');
+                }
+      
+              }).catch((error) => {
+                console.error(error);
+              });
+            }
       }
 
     return (
@@ -86,7 +71,7 @@ export default function Product_Size_Add ({navigation,route}) {
             />
             </View>
             
-            <Button title="Save" onPress={() => { dialogBox() }}></Button>
+            <Button title="Save" onPress={() => { add_item() }}></Button>
       </ScrollView>
 
     </View>

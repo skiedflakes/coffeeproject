@@ -28,66 +28,54 @@ export default function Product_Entry_add ({navigation,route}) {
     //input text parameters
     const [item_name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
+    const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
-        const formData = new FormData();
-        formData.append('product_category_id', id);
-        formData.append('item_name', item_name);
-        formData.append('item_desc', desc);
-        formData.append('image', {
-            uri: imageUri,
-            name: 'my_photo',
-            type: image_file_type
-          });
-        fetch(global.global_url+'product_settings/add_item.php', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data'
-          },
-          body: formData
-  
-        }).then((response) => response.json())
-          .then((responseJson) => {
-            console.log(responseJson);
-            var save_response_data = responseJson.save_response[0];
-            
-            if(save_response_data.status == 'success'){
-                navigation.navigate("Product Entry Items",{name,id});
-            } else if(save_response_data.status == 'failed'){
-                Alert.alert('failed !');
-            } else {
-                Alert.alert('Duplicate name !');
-            }
-            
-          }).catch((error) => {
-            console.error(error);
-        });
+        if(!item_name||!price){
+            Alert.alert('Please enter name');
+        } else if(!imageUri){
+            Alert.alert('Please select image');
+        }
+        else {
+          const formData = new FormData();
+          formData.append('product_category_id', id);
+          formData.append('item_name', item_name);
+          formData.append('item_price', price);
+          formData.append('item_desc', desc);
+          formData.append('image', {
+              uri: imageUri,
+              name: 'my_photo',
+              type: image_file_type
+            });
+          fetch(global.global_url+'product_settings/add_item.php', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data'
+            },
+            body: formData
+    
+          }).then((response) => response.json())
+            .then((responseJson) => {
+              console.log(responseJson);
+              var save_response_data = responseJson.save_response[0];
+              
+              if(save_response_data.status == 'success'){
+                  navigation.navigate("Product Entry Items",{name,id});
+              } else if(save_response_data.status == 'failed'){
+                  Alert.alert('failed !');
+              } else {
+                  Alert.alert('Duplicate name !');
+              }
+    
+            }).catch((error) => {
+              console.error(error);
+            });
+          }
+
       }
 
-    function dialogBox(){
-      if(!item_name){
-        Alert.alert('Please enter name');
-      }
-      else if(!desc){
-        Alert.alert('Please enter description');
-      } 
-      else if(!imageUri){
-          Alert.alert('Please select image');
-      }
-      else {
-        Alert.alert(
-          'SAVE',
-          'Are you sure you want to save ?',
-          [
-            {text: 'OK', onPress: () => add_item()},
-            {text: 'NO', onPress: () => console.log('NO Pressed'), 
-            style: 'cancel'},
-          ],
-          { cancelable: false }
-        );
-      }
-    }
+
 
     function renderImage(){
         if(image_preview==false){
@@ -156,13 +144,19 @@ export default function Product_Entry_add ({navigation,route}) {
                     onChangeText={text => setName(text)}
                     underlineColorAndroid='#FFF'
             />
-            <MultiLineInput
-                  multiline
-                  numberOfLines={3}
-                  onChangeText={text => setDesc(text)}
-              />
+                  <MultiLineInput
+                        multiline
+                        numberOfLines={3}
+                        onChangeText={text => setDesc(text)}
+                    />
+            <TextInput 
+                    style={{borderColor: 'gray',borderWidth: 0.5,borderRadius:10,margin:10,paddingLeft:20}}
+                     placeholder="Price"
+                    onChangeText={text => setPrice(text)}
+                    underlineColorAndroid='#FFF'
+            />
             
-            <Button title="Save" onPress={() => { dialogBox() }}></Button>
+            <Button title="Save" onPress={() => { add_item() }}></Button>
       </ScrollView>
 
     </View>
