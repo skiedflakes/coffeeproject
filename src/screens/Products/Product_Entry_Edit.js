@@ -18,17 +18,11 @@ function MultiLineInput(props) {
 
 export default function Product_Entry_Edit ({navigation,route}) {
     //navigation route parameters
-    const {name,id,product_id,details,product_price,img_url} = route.params; //product_category_id
-
-    //image
-    const [image_preview,Setimage_preview] = useState(false);
-    const [imageUri,SetimageUri] = useState('');
-    const [image_file_type,Setimage_file_type] = useState('');
+    const {name,id,product_id,details,img_url} = route.params; //product_category_id
 
     //input text parameters
     const [item_name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
-    const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
         const formData = new FormData();
@@ -38,12 +32,6 @@ export default function Product_Entry_Edit ({navigation,route}) {
             formData.append('product_name', name);
         } else {
             formData.append('product_name', item_name);
-        }
-
-        if (!price) {
-            formData.append('price', product_price);
-        } else {
-            formData.append('price', price);
         }
 
         if (!desc) {
@@ -120,12 +108,6 @@ export default function Product_Entry_Edit ({navigation,route}) {
                     underlineColorAndroid='#FFF'
                     multiline={true}
                     numberOfLines={3}
-            />
-            <TextInput 
-                    style={{borderColor: 'gray',borderWidth: 0.5,borderRadius:10,margin:10,paddingLeft:20}}
-                     placeholder={product_price}
-                    onChangeText={text => setPrice(text)}
-                    underlineColorAndroid='#FFF'
             />
             
             <Button title="Update" onPress={() => { dialogBox() }}></Button>
