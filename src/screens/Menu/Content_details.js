@@ -197,6 +197,7 @@ const update_pre_selected_req_1 = (h_id,d_id,name,price,required,header) =>{ //a
       );
 
       if(limit>=required){
+
         if(required>0){
           if(required==1){ // if one required
             var check_has_true = newData[section].data.map(function(item,index) {
@@ -324,7 +325,7 @@ const update_pre_selected_req_1 = (h_id,d_id,name,price,required,header) =>{ //a
         }
         }
       }else{ //cannot be
-
+        console.log('cannot be');
       }
 
       setListData(newData);
@@ -475,8 +476,8 @@ const add_to_cart = () =>{
       <View style={{flex:5}}>
 
       <SectionList
+      showsVerticalScrollIndicator={false}
       sections={listData}
-
       keyExtractor={(item, index) => item + index}
       renderItem={({ item,section }) =>
        <Item 
@@ -499,29 +500,27 @@ const add_to_cart = () =>{
         />
       )}
     />
-
     </View>
     <View style={{flex:1}}>
       <View style={{flex:6,alignContent:"center"}}>
 
-        <View style={{flex:3,flexDirection:"row",alignItems:"center",paddingVertical:10}}>
-          <View style={{flex:2.5,flexDirection:'row',alignItems:"center"}}>
-            <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('plus')}>
-              <Text style={{fontSize:18}}>+</Text>
-            </TouchableNativeFeedback>
-            <Text style={{color:'#4A4A4A',padding:10,fontSize: 20,}}>{current_qty}</Text>
+        <View style={{flex:6,alignContent:"center",alignItems:"center",flexDirection:"row"}}>
+              <View style={{flex:4,flexDirection:"row-reverse",alignContent:"center",alignItems:"center"}}>
+              <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('plus')}>
+                <Text style={{fontSize:18}}>+</Text>
+              </TouchableNativeFeedback>
+              <Text style={{color:'#4A4A4A',padding:10,fontSize: 20,}}>{current_qty}</Text>
 
-            <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('minus')}>
-              <Text style={{fontSize:18}}>-</Text>
-            </TouchableNativeFeedback>
-          </View>
-
-          <View style={{flex:1.5,flexDirection:"row-reverse",marginLeft:20}}>
-           <Text style={{fontSize:18}}> P {final_price}</Text>
-          </View>
+              <TouchableNativeFeedback style={styles.add_plus} onPress={() => update_price('minus')}>
+                <Text style={{fontSize:18}}>-</Text>
+              </TouchableNativeFeedback>
+            </View>
+            <View style={{flex:2,flexDirection:"row-reverse",paddingLeft:30,alignContent:"center",alignItems:"center"}}>
+            <Text style={{fontSize:25,paddingLeft:5}}>{final_price}</Text>
+            </View>
         </View>
 
-        <View style={{flex:3,alignItems:"center"}}>
+        <View style={{flex:3,alignItems:"center",marginRight:15}}>
           <Button title="add to cart" onPress={()=>add_to_cart()}></Button>
         </View>
       </View>

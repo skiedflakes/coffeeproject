@@ -4,8 +4,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import MainScreen from './Menu/Main';
 import ContentScreen from './Menu/Content';
 import CartScreen from './CartScreen';
+
 import Content_DetailsScreen from './Menu/Content_details';
 import LoginScreen from './LoginScreen';
+import PlaceOrderScreen from './PlaceOrderScreen';
 const Stack = createStackNavigator();
 
 export default class MenuScreen extends React.Component {
@@ -13,7 +15,6 @@ export default class MenuScreen extends React.Component {
         dataSource: ''
       }
 
-      
   render() {
     //  console.log(this.state.dataSource)
   return (
@@ -26,7 +27,6 @@ export default class MenuScreen extends React.Component {
         initialParams={{menu_list:this.state.dataSource}}
  
       />
-
       <Stack.Screen
         name="Content"
         component={ContentScreen}
@@ -37,6 +37,11 @@ export default class MenuScreen extends React.Component {
         name="Cart"
         component={CartScreen}
         options={{ title: 'My Cart' }}
+      />
+
+      <Stack.Screen
+        name="Place Order"
+        component={PlaceOrderScreen}
       />
 
 <     Stack.Screen 
