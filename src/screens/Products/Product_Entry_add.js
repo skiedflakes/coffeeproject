@@ -149,12 +149,6 @@ export default function Product_Entry_add ({navigation,route}) {
                         numberOfLines={3}
                         onChangeText={text => setDesc(text)}
                     />
-            <TextInput 
-                    style={{borderColor: 'gray',borderWidth: 0.5,borderRadius:10,margin:10,paddingLeft:20}}
-                     placeholder="Price"
-                    onChangeText={text => setPrice(text)}
-                    underlineColorAndroid='#FFF'
-            />
             
             <Button title="Save" onPress={() => { add_item() }}></Button>
       </ScrollView>
