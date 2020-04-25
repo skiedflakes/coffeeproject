@@ -28,10 +28,9 @@ export default function Product_Entry_add ({navigation,route}) {
     //input text parameters
     const [item_name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
-    const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
-        if(!item_name||!price){
+        if(!item_name){
             Alert.alert('Please enter name');
         } else if(!imageUri){
             Alert.alert('Please select image');
@@ -40,7 +39,6 @@ export default function Product_Entry_add ({navigation,route}) {
           const formData = new FormData();
           formData.append('product_category_id', id);
           formData.append('item_name', item_name);
-          formData.append('item_price', price);
           formData.append('item_desc', desc);
           formData.append('image', {
               uri: imageUri,

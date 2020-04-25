@@ -28,7 +28,6 @@ export default function Product_Entry_Edit ({navigation,route}) {
     //input text parameters
     const [item_name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
-    const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
         const formData = new FormData();
@@ -38,12 +37,6 @@ export default function Product_Entry_Edit ({navigation,route}) {
             formData.append('product_name', name);
         } else {
             formData.append('product_name', item_name);
-        }
-
-        if (!price) {
-            formData.append('price', product_price);
-        } else {
-            formData.append('price', price);
         }
 
         if (!desc) {
@@ -120,12 +113,6 @@ export default function Product_Entry_Edit ({navigation,route}) {
                     underlineColorAndroid='#FFF'
                     multiline={true}
                     numberOfLines={3}
-            />
-            <TextInput 
-                    style={{borderColor: 'gray',borderWidth: 0.5,borderRadius:10,margin:10,paddingLeft:20}}
-                     placeholder={product_price}
-                    onChangeText={text => setPrice(text)}
-                    underlineColorAndroid='#FFF'
             />
             
             <Button title="Update" onPress={() => { dialogBox() }}></Button>
