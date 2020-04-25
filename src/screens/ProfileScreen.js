@@ -5,23 +5,38 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './LoginScreen';
-import MainProfileScreen from './Profile/Main';
+import MainProfileScreen from './Profile/Profile_Main';
 
+import SignoutScreen from './Profile/Signed_out';
 const Stack = createStackNavigator();
 export default class ProfileScreen extends React.Component {
-    render() {
+
+
+  render() {
+   
   return (
     <Stack.Navigator>
+
       <Stack.Screen
-        name="MainProfile"
+        name="Profile_Main"
         component={MainProfileScreen}
         options={{ headerShown: false }}
+        initialParams={{ name:'',user_id:''}}
       />
       <Stack.Screen 
         name="Login" 
         component={LoginScreen} 
         />
+
+      <Stack.Screen 
+        name="Sign out" 
+        component={SignoutScreen} 
+        options={{ headerShown: false }}
+      />
+
     </Stack.Navigator>
+
+    
   );
 }}
 
@@ -58,3 +73,5 @@ const styles = StyleSheet.create({
   }
   
 })
+
+
