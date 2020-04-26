@@ -44,8 +44,9 @@ export default function Product_Size_Edit ({navigation,route}) {
             var save_response_data = responseJson.save_response[0];
             
             if(save_response_data.status == 'success'){
+                navigation.goBack(null);
                 //navigation.navigate("Size Add",{name,id});
-                Alert.alert('Successfully update !');
+                //Alert.alert('Successfully update !');
             } else if(save_response_data.status == 'failed'){
                 Alert.alert('failed !');
             }
