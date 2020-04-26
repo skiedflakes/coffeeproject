@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button,Image,Dimensions,TextInput, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { Button,Image,Dimensions,TextInput,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
+import { ActivityIndicator } from 'react-native';
 const deviceWidth = Dimensions.get('window').deviceWidth;
 const deviceHeight = Dimensions.get('window').deviceHeight;
 
@@ -9,11 +10,14 @@ export default function Product_Size_Add ({navigation,route}) {
     //navigation route parameters
     const {name,id,category_id} = route.params; //product_category_id
 
+    const [spinner, setSpinner] = React.useState(false);
+
     //input text parameters
     const [item_name, setName] = React.useState('');
     const [price, setPrice] = React.useState('');
 
     const add_item = () =>{
+        setSpinner(true)
         const formData = new FormData();
         formData.append('product_id', id);
         formData.append('category_id', category_id);
@@ -43,7 +47,11 @@ export default function Product_Size_Add ({navigation,route}) {
                 Alert.alert('Duplicate size name !');
             }
 
+            setSpinner(false)
+
           }).catch((error) => {
+            
+            setSpinner(false)
             console.error(error);
           });
       }
@@ -91,11 +99,23 @@ export default function Product_Size_Add ({navigation,route}) {
             
             <Button title="Save" onPress={() => { dialogBox() }}></Button>
       </ScrollView>
-
+      {spinner && <CustomProgressBar />}
+      {/* { spinner? <CustomProgressBar /> : <View><Text>Data loaded</Text></View>} */}
     </View>
 
   );
 }
+
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
 const styles = StyleSheet.create({
     main:{
