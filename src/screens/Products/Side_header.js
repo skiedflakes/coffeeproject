@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
-
+import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -14,24 +14,24 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
-
 const FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 0.5,
-          width: "100%",
-          backgroundColor: "#000",
-        }}
-      />
-    );
-  }
-
+  return (
+    <View
+      style={{
+        height: 0.5,
+        width: "100%",
+        backgroundColor: "#000",
+      }}
+    />
+  );
+}
 
 export default function Side_header ({navigation,route}) {
     const {name,id} = route.params;
     const [current_list_data, setcurrent_list_data] = useState('');
+
+    const [spinner, setSpinner] = React.useState(false);
+    const [spinnerMSG, setSpinnerMSG] = React.useState("Loading");
 
     const [modalVisible, setModalVisible] = useState(false);
     const [CurrentSideName, setCurrentSideName] = useState(false);
@@ -41,6 +41,8 @@ export default function Side_header ({navigation,route}) {
     const [allow_navigation, setallow_navigation] =useState(true);
   useFocusEffect(
     React.useCallback(() => {
+        setSpinner(true)
+        setSpinnerMSG("Loading")
         const formData = new FormData();
         formData.append('product_category_id', id);
         fetch(global.global_url+'product_settings/get_side_header.php', {
@@ -64,9 +66,12 @@ export default function Side_header ({navigation,route}) {
                     });
 
                     setcurrent_list_data(data);
+
+                    setSpinner(false)
   
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
 
       return () => {
@@ -74,8 +79,21 @@ export default function Side_header ({navigation,route}) {
     }, [])
   );
 
+  const CustomProgressBar = ({ visible }) => (
+    <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+      <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+        <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>{spinnerMSG}</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      </View>
+    </Modal>
+  );
+
   const add_side_header = () =>{
-      const formData = new FormData();
+        setSpinner(true)
+        setSpinnerMSG("Saving")
+        const formData = new FormData();
         formData.append('name', CurrentSideName);
         formData.append('required', CurrentRequiredName);
         formData.append('maxLimit', CurrentMaxLimit);
@@ -111,9 +129,12 @@ export default function Side_header ({navigation,route}) {
             } else {
               Alert.alert('Duplicate name !');
             }
+
+            setSpinner(false)
   
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
       });
   }
 
@@ -131,7 +152,8 @@ const onRowDidOpen = rowKey => {
 };
 
 const deleteRow = (rowMap, rowKey) => {
-
+    setSpinner(true)
+    setSpinnerMSG("Deleting")
     const formData = new FormData();
     formData.append('id', rowKey);
     fetch(global.global_url+'product_settings/delete_side_header.php', {
@@ -157,8 +179,12 @@ const deleteRow = (rowMap, rowKey) => {
         } else if(save_response_data.status == 'failed'){
           Alert.alert('failed !');
         }
+
+        setSpinner(false)
+
       }).catch((error) => {
         console.error(error);
+        setSpinner(false)
       });
 };
 
@@ -223,7 +249,7 @@ function dialogBox_add(){
   }
 }
 
-  return (
+return (
     <View style={styles.main}>
 
     <Modal
@@ -318,16 +344,12 @@ function dialogBox_add(){
         />
     </View> 
     </View>
+    {spinner && <CustomProgressBar />}
     </View>
   );
 }
 
-
-
-
 function RowItem ({navigation,title,id}) {
-
-    
   return (
     //   <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,allow_nav,true)}>
      <TouchableNativeFeedback>
@@ -344,7 +366,6 @@ function RowItem ({navigation,title,id}) {
 function navigate_side_details(navigation,name,id){
     navigation.navigate("Side Details",{name,id});
 }
-  
 
 const styles = StyleSheet.create({
     main:{

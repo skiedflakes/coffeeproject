@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 //etc
 import { useFocusEffect } from '@react-navigation/native';
@@ -33,6 +34,8 @@ export default function Product_Size_Select ({navigation,route}) {
     const {name,category_id} = route.params;
     const [current_list_data, setcurrent_list_data] = useState('');
 
+    const [spinner, setSpinner] = React.useState(false);
+
     const [modalVisible, setModalVisible] = useState(false);
     const [CurrentSideName, setCurrentSideName] = useState(false);
 
@@ -40,6 +43,7 @@ export default function Product_Size_Select ({navigation,route}) {
 
     useFocusEffect(
         React.useCallback(() => {
+            setSpinner(true)
             const formData = new FormData();
             formData.append('product_category_id', category_id);
             fetch(global.global_url+'product_settings/get_product_entry_items.php', {
@@ -63,9 +67,12 @@ export default function Product_Size_Select ({navigation,route}) {
                         });
                         
                         setcurrent_list_data(data);
+
+                        setSpinner(false)
     
             }).catch((error) => {
                 console.error(error);
+                setSpinner(false)
             });
 
         return () => {
@@ -102,6 +109,7 @@ export default function Product_Size_Select ({navigation,route}) {
             />
         </View> 
         </View>
+        {spinner && <CustomProgressBar />}
         </View>
     );
 }
@@ -123,6 +131,16 @@ function navigate_side_details(navigation,name,id,category_id){
     navigation.navigate("Size Add List",{name,id,category_id});
 }
   
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+      <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
 const styles = StyleSheet.create({
     main:{

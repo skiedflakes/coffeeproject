@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 //etc
 import { useFocusEffect } from '@react-navigation/native';
@@ -29,12 +30,15 @@ const FlatListItemSeparator = () => {
   }
 
 export default function Side_details ({navigation,route}) {
+
+    const [spinner, setSpinner] = React.useState(false);
+    const [spinnerMSG, setSpinnerMSG] = React.useState("Loading");
+
     //route params
     const {name,id} = route.params;
 
     //constants of flatlist data
     const [current_list_data, setcurrent_list_data] = useState('');
-
 
     //constants of modal 
     const [modalVisible, setModalVisible] = useState(false);
@@ -43,6 +47,8 @@ export default function Side_details ({navigation,route}) {
 
   useFocusEffect(
     React.useCallback(() => {
+        setSpinner(true)
+        setSpinnerMSG("Loading")
         const formData = new FormData();
         formData.append('dropdown_header_id', id);
         fetch(global.global_url+'product_settings/get_side_details.php', {
@@ -67,9 +73,12 @@ export default function Side_details ({navigation,route}) {
                     });
 
                     setcurrent_list_data(data);
+
+                    setSpinner(false)
   
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
 
       return () => {
@@ -77,10 +86,40 @@ export default function Side_details ({navigation,route}) {
     }, [])
   );
 
+  const CustomProgressBar = ({ visible }) => (
+    <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+      <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+        <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>{spinnerMSG}</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      </View>
+    </Modal>
+  );
+
+function dialogBox_add(){
+    if(M_name == ""){ 
+        Alert.alert('Please enter name');
+    } else if (M_price == "") {
+        Alert.alert('Please enter price');
+    }
+    else {
+        Alert.alert(
+          'SAVE',
+          'Are you sure you want to save ?',
+          [
+            {text: 'OK', onPress: () => add_side_details()},
+            {text: 'NO', onPress: () => console.log('NO Pressed'), 
+            style: 'cancel'},
+          ],
+          { cancelable: false }
+      );
+    }
+  }
+
   const add_side_details = () =>{
-    if(!M_name||!M_price){
-        Alert.alert('Please fill up required data');
-      } else {
+    setSpinner(true)
+        setSpinnerMSG("Saving")
         const formData = new FormData();
         formData.append('name', M_name);
         formData.append('price', M_price);
@@ -117,11 +156,13 @@ export default function Side_details ({navigation,route}) {
             } else {
               Alert.alert('Duplicate name !');
             }
+
+            setSpinner(false)
   
           }).catch((error) => {
             console.error(error);
-          });
-        }
+            setSpinner(false)
+      });
   }
 
   const closeRow = (rowMap, rowKey) => {
@@ -130,8 +171,22 @@ export default function Side_details ({navigation,route}) {
     }
 };
 
-const deleteRow = (rowMap, rowKey) => {
+function dialogBox(rowMap, rowKey, name){
+  Alert.alert(
+    'DELETE',
+    'Are you sure you want to delete '+name+' ?',
+    [
+      {text: 'OK', onPress: () => deleteRow(rowMap, rowKey)},
+      {text: 'NO', onPress: () => console.log('NO Pressed'), 
+      style: 'cancel'},
+    ],
+    { cancelable: false }
+  );
+}
 
+const deleteRow = (rowMap, rowKey) => {
+    setSpinner(true)
+    setSpinnerMSG("Deleting")
     const formData = new FormData();
     formData.append('id', rowKey);
     fetch(global.global_url+'product_settings/delete_side_details.php', {
@@ -157,11 +212,14 @@ const deleteRow = (rowMap, rowKey) => {
         } else if(save_response_data.status == 'failed'){
           Alert.alert('failed !');
         }
+
+        setSpinner(false)
+
       }).catch((error) => {
         console.error(error);
-      });
+        setSpinner(false)
+    });
 };
-
 
 const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
@@ -173,7 +231,7 @@ const renderHiddenItem = (data, rowMap) => (
         </TouchableOpacity>
         <TouchableOpacity
             style={[styles.backRightBtn, styles.backRightBtnRight]}
-            onPress={() => deleteRow(rowMap, data.item.key)}
+            onPress={() => dialogBox(rowMap, data.item.key, data.item.name)}
         >
             <Text style={styles.backTextWhite}>Delete</Text>
         </TouchableOpacity>
@@ -182,9 +240,10 @@ const renderHiddenItem = (data, rowMap) => (
 
 const clear_modal_data = () =>{
     setM_name('');
-    setM_name('');
+    setM_price('');
 }
-    return (
+
+return (
     <View style={styles.main}>
     <Modal
             animationType="fade"
@@ -217,7 +276,7 @@ const clear_modal_data = () =>{
                     <TouchableHighlight
                         style={{ ...styles.openButton, backgroundColor: "#2196F3",marginTop:15}}
                         onPress={() => {
-                            add_side_details();
+                            dialogBox_add();
                         }}
                     >   
                     <Text style={styles.textStyle}>Add</Text>
@@ -274,10 +333,10 @@ const clear_modal_data = () =>{
         />
     </View> 
     </View>
+    {spinner && <CustomProgressBar />}
     </View>
   );
 }
-
 
 function RowItem ({navigation,title,price}) {
   return (

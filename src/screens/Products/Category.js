@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput,Image,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -36,6 +37,8 @@ const FlatListItemSeparator = () => {
 
 export default function Category ({navigation}) {
 
+  const [spinner, setSpinner] = React.useState(false);
+  const [spinnerMSG, setSpinnerMSG] = React.useState("Loading");
 
   const [modalVisible, setModalVisible] = useState(false);
   const [Category_name, setCategory_name] = useState('');
@@ -47,6 +50,8 @@ export default function Category ({navigation}) {
   const [image_file_type,Setimage_file_type] = useState('');
   useFocusEffect(
     React.useCallback(() => {
+        setSpinner(true)
+        setSpinnerMSG("Loading")
         fetch(global.global_url+'product_settings/get_tags_dropdrown.php')
         .then((response) => response.json())
         .then((responseJson) => {
@@ -57,67 +62,100 @@ export default function Category ({navigation}) {
             };
             });
             setcurrent_list_data(data)
+
+            setSpinner(false)
     
         }).catch((error) => {
           console.error(error);
-          Alert.alert('Connection Error');
+          //Alert.alert('Connection Error');
+          setSpinner(false)
         });
 
       return () => {
       };
     }, [])
   );
+
+  const CustomProgressBar = ({ visible }) => (
+    <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+      <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+        <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>{spinnerMSG}</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      </View>
+    </Modal>
+  );
+
+  function dialogBox_add(){
+    if(Category_name == ""){ 
+        Alert.alert('Please enter name');
+    } else if (imageUri == "") {
+        Alert.alert('Please select image');
+    }
+    else {
+        Alert.alert(
+          'SAVE',
+          'Are you sure you want to save ?',
+          [
+            {text: 'OK', onPress: () => add_tag()},
+            {text: 'NO', onPress: () => console.log('NO Pressed'), 
+            style: 'cancel'},
+          ],
+          { cancelable: false }
+      );
+    }
+  }
  
     const add_tag = () =>{
-        console.log(imageUri);
-        if(!Category_name){
-            Alert.alert('Please enter name');
-          } else {
-            const formData = new FormData();
-            formData.append('product_type_name', Category_name);
-            formData.append('image', {
-                uri: imageUri,
-                name: 'my_photo',
-                type: image_file_type
-              });
-            fetch(global.global_url+'product_settings/add_category.php', {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data'
-              },
-              body: formData
-      
-            }).then((response) => response.json())
-              .then((responseJson) => {
-                console.log(responseJson);
-                var save_response_data = responseJson.save_response[0];
+      setSpinner(true)
+      setSpinnerMSG("Saving")
+      const formData = new FormData();
+      formData.append('product_type_name', Category_name);
+      formData.append('image', {
+          uri: imageUri,
+          name: 'my_photo',
+          type: image_file_type
+        });
+      fetch(global.global_url+'product_settings/add_category.php', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
+        },
+        body: formData
+
+      }).then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson);
+          var save_response_data = responseJson.save_response[0];
+          
+          if(save_response_data.status == 'success'){
+
+              //get current data
+              var data = responseJson.array_tags.map(function(item,index) {
+                  return {
+                  key:item.product_category_id,
+                  product_type_name: item.product_type_name
+                  };
+                  });
                 
-                if(save_response_data.status == 'success'){
+                  setModalVisible(!modalVisible);
+                  clear_modal();
+                  setcurrent_list_data(data);
 
-                    //get current data
-                    var data = responseJson.array_tags.map(function(item,index) {
-                        return {
-                        key:item.product_category_id,
-                        product_type_name: item.product_type_name
-                        };
-                        });
-                      
-                        setModalVisible(!modalVisible);
-                        clear_modal();
-                        setcurrent_list_data(data);
+          } else if(save_response_data.status == 'failed'){
+            Alert.alert('failed !');
+          } else {
+            Alert.alert('Duplicate name !');
+          }
 
-                } else if(save_response_data.status == 'failed'){
-                  Alert.alert('failed !');
-                } else {
-                  Alert.alert('Duplicate name !');
-                }
-      
-              }).catch((error) => {
-                console.error(error);
-              });
-            }
+          setSpinner(false)
 
+        }).catch((error) => {
+          console.error(error);
+          setSpinner(false)
+        });
       }
 
       const closeRow = (rowMap, rowKey) => {
@@ -126,8 +164,22 @@ export default function Category ({navigation}) {
         }
     };
 
-    const deleteRow = (rowMap, rowKey) => {
+    function dialogBox(rowMap, rowKey, name){
+      Alert.alert(
+        'DELETE',
+        'Are you sure you want to delete '+name+' ?',
+        [
+          {text: 'OK', onPress: () => deleteRow(rowMap, rowKey)},
+          {text: 'NO', onPress: () => console.log('NO Pressed'), 
+          style: 'cancel'},
+        ],
+        { cancelable: false }
+      );
+    }
 
+    const deleteRow = (rowMap, rowKey) => {
+        setSpinner(true)
+        setSpinnerMSG("Deleting")
         const formData = new FormData();
         formData.append('product_category_id', rowKey);
         fetch(global.global_url+'product_settings/delete_category.php', {
@@ -153,8 +205,12 @@ export default function Category ({navigation}) {
             } else if(save_response_data.status == 'failed'){
               Alert.alert('failed !');
             }
+
+            setSpinner(false)
+
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
     };
 
@@ -168,7 +224,7 @@ export default function Category ({navigation}) {
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.backRightBtnRight]}
-                onPress={() => deleteRow(rowMap, data.item.key)}
+                onPress={() => dialogBox(rowMap, data.item.key,data.item.name)}
             >
                 <Text style={styles.backTextWhite}>Delete</Text>
             </TouchableOpacity>
@@ -236,7 +292,7 @@ export default function Category ({navigation}) {
     return (
 
         <View style={styles.main}>
-                    <Modal
+        <Modal
         animationType="fade"
         transparent={true}
         visible={modalVisible}
@@ -264,7 +320,7 @@ export default function Category ({navigation}) {
                 <TouchableHighlight
                     style={{ ...styles.openButton, backgroundColor: "#2196F3",marginTop:10}}
                     onPress={() => {
-                        add_tag();
+                      dialogBox_add();
                     }}
                 >   
                 <Text style={styles.textStyle}>Save Category</Text>
@@ -322,6 +378,7 @@ export default function Category ({navigation}) {
                 />
             </View> 
         </View>
+        {spinner && <CustomProgressBar />}
         </View>
   );
 }

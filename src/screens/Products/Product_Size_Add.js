@@ -110,7 +110,7 @@ const CustomProgressBar = ({ visible }) => (
   <Modal onRequestClose={() => null} visible={visible} transparent={true}>
     <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
       <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
-        <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>Saving</Text>
         <ActivityIndicator size="large" />
       </View>
     </View>

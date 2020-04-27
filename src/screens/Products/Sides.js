@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -26,10 +27,10 @@ const FlatListItemSeparator = () => {
       text: 'Delete'
     }
   ]
- 
 
 export default function Sides ({navigation}) {
 
+  const [spinner, setSpinner] = React.useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [Category_name, setCategory_name] = useState('');
@@ -37,6 +38,7 @@ export default function Sides ({navigation}) {
 
   useFocusEffect(
     React.useCallback(() => {
+        setSpinner(true)
         fetch(global.global_url+'product_settings/get_tags_dropdrown.php')
         .then((response) => response.json())
         .then((responseJson) => {
@@ -47,10 +49,13 @@ export default function Sides ({navigation}) {
             };
             });
             setcurrent_list_data(data)
+
+            setSpinner(false)
     
         }).catch((error) => {
           console.error(error);
-          Alert.alert('Connection Error');
+          setSpinner(false)
+          //Alert.alert('Connection Error');
         });
 
       return () => {
@@ -87,6 +92,7 @@ export default function Sides ({navigation}) {
         />
     </View> 
     </View>
+    {spinner && <CustomProgressBar />}
     </View>
   );
 }
@@ -109,6 +115,17 @@ function RowItem ({navigation,title,id}) {
 function get_side_header(navigation,name,id){
   navigation.navigate("Side Header",{name,id});
 }
+
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+      <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
 const styles = StyleSheet.create({
     main:{

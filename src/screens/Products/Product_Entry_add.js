@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button,Image,Dimensions,TextInput, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
+import { Button,Image,Dimensions,TextInput,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView,Modal,TouchableHighlight } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
+import { ActivityIndicator } from 'react-native';
 const deviceWidth = Dimensions.get('window').deviceWidth;
 const deviceHeight = Dimensions.get('window').deviceHeight;
 
@@ -20,6 +21,8 @@ export default function Product_Entry_add ({navigation,route}) {
     //navigation route parameters
     const {name,id} = route.params; //product_category_id
 
+    const [spinner, setSpinner] = React.useState(false);
+
     //image
     const [image_preview,Setimage_preview] = useState(false);
     const [imageUri,SetimageUri] = useState('');
@@ -30,6 +33,7 @@ export default function Product_Entry_add ({navigation,route}) {
     const [desc, setDesc] = React.useState('');
 
     const add_item = () =>{
+        setSpinner(true)
         const formData = new FormData();
         formData.append('product_category_id', id);
         formData.append('item_name', item_name);
@@ -60,8 +64,11 @@ export default function Product_Entry_add ({navigation,route}) {
                 Alert.alert('Duplicate name !');
             }
   
+            setSpinner(false)
+
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
       }
 
@@ -164,11 +171,22 @@ export default function Product_Entry_add ({navigation,route}) {
             
             <Button title="Save" onPress={() => { dialogBox() }}></Button>
       </ScrollView>
-
+      {spinner && <CustomProgressBar />}
     </View>
 
   );
 }
+
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>Saving</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
 const styles = StyleSheet.create({
     main:{
