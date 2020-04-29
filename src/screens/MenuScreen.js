@@ -8,6 +8,7 @@ import CartScreen from './CartScreen';
 import Content_DetailsScreen from './Menu/Content_details';
 import LoginScreen from './LoginScreen';
 import PlaceOrderScreen from './PlaceOrderScreen';
+import LocationPicker from './Menu/Location_Picker';
 const Stack = createStackNavigator();
 
 export default class MenuScreen extends React.Component {
@@ -42,6 +43,11 @@ export default class MenuScreen extends React.Component {
       <Stack.Screen
         name="Place Order"
         component={PlaceOrderScreen}
+      />
+
+      <Stack.Screen
+        name="Location Picker"
+        component={LocationPicker}
       />
 
 <     Stack.Screen 

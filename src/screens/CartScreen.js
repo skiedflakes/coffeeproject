@@ -293,6 +293,17 @@ const renderHiddenItem = (data, rowMap) => (
     />
     </View>
     <View>
+    <TouchableOpacity
+        onPress={() => openLocationPicker({navigation,TotalCartPrice})}
+         style={styles.place_order}>
+         <Text style={{
+                  padding:8,
+                  fontSize: 18,
+                  color:"#FFFFFF",
+                  marginLeft:20
+                }}>Location Picker</Text>
+        </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => cart_nav({navigation,TotalCartPrice})}
          style={styles.place_order}>
@@ -319,9 +330,12 @@ const renderHiddenItem = (data, rowMap) => (
   )
 }
 
+function openLocationPicker({navigation,TotalCartPrice}){
+  navigation.navigate("Location Picker",{TotalCartPrice:TotalCartPrice});
+}
+
 function cart_nav({navigation,TotalCartPrice}){
   navigation.navigate("Place Order",{TotalCartPrice:TotalCartPrice});
-  
 }
 
 function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,minus_qty}) {
