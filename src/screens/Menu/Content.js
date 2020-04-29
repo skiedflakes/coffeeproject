@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet,Button } from 'react-native';
+import { Text, View,Image,TouchableOpacity,Dimensions,FlatList,Alert,StyleSheet,Button,Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-
+import { ActivityIndicator } from 'react-native';
 
 //icons
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +17,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { Avatar, Badge, withBadge } from 'react-native-elements'
 
 export default function Content({navigation,route}){
+
+const [spinner, setSpinner] = React.useState(false);
+
 var {title,product_category_id } = route.params;
 const [current_list_data, setcurrent_list_data] = useState('');
 
@@ -24,7 +27,7 @@ var [badge_val, setbadge_val] = React.useState(null);
 var [badge_hidden, setbadge_hidden] = React.useState(false);
 useFocusEffect(
   React.useCallback(() => {
-
+    setSpinner(true)
     AsyncStorage.getAllKeys((err, keys) => {
       AsyncStorage.multiGet(keys, (err, stores) => {
         const newData= stores.map((result, i, store) => {
@@ -67,9 +70,12 @@ useFocusEffect(
               };
             });
             setcurrent_list_data(data);
+
+            setSpinner(false)
           
           }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
 
     return () => {
@@ -77,6 +83,16 @@ useFocusEffect(
   }, [])
 );
 
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+      <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
 return (
   <View style={styles.main}>
@@ -126,6 +142,7 @@ return (
       {/* {content} */}
 
     </View>
+    {spinner && <CustomProgressBar />}
     </View>
  
 );

@@ -1,10 +1,11 @@
 import React, { useState, useRef,useEffect } from 'react';
-import {Button,BackHandler,SafeAreaView, FlatList, Text, View,Alert,StyleSheet,TouchableOpacity,SectionList,TextInput,CheckBox } from 'react-native';
+import {Button,BackHandler,SafeAreaView, FlatList, Text, View,Alert,StyleSheet,TouchableOpacity,SectionList,TextInput,CheckBox,Modal } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native';
 
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 
@@ -13,6 +14,8 @@ import { call, set, min } from 'react-native-reanimated';
 
 export default function Content_details ({navigation,route}) {
   const {product_name,product_id,product_category_id} = route.params;
+
+  const [spinner, setSpinner] = React.useState(false);
 
   var [current_qty,setqty] = useState(1);
   
@@ -44,6 +47,7 @@ export default function Content_details ({navigation,route}) {
     });
 
     // LOAD SELECTIONS
+    setSpinner(true)
     const formData = new FormData();
     formData.append('product_category_id',product_category_id);
     formData.append('product_id',product_id);
@@ -89,8 +93,11 @@ export default function Content_details ({navigation,route}) {
             var total_required = filtered_data.map(item => item.required).reduce((prev, next) => +prev + +next);
             setrequired_check(total_required);
 
+            setSpinner(false)
+
             }).catch((error) => {
             console.error(error);
+            setSpinner(false)
           });
 
       return () => {
@@ -468,7 +475,16 @@ const add_to_cart = () =>{
   }
 }
 
-
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+      <Text style={{ fontSize: 20, fontWeight: '200' }}>Loading</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
 
   return (
 
@@ -526,7 +542,7 @@ const add_to_cart = () =>{
       </View>
 
     </View>
-
+    {spinner && <CustomProgressBar />}
   </SafeAreaView>
   
   );

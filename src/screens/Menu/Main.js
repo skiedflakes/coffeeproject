@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Dimensions,Image,Text, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView } from 'react-native';
+import { Dimensions,Image,Text,Modal, View,Alert,StyleSheet,TouchableOpacity,ScrollView,FlatList,SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+import ImagePicker from 'react-native-image-picker';
+import { ActivityIndicator } from 'react-native';
 
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -19,10 +21,12 @@ export default function Main ({route,navigation,body_content}) {
   var [badge_val, setbadge_val] = React.useState(null);
   var [badge_hidden, setbadge_hidden] = React.useState(false);
 
+  const [spinner, setSpinner] = React.useState(false);
+  const [spinnerMSG, setSpinnerMSG] = React.useState("Loading");
 
   useFocusEffect(
     React.useCallback(() => {
-
+      
       AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (err, stores) => {
           const newData= stores.map((result, i, store) => {
@@ -44,6 +48,8 @@ export default function Main ({route,navigation,body_content}) {
           });
   });
 
+      setSpinner(true)
+      setSpinnerMSG("Loading")
       setcontent(<Content category_id={0}/>);
       fetch(global.global_url+'menu/get_all_tags.php')
             .then((response) => response.json())
@@ -56,12 +62,27 @@ export default function Main ({route,navigation,body_content}) {
                       };
                     });
                      setMenu_list(data);
+
+                     setSpinner(false)
+
                   }).catch((error) => {
                     console.error(error);
+                    setSpinner(false)
       });
       return () => {
     };
     }, [])
+  );
+
+  const CustomProgressBar = ({ visible }) => (
+    <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+      <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+        <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>{spinnerMSG}</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      </View>
+    </Modal>
   );
 
   return (
@@ -106,6 +127,7 @@ export default function Main ({route,navigation,body_content}) {
       {/* {content} */}
 
     </View>
+    {spinner && <CustomProgressBar />}
     </View>
   );
 }
