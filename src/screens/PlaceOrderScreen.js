@@ -5,7 +5,8 @@ import {
   View,
   SafeAreaView,
   Button,
-  Picker
+  Picker,
+  TouchableOpacity
 } from "react-native";
 
 
@@ -13,7 +14,7 @@ import GetLocation from 'react-native-get-location';
 
 
 export default function PlaceOrderScreen ({navigation,route}) {
-  var {TotalCartPrice} = route.params;
+  var {TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance} = route.params;
   const [selectedValue, setSelectedValue] = useState("Payment Type");
   const [longitude, setlongitude] = useState('');
   const [latitude, setlatitude] = useState('');
@@ -31,13 +32,12 @@ export default function PlaceOrderScreen ({navigation,route}) {
     console.warn(code, message);
 })
 
-
-  return(
+return(
   <SafeAreaView style={styles.container}>
-     
+    <Button style={{}} title="My Location Picker" onPress={() => openLocationPicker({navigation,TotalCartPrice,latitude,longitude})}></Button>
     <Text style={styles.item}>Store Location: ex. longitude,latitude</Text>
     <Text style={styles.item}>My Location: {longitude} {latitude}</Text>
-    <Text style={styles.item}>Distance: </Text>
+<Text style={styles.item}>Distance: {distance}</Text>
     <Text style={styles.item}>Charge: </Text>
   <Text style={styles.item}>Total Cart Price: {TotalCartPrice}</Text>
     <Picker
@@ -48,12 +48,16 @@ export default function PlaceOrderScreen ({navigation,route}) {
         <Picker.Item label="Payment Type" value="Payment Type" />
         <Picker.Item label="Paymaya" value="Paymaya" />
         <Picker.Item label="GCASH" value="GCASH" />
-      </Picker>
+    </Picker>
       
-      <Button style={{}} title="Confirm"></Button>
+    <Button style={{}} title="Confirm"></Button>
 
   </SafeAreaView>
   )
+}
+
+function openLocationPicker({navigation,TotalCartPrice,latitude,longitude}){
+  navigation.navigate("Location Picker",{TotalCartPrice,latitude,longitude});
 }
 
 const styles = StyleSheet.create({

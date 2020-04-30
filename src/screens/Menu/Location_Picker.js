@@ -1,20 +1,44 @@
-import * as React from 'react';
-import { StyleSheet,Button, Text, View, TouchableOpacity } from 'react-native';
+import React,{useState,useRef} from 'react';
+import { StyleSheet,Button, Text, View, TouchableOpacity, Alert } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
 import { getPreciseDistance } from 'geolib';
 
-export default class Location_Picker extends React.Component {
+export default function Location_Picker ({navigation,route}) {
+  const {TotalCartPrice,latitude,longitude} = route.params;
 
-render() {
+  const [Draglongitude, setDragLongitude] = useState('');
+  const [Draglatitude, setDragLatitude] = useState('');
+  const [distance, setDistance] = useState('');
+
+  onMarkerDragEnd = (coord) => {
+    const user_lat = coord.latitude;
+    const user_lng = coord.longitude;
+
+    setDragLatitude(user_lat);
+    setDragLongitude(user_lng);
+
+    // STORE location
+    const store_lat = 14.60498536757159; 
+    const store_lng = 120.98707526922226;
+
+    var pdis = getPreciseDistance(
+        { latitude: user_lat, longitude: user_lng },
+        { latitude: store_lat, longitude: store_lng }
+      );
+      alert(`Precise Distance ${pdis} Meter or ${pdis / 1000} KM`);
+
+      setDistance(pdis / 1000);
+      console.log(distance)
+  };
+
   return (
     <>
-    <View style={{
+  <View style={{
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'stretch',
   }}>
   <View  style={styles.container}>
 
@@ -22,43 +46,30 @@ render() {
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
       style={styles.map}
       initialRegion={{
-        latitude: 14.5995,
-        longitude: 120.9842,
+        latitude: latitude,
+        longitude: longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,}}>
 
         <Marker
             style={{height: 10, width:10 }}
-            coordinate={{  latitude: 14.6010,
-            longitude: 120.9842, }}
+            coordinate={{latitude: latitude, longitude: longitude,}}
             tracksViewChanges={false}
             draggable={true}
             onDragEnd={(e) => onMarkerDragEnd(e.nativeEvent.coordinate)}
         />
     
     </MapView>     
-
-  </View>
-  <View style={{padding:20,marginTop:60}}>
   </View>
   </View>
+  <Button style={{}} title="Confirm" onPress={() => goBack(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance)}></Button>
   </>
   );
-}}
+}
 
-onMarkerDragEnd = (coord) => {
-    const user_lat = coord.latitude;
-    const user_lng = coord.longitude;
-
-    const delivery_lat = 14.60498536757159;
-    const delivery_lng = 120.98707526922226;
-
-    var pdis = getPreciseDistance(
-        { latitude: user_lat, longitude: user_lng },
-        { latitude: delivery_lat, longitude: delivery_lng }
-      );
-      alert(`Precise Distance ${pdis} Meter or ${pdis / 1000} KM`);
-  };
+function goBack(navigation,TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance){
+  navigation.navigate("Place Order",{TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance});
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -66,8 +77,6 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    height: 300,
-    width: 400,
   },
   circle: {
     width: 30,
@@ -82,8 +91,9 @@ pinText: {
     fontSize: 20,
     marginBottom: 10,
 },
-image:{ height:30, width:30
-   
+image:{ 
+  height:30,
+  width:30
 }
 
 
