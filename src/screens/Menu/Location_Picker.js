@@ -33,6 +33,23 @@ export default function Location_Picker ({navigation,route}) {
       console.log(distance)
   };
 
+  function dialogBox(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance){
+    if(Draglatitude==''){
+      alert("Please move the red marker, to change your location.")
+    } else {
+      Alert.alert(
+        'Update Location',
+        'Are you sure you want to move your location?',
+        [
+          {text: 'OK', onPress: () => goBack(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance)},
+          {text: 'NO', onPress: () => console.log('NO Pressed'), 
+          style: 'cancel'},
+        ],
+        { cancelable: false }
+      );
+    } 
+  }
+
   return (
     <>
   <View style={{
@@ -52,6 +69,7 @@ export default function Location_Picker ({navigation,route}) {
         longitudeDelta: 0.0421,}}>
 
         <Marker
+            title={"You"}
             style={{height: 10, width:10 }}
             coordinate={{latitude: latitude, longitude: longitude,}}
             tracksViewChanges={false}
@@ -62,7 +80,7 @@ export default function Location_Picker ({navigation,route}) {
     </MapView>     
   </View>
   </View>
-  <Button style={{}} title="Confirm" onPress={() => goBack(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance)}></Button>
+  <Button style={{}} title="Update Location" onPress={() => dialogBox(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance)}></Button>
   </>
   );
 }
