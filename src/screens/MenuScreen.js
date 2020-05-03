@@ -9,6 +9,9 @@ import Content_DetailsScreen from './Menu/Content_details';
 import LoginScreen from './LoginScreen';
 import PlaceOrderScreen from './PlaceOrderScreen';
 import LocationPicker from './Menu/Location_Picker';
+import GCashScreen from './Payments/Ayden/GCashScreen';
+
+import GooglepayScreen from './Payments/GooglePay/GooglepayScreen';
 const Stack = createStackNavigator();
 
 export default class MenuScreen extends React.Component {
@@ -50,10 +53,22 @@ export default class MenuScreen extends React.Component {
         component={LocationPicker}
       />
 
-<     Stack.Screen 
+      <Stack.Screen 
         name="Login" 
         component={LoginScreen} 
-        />
+      />
+
+      <Stack.Screen 
+        name="GcashScreen" 
+        component={GCashScreen} 
+      />
+
+      <Stack.Screen 
+        name="GooglepayScreen" 
+        component={GooglepayScreen} 
+      />
+
+
       <Stack.Screen
         name="Content Details"
         component={Content_DetailsScreen}
