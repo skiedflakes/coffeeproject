@@ -14,7 +14,7 @@ import GetLocation from 'react-native-get-location';
 
 
 export default function PlaceOrderScreen ({navigation,route}) {
-  var {TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance,duration} = route.params;
+  const {TotalCartPrice,Draglatitude,Draglongitude,distance,duration} = route.params;
   const [selectedValue, setSelectedValue] = useState("Payment Type");
   const [longitude, setlongitude] = useState('');
   const [latitude, setlatitude] = useState('');
@@ -46,7 +46,7 @@ return(
     <Button style={{}} title="My Location Picker" onPress={() => openLocationPicker({navigation,TotalCartPrice,latitude,longitude})}></Button>
     <Text style={styles.item}>Store Location: ex. longitude,latitude</Text>
     <Text style={styles.item}>My Location: {longitude} {latitude}</Text>
-<Text style={styles.item}>Distance: {distance}</Text>
+<Text style={styles.item}>Distance:</Text>
     <Text style={styles.item}>Charge: </Text>
   <Text style={styles.item}>Total Cart Price: {TotalCartPrice}</Text>
     <Picker
@@ -63,10 +63,6 @@ return(
 
   </SafeAreaView>
   )
-}
-
-function openLocationPicker({navigation,TotalCartPrice,latitude,longitude}){
-  navigation.navigate("Location Picker",{TotalCartPrice,latitude,longitude});
 }
 
 const styles = StyleSheet.create({
