@@ -330,14 +330,18 @@ function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,mi
  
           <View style={styles.row_item}>
             <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
-            <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
-              <Text style={{fontSize:18}}>+</Text>
-            </TouchableNativeFeedback>
-            <Text style={styles.title}>{qty}x</Text>
 
             <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
               <Text style={{fontSize:18}}>-</Text>
             </TouchableNativeFeedback>
+
+            <Text style={styles.title}>{qty}x</Text>
+            <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+              <Text style={{fontSize:18}}>+</Text>
+            </TouchableNativeFeedback>
+
+
+
             </View>
             <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
             <Text style={styles.row_title}>{title}</Text>

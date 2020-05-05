@@ -57,6 +57,7 @@ return(
         <Picker.Item label="Payment Type" value="Payment Type" />
         <Picker.Item label="GCASH" value="GCASH" />
         <Picker.Item label="Google Pay" value="Google Pay" />
+        <Picker.Item label="Apple Pay" value="Apple Pay" />
     </Picker>
     <Button style={{}} title="Confirm"></Button>
 
