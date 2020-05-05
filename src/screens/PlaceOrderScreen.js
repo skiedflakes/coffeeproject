@@ -32,6 +32,15 @@ export default function PlaceOrderScreen ({navigation,route}) {
     console.warn(code, message);
 })
 
+const selectedPayment = (itemValue) =>{
+  setSelectedValue(itemValue)
+  if(itemValue=="GCASH"){
+    navigation.navigate("GcashScreen");
+  }else if(itemValue=="Google Pay"){
+    navigation.navigate("GooglepayScreen");
+  }
+}
+
 return(
   <SafeAreaView style={styles.container}>
     <Button style={{}} title="My Location Picker" onPress={() => openLocationPicker({navigation,TotalCartPrice,latitude,longitude})}></Button>
@@ -43,13 +52,13 @@ return(
     <Picker
         selectedValue={selectedValue}
         style={{ height: 50, width: 250,alignItems:"center",alignItems:"center",alignSelf:"center"}}
-        onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+        onValueChange={(itemValue, itemIndex) => selectedPayment(itemValue)}
       >
         <Picker.Item label="Payment Type" value="Payment Type" />
-        <Picker.Item label="Paymaya" value="Paymaya" />
         <Picker.Item label="GCASH" value="GCASH" />
+        <Picker.Item label="Google Pay" value="Google Pay" />
+        <Picker.Item label="Apple Pay" value="Apple Pay" />
     </Picker>
-      
     <Button style={{}} title="Confirm"></Button>
 
   </SafeAreaView>
