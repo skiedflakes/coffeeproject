@@ -14,7 +14,7 @@ import GetLocation from 'react-native-get-location';
 
 
 export default function PlaceOrderScreen ({navigation,route}) {
-  var {TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance} = route.params;
+  var {TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance,duration} = route.params;
   const [selectedValue, setSelectedValue] = useState("Payment Type");
   const [longitude, setlongitude] = useState('');
   const [latitude, setlatitude] = useState('');
