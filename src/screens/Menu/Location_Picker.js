@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
+import GetLocation from 'react-native-get-location';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,latitude,longitude} = route.params;
@@ -22,6 +23,20 @@ export default function Location_Picker ({navigation,route}) {
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
   const GOOGLE_MAPS_APIKEY = 'AIzaSyCwrEeL9t4q1kOmU4TEElsZf9nBEboe_JI';
+
+  GetLocation.getCurrentPosition({
+    enableHighAccuracy: true,
+    timeout: 15000,
+  })
+  .then(location => {
+    //setDragLatitude(location.longitude);
+    //setDragLongitude(location.latitude);
+    console.log("longitude - "+location.longitude)
+  })
+  .catch(error => {
+      const { code, message } = error;
+      console.warn(code, message);
+  })
 
   onMarkerDragEnd = (coord) => {
     const user_lat = coord.latitude;
@@ -97,6 +112,16 @@ export default function Location_Picker ({navigation,route}) {
               setDuration(result.duration)
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
+              
+              Alert.alert(
+                'Location details',
+                'Distance: '+result.distance+' km\nDuration: '+result.duration+' min',
+                [
+                  {text: 'Close', onPress: () => console.log('NO Pressed'), 
+                  style: 'cancel'},
+                ],
+                { cancelable: false }
+              );
             }}
             onError={(errorMessage) => {
               // console.log('GOT AN ERROR');
