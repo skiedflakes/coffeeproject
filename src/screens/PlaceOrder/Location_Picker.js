@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 
 export default function Location_Picker ({navigation,route}) {
-  const {TotalCartPrice,latitude,longitude} = route.params;
+  const {TotalCartPrice,} = route.params;
 
   // STORE location
   const store_lat = 10.627794; 
@@ -45,15 +45,15 @@ export default function Location_Picker ({navigation,route}) {
     setDragLongitude(user_lng);
   };
 
-  function dialogBox(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance,duration){
+  function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
     if(Draglatitude==''){
       alert("Please move the red marker, to change your location.")
     } else {
       Alert.alert(
-        'Update Location',
-        'Are you sure you want to move your location?',
+        'Confirm Location',
+        'Are you sure?',
         [
-          {text: 'OK', onPress: () => goBack(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance,duration)},
+          {text: 'OK', onPress: () => goBack(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
           {text: 'NO', onPress: () => console.log('NO Pressed'), 
           style: 'cancel'},
         ],
@@ -131,13 +131,13 @@ export default function Location_Picker ({navigation,route}) {
     </MapView>     
   </View>
   </View>
-  <Button style={{}} title="Update Location" onPress={() => dialogBox(navigation,TotalCartPrice,latitude,longitude,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
   </>
   );
 }
 
-function goBack(navigation,TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance,duration){
-  navigation.navigate("Place Order",{TotalCartPrice,latitude_,longitude_,Draglatitude,Draglongitude,distance,duration});
+function goBack(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
+  navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
 }
 
 const styles = StyleSheet.create({

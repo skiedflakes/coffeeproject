@@ -320,7 +320,7 @@ const renderHiddenItem = (data, rowMap) => (
 }
 
 function cart_nav({navigation,TotalCartPrice}){
-  navigation.navigate("Place Order",{TotalCartPrice:TotalCartPrice});
+  navigation.navigate("Location Picker",{TotalCartPrice:TotalCartPrice});
 }
 
 function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,minus_qty}) {
