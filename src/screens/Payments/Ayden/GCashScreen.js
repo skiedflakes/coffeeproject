@@ -7,9 +7,7 @@ import {
   Button,
   Alert,
   Linking,
-  Dimensions
 } from "react-native";
-const deviceWidth = Dimensions.get('window').width;
 import { WebView } from 'react-native-webview';
 import { useFocusEffect } from '@react-navigation/native';
 const supportedURL = "https://google.com";

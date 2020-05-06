@@ -76,13 +76,7 @@ export default function CartScreen ({navigation}) {
                 data:item2.data,
               };
             });
-
-
-       
             setListData(data);
-            // console.log(data);
-       
-
           }catch(error){}
          
         });
