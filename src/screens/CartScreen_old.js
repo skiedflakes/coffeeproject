@@ -27,25 +27,49 @@ export default function CartScreen ({navigation}) {
           });
           try{
             var filtered_newData = newData.filter(e => e != null);
-            console.log("cart data: ",filtered_newData.length);
+            var final_total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
+            //save filtered data
+            // filtered_newData
 
-            var total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
-            set_total_price(total);
-            setmycart(filtered_newData);
+            // setTotalCartPrice(final_total);
+            // var counter =-1;
+            //   var data = filtered_newData.map(function(item2) {
+            //   var data_title = filtered_newData.map(function(item) {
+              
+            //     if(item2.id==item.id){
+            //       ++counter;
+            //       return {
+            //         section:counter,
+            //         id: item.id,
+            //         product_name: item.product_n ame,
+            //         price: item.price,
+            //           :item.base_price,
+            //         add_on_price:item.add_on_price,
+            //         qty:item.qty
+            //       };
+            //     }else{return null}
+            //   });
+            //   var f_data_title = data_title.filter(e => e != null);
+
+            //   return {
+            //     id: item2.id,
+            //     product_id: item2.product_id,
+            //     product_name: item2.product_name,
+            //     qty:item2.qty,
+            //     price:item2.price,
+            //     data_title:f_data_title,
+            //     data:item2.data,
+            //   };
+            // });
+            // setListData(data);
 
           }catch(error){}
-         
         });
       });
-
-
       return () => {
-
-        
       };
     }, [])
   );
-
 
   const clear_async = ()=> {
     console.log(mycart);
