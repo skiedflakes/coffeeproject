@@ -1,13 +1,16 @@
 import React,{useState,useRef} from 'react';
-import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image } from 'react-native';
+import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
+import { ActivityIndicator } from 'react-native';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
+
+  const [spinner, setSpinner] = React.useState(false);
 
   // STORE location
   const store_lat = 10.627794; 
@@ -16,13 +19,13 @@ export default function Location_Picker ({navigation,route}) {
   // user location
   const [Draglatitude, setDragLatitude] = useState(10.641707);
   const [Draglongitude, setDragLongitude] = useState(122.945301);
+  const [isMarkerDrag, setMarkerDrag] = useState(false);
 
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
-  const GOOGLE_MAPS_APIKEY = 'AIzaSyCwrEeL9t4q1kOmU4TEElsZf9nBEboe_JI';
 
   GetLocation.getCurrentPosition({
     enableHighAccuracy: true,
@@ -43,23 +46,20 @@ export default function Location_Picker ({navigation,route}) {
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
+    setMarkerDrag(true);
   };
 
   function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
-    if(Draglatitude==''){
-      alert("Please move the red marker, to change your location.")
-    } else {
-      Alert.alert(
-        'Confirm Location',
-        'Are you sure?',
-        [
-          {text: 'OK', onPress: () => goBack(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
-          {text: 'NO', onPress: () => console.log('NO Pressed'), 
-          style: 'cancel'},
-        ],
-        { cancelable: false }
-      );
-    } 
+    Alert.alert(
+      'Confirm Location',
+      'Are you want that is your current location?',
+      [
+        {text: 'OK', onPress: () => confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
+        {text: 'NO', onPress: () => console.log('NO Pressed'), 
+        style: 'cancel'},
+      ],
+      { cancelable: false }
+    );
   }
 
   return (
@@ -67,13 +67,13 @@ export default function Location_Picker ({navigation,route}) {
   <View style={{
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'center',
   }}>
   <View  style={styles.container}>
 
     <MapView
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
       style={styles.map}
+      showsMyLocationButton={true}
       showsTraffic={true}
       initialRegion={{
         latitude: Draglatitude,
@@ -89,7 +89,7 @@ export default function Location_Picker ({navigation,route}) {
             draggable={true}
             onDragEnd={(e) => onMarkerDragEnd(e.nativeEvent.coordinate)}
         />
-
+        
         <Marker
             title={"Store"}
             pinColor="violet"
@@ -101,42 +101,52 @@ export default function Location_Picker ({navigation,route}) {
         <MapViewDirections
             origin={origin}
             destination={destination}
-            apikey={GOOGLE_MAPS_APIKEY}
+            apikey={global.GOOGLE_MAPS_APIKEY}
             strokeColor="red"
             strokeWidth={3}
             onStart={(params) => {
+              setSpinner(true);
               console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
             }}
             onReady={result => {
-              setDistance(result.distance)
-              setDuration(result.duration)
+              setSpinner(false);
+              setDistance(Math.round(result.distance))
+              setDuration(Math.round(result.duration))
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
-              
-              Alert.alert(
-                'Location details',
-                'Distance: '+result.distance+' km\nDuration: '+result.duration+' min',
-                [
-                  {text: 'Close', onPress: () => console.log('NO Pressed'), 
-                  style: 'cancel'},
-                ],
-                { cancelable: false }
-              );
             }}
             onError={(errorMessage) => {
-              // console.log('GOT AN ERROR');
+              console.log('GOT AN ERROR');
             }}
           />
     
     </MapView>     
   </View>
+  <View style={{flexDirection:"row-reverse"}}>
+      <Text style={{backgroundColor:"#969696", borderRadius:20, padding:5, margin:5, color:"white"}}>{"Distance: "+distance+" km"}</Text>
+  </View>
+  <View style={{flexDirection:"row-reverse"}}>
+      <Text style={{backgroundColor:"#969696", borderRadius:20, padding:5, marginRight:5, color:"white"}}>{"Duration: "+duration+" min"}</Text>
+  </View>
+  {spinner && <CustomProgressBar />}
   </View>
   <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
   </>
   );
 }
 
-function goBack(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>Calculating</Text>
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
+
+function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
   navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
 }
 
@@ -145,7 +155,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
   },
   circle: {
     width: 30,
