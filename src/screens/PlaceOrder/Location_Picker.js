@@ -7,6 +7,7 @@ import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import { ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
@@ -19,6 +20,9 @@ export default function Location_Picker ({navigation,route}) {
   const store_lng = 122.965016;
 
   // user location
+  const [UserOriginlatitude, setUserOriginLatitude] = useState(0);
+  const [UserOriginlongitude, setUserOriginLongitude] = useState(0);
+
   const [Draglatitude, setDragLatitude] = useState(0);
   const [Draglongitude, setDragLongitude] = useState(0);
   const [getUserLocation, setgetUserLocation] = useState(false);
@@ -26,12 +30,14 @@ export default function Location_Picker ({navigation,route}) {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
+  const [MapRef, setMapRef] = useState('');
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
 
   useFocusEffect(
     React.useCallback(() => {
       getUserLoc();
+      console.log("test")
     })
   );
 
@@ -46,6 +52,9 @@ export default function Location_Picker ({navigation,route}) {
         setgetUserLocation(true);
         setDragLatitude(location.latitude);
         setDragLongitude(location.longitude);
+
+        setUserOriginLatitude(location.latitude);
+        setUserOriginLongitude(location.longitude);
       }
       
       console.log("longitude - "+location.longitude)
@@ -54,6 +63,12 @@ export default function Location_Picker ({navigation,route}) {
         const { code, message } = error;
         console.warn(code, message);
     })
+  }
+
+  function returnToOriginLoc(){
+    setDragLatitude(UserOriginlatitude);
+    setDragLongitude(UserOriginlongitude);
+    MapRef.initialRegion
   }
 
   onMarkerDragEnd = (coord) => {
@@ -81,6 +96,7 @@ return (
 
   {getUserLocation && 
   <MapView
+      ref={(ref) => {setMapRef(ref)}}
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
       style={{flex: 1, marginBottom: 1}}
       showsMyLocationButton={true}
@@ -125,7 +141,6 @@ return (
               setDuration(Math.round(result.duration))
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
-              
             }}
             onError={(errorMessage) => {
               setSpinner(false);
@@ -135,15 +150,23 @@ return (
     </MapView>}
 
   </View>
+  
   <View style={{flexDirection:"row-reverse"}}>
-      <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, margin:5, color:"white"}}>{"Distance: "+distance+" km"}</Text>
+    {/* <Icon style={{backgroundColor:"#4784ed", borderRadius:50, padding:3, margin:5, color:"white"}} onPress={() => returnToOriginLoc()} name="ios-person" size={25} color="#4F8EF7" /> */}
+    <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, margin:5, color:"white"}} onPress={() => returnToOriginLoc()}>Origin</Text>
   </View>
-  <View style={{flexDirection:"row-reverse"}}>
-      <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, marginRight:5, color:"white"}}>{"Duration: "+duration+" min"}</Text>
   </View>
-  {spinner && <CustomProgressBar />}
+
+  <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+      <Text style={{padding:5, margin:5, color:"blue"}}>{"Duration: "+duration+" min"}</Text>
+      <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+      <Text style={{padding:5, margin:5, color:"blue"}}>{"Distance: "+distance+" km"}</Text>
+      {/* <Icon name="ios-person" size={30} color="#4F8EF7" /> */}
+    </View>
   </View>
+
   <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  {spinner && <CustomProgressBar />}
   </>
   );
 }
