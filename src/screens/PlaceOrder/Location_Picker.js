@@ -1,78 +1,104 @@
-import React,{useState,useRef} from 'react';
+import React,{useState,useRef,useEffect} from 'react';
 import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
+import { useFocusEffect } from '@react-navigation/native';
 import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import { ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
 
-  const [spinner, setSpinner] = React.useState(false);
+  const [spinner, setSpinner] = React.useState(true);
+  const [spinnerMSG, setSpinnerMSG] = React.useState("Getting user location");
 
   // STORE location
   const store_lat = 10.627794; 
   const store_lng = 122.965016;
 
   // user location
-  const [Draglatitude, setDragLatitude] = useState(10.641707);
-  const [Draglongitude, setDragLongitude] = useState(122.945301);
-  const [isMarkerDrag, setMarkerDrag] = useState(false);
+  const [UserOriginlatitude, setUserOriginLatitude] = useState(0);
+  const [UserOriginlongitude, setUserOriginLongitude] = useState(0);
+
+  const [Draglatitude, setDragLatitude] = useState(0);
+  const [Draglongitude, setDragLongitude] = useState(0);
+  const [getUserLocation, setgetUserLocation] = useState(false);
 
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
+  const [MapRef, setMapRef] = useState('');
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
 
-  GetLocation.getCurrentPosition({
-    enableHighAccuracy: true,
-    timeout: 15000,
-  })
-  .then(location => {
-    //setDragLatitude(location.longitude);
-    //setDragLongitude(location.latitude);
-    console.log("longitude - "+location.longitude)
-  })
-  .catch(error => {
-      const { code, message } = error;
-      console.warn(code, message);
-  })
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserLoc();
+      console.log("test")
+    })
+  );
+
+  function getUserLoc(){
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    })
+    .then(location => {
+      if (!getUserLocation) {
+        setSpinner(false);
+        setgetUserLocation(true);
+        setDragLatitude(location.latitude);
+        setDragLongitude(location.longitude);
+
+        setUserOriginLatitude(location.latitude);
+        setUserOriginLongitude(location.longitude);
+      }
+      
+      console.log("longitude - "+location.longitude)
+    })
+    .catch(error => {
+        const { code, message } = error;
+        console.warn(code, message);
+    })
+  }
+
+  function returnToOriginLoc(){
+    setDragLatitude(UserOriginlatitude);
+    setDragLongitude(UserOriginlongitude);
+    MapRef.initialRegion
+  }
 
   onMarkerDragEnd = (coord) => {
     const user_lat = coord.latitude;
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
-    setMarkerDrag(true);
   };
 
-  function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
-    Alert.alert(
-      'Confirm Location',
-      'Are you want that is your current location?',
-      [
-        {text: 'OK', onPress: () => confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
-        {text: 'NO', onPress: () => console.log('NO Pressed'), 
-        style: 'cancel'},
-      ],
-      { cancelable: false }
-    );
-  }
+  const CustomProgressBar = ({ visible }) => (
+    <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+      <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+        <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+        <Text style={{ fontSize: 20, fontWeight: '200' }}>{spinnerMSG}</Text>
+          <ActivityIndicator size="large" />
+        </View>
+      </View>
+    </Modal>
+  );
 
-  return (
+return (
     <>
-  <View style={{
-    flex: 1,
-    flexDirection: 'column',
-  }}>
+  <View style={{flex: 1,flexDirection: 'column',}}>
   <View  style={styles.container}>
 
-    <MapView
+  {getUserLocation && 
+  <MapView
+      ref={(ref) => {setMapRef(ref)}}
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-      style={styles.map}
+      style={{flex: 1, marginBottom: 1}}
       showsMyLocationButton={true}
       showsTraffic={true}
       initialRegion={{
@@ -105,6 +131,7 @@ export default function Location_Picker ({navigation,route}) {
             strokeColor="red"
             strokeWidth={3}
             onStart={(params) => {
+              setSpinnerMSG('Calculating');
               setSpinner(true);
               console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
             }}
@@ -116,35 +143,46 @@ export default function Location_Picker ({navigation,route}) {
               console.log(`Duration: ${result.duration} min.`)
             }}
             onError={(errorMessage) => {
+              setSpinner(false);
               console.log('GOT AN ERROR');
             }}
           />
-    
-    </MapView>     
+    </MapView>}
+
   </View>
+  
   <View style={{flexDirection:"row-reverse"}}>
-      <Text style={{backgroundColor:"#969696", borderRadius:20, padding:5, margin:5, color:"white"}}>{"Distance: "+distance+" km"}</Text>
+    {/* <Icon style={{backgroundColor:"#4784ed", borderRadius:50, padding:3, margin:5, color:"white"}} onPress={() => returnToOriginLoc()} name="ios-person" size={25} color="#4F8EF7" /> */}
+    <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, margin:5, color:"white"}} onPress={() => returnToOriginLoc()}>Origin</Text>
   </View>
-  <View style={{flexDirection:"row-reverse"}}>
-      <Text style={{backgroundColor:"#969696", borderRadius:20, padding:5, marginRight:5, color:"white"}}>{"Duration: "+duration+" min"}</Text>
   </View>
-  {spinner && <CustomProgressBar />}
+
+  <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+      <Text style={{padding:5, margin:5, color:"blue"}}>{"Duration: "+duration+" min"}</Text>
+      <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+      <Text style={{padding:5, margin:5, color:"blue"}}>{"Distance: "+distance+" km"}</Text>
+      {/* <Icon name="ios-person" size={30} color="#4F8EF7" /> */}
+    </View>
   </View>
+
   <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  {spinner && <CustomProgressBar />}
   </>
   );
 }
 
-const CustomProgressBar = ({ visible }) => (
-  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
-    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
-      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
-        <Text style={{ fontSize: 20, fontWeight: '200' }}>Calculating</Text>
-        <ActivityIndicator size="large" />
-      </View>
-    </View>
-  </Modal>
-);
+function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
+  Alert.alert(
+    'Confirm Location',
+    'Are you sure this is your current location?',
+    [
+      {text: 'OK', onPress: () => confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
+      {text: 'NO', onPress: () => console.log('NO Pressed'), 
+      style: 'cancel'},
+    ],
+    { cancelable: false }
+  );
+}
 
 function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
   navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
@@ -156,6 +194,7 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+    marginBottom: 1
   },
   circle: {
     width: 30,
