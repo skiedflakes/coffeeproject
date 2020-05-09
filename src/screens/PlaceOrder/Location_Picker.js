@@ -19,7 +19,12 @@ export default function Location_Picker ({navigation,route}) {
   const store_lat = 10.627794; 
   const store_lng = 122.965016;
 
-  // user location
+  // Zoom level
+  const latDelta = 0.0922;
+  const lngDelta = 0.0421;
+  const DEFAULT_PADDING = { top: 200, right: 50, bottom: 50, left: 50 };
+
+  // User location
   const [UserOriginlatitude, setUserOriginLatitude] = useState(0);
   const [UserOriginlongitude, setUserOriginLongitude] = useState(0);
 
@@ -30,14 +35,16 @@ export default function Location_Picker ({navigation,route}) {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
-  const [MapRef, setMapRef] = useState('');
+  const [MapRef, setMapRef] = useState();
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
 
   useFocusEffect(
     React.useCallback(() => {
-      getUserLoc();
       console.log("test")
+      if (!getUserLocation) {
+        getUserLoc();
+      }
     })
   );
 
@@ -47,7 +54,6 @@ export default function Location_Picker ({navigation,route}) {
       timeout: 15000,
     })
     .then(location => {
-      if (!getUserLocation) {
         setSpinner(false);
         setgetUserLocation(true);
         setDragLatitude(location.latitude);
@@ -55,9 +61,8 @@ export default function Location_Picker ({navigation,route}) {
 
         setUserOriginLatitude(location.latitude);
         setUserOriginLongitude(location.longitude);
-      }
       
-      console.log("longitude - "+location.longitude)
+        console.log("longitude - "+location.longitude)
     })
     .catch(error => {
         const { code, message } = error;
@@ -68,7 +73,14 @@ export default function Location_Picker ({navigation,route}) {
   function returnToOriginLoc(){
     setDragLatitude(UserOriginlatitude);
     setDragLongitude(UserOriginlongitude);
-    MapRef.initialRegion
+   
+    let r = {
+      latitude: UserOriginlatitude,
+      longitude: UserOriginlongitude,
+      latitudeDelta: latDelta,
+      longitudeDelta: lngDelta,
+    };
+    MapRef.animateToRegion(r, 1000);
   }
 
   onMarkerDragEnd = (coord) => {
@@ -76,6 +88,8 @@ export default function Location_Picker ({navigation,route}) {
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
+
+    MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: store_lat, longitude: store_lng }], { edgePadding: DEFAULT_PADDING, animated: true, });
   };
 
   const CustomProgressBar = ({ visible }) => (
@@ -99,13 +113,13 @@ return (
       ref={(ref) => {setMapRef(ref)}}
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
       style={{flex: 1, marginBottom: 1}}
-      showsMyLocationButton={true}
+      showsMyLocationButton={false}
       showsTraffic={true}
       initialRegion={{
         latitude: Draglatitude,
         longitude: Draglongitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,}}>
+        latitudeDelta: latDelta,
+        longitudeDelta: lngDelta,}}>
 
         <Marker
             title={"You"}
@@ -158,14 +172,14 @@ return (
   </View>
 
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"blue"}}>{"Duration: "+duration+" min"}</Text>
-      <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"blue"}}>{"Distance: "+distance+" km"}</Text>
-      {/* <Icon name="ios-person" size={30} color="#4F8EF7" /> */}
-    </View>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Duration: "+duration+" min"}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Distance: "+distance+" km"}</Text>
   </View>
 
-  <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+  <Button title="Proceed" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <Button color="#ff5c5c" title="Cancel" onPress={() => navigation.goBack(null)}></Button>
+  </View>
   {spinner && <CustomProgressBar />}
   </>
   );
