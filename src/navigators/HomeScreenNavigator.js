@@ -3,12 +3,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 //import screens 
 import FeedScreen from '../screens/FeedScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ProductsScreen from '../screens/ProductScreen';
 import OrderScreen from '../screens/OrderScreen';
+import UserTransactionsScreen from '../screens/UserTransactionsScreen';
 import MenuScreen from '../screens/MenuScreen';
 
 const Tab = createBottomTabNavigator();
@@ -79,13 +81,22 @@ export default class HomeScreenNavigator extends React.Component{
               ),
             }}/>
 
-          <Tab.Screen name="Orders" component={OrderScreen} 
+          {/* <Tab.Screen name="Orders" component={OrderScreen} 
             options={{
               tabBarLabel: 'Orders',
               tabBarIcon: ({ color, size }) => (
                 <Icon name="list-ul" color={color} size={size} />
               ),
+            }}/> */}
+
+            <Tab.Screen name="User Transactions" component={UserTransactionsScreen} 
+            options={{
+              tabBarLabel: 'Transactions',
+              tabBarIcon: ({ color, size }) => (
+                <Octicons name="package" color={color} size={size} />
+              ),
             }}/>
+
             <Tab.Screen name="Profile" component={ProfileScreen} 
             options={{
               tabBarLabel: 'Profile',
