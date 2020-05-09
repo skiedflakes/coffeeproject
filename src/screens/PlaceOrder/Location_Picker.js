@@ -185,7 +185,7 @@ function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance
 }
 
 function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
-  navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
+  navigation.navigate("Place Order",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
 }
 
 const styles = StyleSheet.create({
