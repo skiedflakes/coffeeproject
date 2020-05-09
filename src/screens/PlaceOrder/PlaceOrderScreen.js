@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   Button,
   Picker,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from "react-native";
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -18,6 +19,8 @@ const {TotalCartPrice,Draglatitude,Draglongitude,distance,duration} = route.para
 const [selectedValue, setSelectedValue] = useState("Payment Type");
 const [longitude, setlongitude] = useState('');
 const [latitude, setlatitude] = useState('');
+
+const [cart_data, setcart_data] = useState('');
 useFocusEffect(
   React.useCallback(() => {
    //remove selected items
@@ -37,41 +40,9 @@ useFocusEffect(
         try{
           var filtered_newData = newData.filter(e => e != null);
           var final_total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
-
           console.log(filtered_newData);
-          // setTotalCartPrice(final_total);
-          // var counter =-1;
-          //   var data = filtered_newData.map(function(item2) {
-          //   var data_title = filtered_newData.map(function(item) {
-            
-          //     if(item2.id==item.id){
-          //       ++counter;
-          //       return {
-          //         section:counter,
-          //         id: item.id,
-          //         product_name: item.product_name,
-          //         price: item.price,
-          //         base_price:item.base_price,
-          //         add_on_price:item.add_on_price,
-          //         qty:item.qty
-          //       };
-          //     }else{return null}
-          //   });
-          //   var f_data_title = data_title.filter(e => e != null);
-
-          //   return {
-          //     id: item2.id,
-          //     product_id: item2.product_id,
-          //     product_name: item2.product_name,
-          //     qty:item2.qty,
-          //     price:item2.price,
-          //     data_title:f_data_title,
-          //     data:item2.data,
-          //   };
-          // });
-
+          setcart_data(filtered_newData);
         }catch(error){}
-       
       });
     });
     return () => {
@@ -93,13 +64,88 @@ GetLocation.getCurrentPosition({
     console.warn(code, message);
 })
 
+  const remove_cart_items = () => {
+    AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (err, stores) => {
+          stores.map((result, i, store) => {
+            let key = store[i][0];
+            var jsonPars = JSON.parse(store[i][1]);
+            if(jsonPars.add_to_cart==1){
+              removeItems(key)
+            }else{
+            
+            }
+          
+          });
+        });
+    });
+  }
+
+  //DELETE ITEM STORAGE
+  const removeItems  = async (key) => {
+    await AsyncStorage.removeItem(key);
+  }
+
+
+const confirm = () =>{
+  TotalCartPrice,Draglatitude,Draglongitude,distance,duration
+  const formData = new FormData();
+  formData.append('cart_price', JSON.stringify(TotalCartPrice));
+  formData.append('latitude', JSON.stringify(Draglatitude));
+  formData.append('longitude', JSON.stringify(Draglongitude));
+  formData.append('data', JSON.stringify(cart_data));
+
+  fetch(global.global_url+'placeorder/insert_place_order.php', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'multipart/form-data'
+    },
+    body: formData
+
+  }).then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson);
+      if(responseJson=="success"){
+        //clear async
+        remove_cart_items();
+
+        //navigate
+        navigation.popToTop()
+        navigation.navigate('User Transactions');
+
+
+      }else{
+        Alert.alert("failed");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+    // fetch(global.global_url+'placeorder/test.php', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'multipart/form-data'
+    //   },
+    //   body: formData
+  
+    // }).then((response) => response.json())
+    //   .then((responseJson) => {
+    //     console.log(responseJson);
+  
+    //   }).catch((error) => {
+    //     console.error(error);
+    //   });
+}
+
 return(
   <SafeAreaView style={styles.container}>
-    <Text style={styles.item}>Estimated Time arrival:{duration} minutes</Text>
+    <Text style={styles.item}>Estimated Time of Arrival is {duration} minutes</Text>
     <Text style={styles.item}>Delivery Fee: </Text>
     <Text style={styles.item}>Cart: {TotalCartPrice}</Text>
     <Text style={styles.item}>Total: {TotalCartPrice}</Text>
-    <Button style={{}} title="Confirm"></Button>
+    <Button onPress={() => confirm()} style={{}} title="Confirm"></Button>
   </SafeAreaView>
   )
 }

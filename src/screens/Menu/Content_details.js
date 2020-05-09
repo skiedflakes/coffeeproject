@@ -12,7 +12,7 @@ import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 import CircleCheckBox, {LABEL_POSITION} from 'react-native-circle-checkbox'; 
 import { call, set, min } from 'react-native-reanimated';
 
-export default function Content_details ({navigation,route}) {
+export default function Content_details ({navigation: { goBack },route}) {
   const {product_name,product_id,product_category_id} = route.params;
 
   const [spinner, setSpinner] = React.useState(false);
@@ -465,7 +465,7 @@ const add_to_cart = () =>{
              'base_price':base_price,
              'price':final_price,
              'data':filtered_newData});
-           getContent(navigation,product_name,product_category_id);
+             goBack();
         }catch(error){}
        
       });

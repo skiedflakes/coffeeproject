@@ -73,10 +73,9 @@ export default class MenuScreen extends React.Component {
         name="Payment Methods"
         component={Payment_methods}
       />
+
+  
 {/* PLACEORDER END*/}
-
-
-
 {/* Payment methods */}
       <Stack.Screen 
         name="GcashScreen" 
