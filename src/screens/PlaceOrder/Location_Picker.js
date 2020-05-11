@@ -1,5 +1,5 @@
 import React,{useState,useRef,useEffect} from 'react';
-import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal } from 'react-native';
+import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal,TouchableHighlight } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { useFocusEffect } from '@react-navigation/native';
@@ -11,6 +11,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
+
+  const [StoreArray, setStoreArray] = useState('');
 
   const [spinner, setSpinner] = React.useState(true);
   const [spinnerMSG, setSpinnerMSG] = React.useState("Getting user location");
@@ -32,6 +34,7 @@ export default function Location_Picker ({navigation,route}) {
   const [Draglongitude, setDragLongitude] = useState(0);
   const [getUserLocation, setgetUserLocation] = useState(false);
 
+  const [selectedStore, setSelectedStore] = useState('Test');
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
@@ -44,9 +47,43 @@ export default function Location_Picker ({navigation,route}) {
       console.log("test")
       if (!getUserLocation) {
         getUserLoc();
+        getchStoreLocation();
       }
     })
   );
+
+  function getchStoreLocation(){
+    const formData = new FormData();
+    formData.append('product_category_id', "id");
+    fetch(global.global_url+'location_picker/fetchStoreLocation.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data'
+      },
+      body: formData
+
+    }).then((response) => response.json())
+      .then((responseJson) => {
+
+            //get current data
+            var data = responseJson.array_store.map(function(item,index) {
+                return {
+                branch_id:item.branch_id,
+                branch_name: item.branch_name,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                };
+                });
+                
+                setStoreArray(data);
+
+                console.log(StoreArray)
+
+      }).catch((error) => {
+        console.error(error);
+      });
+  }
 
   function getUserLoc(){
     GetLocation.getCurrentPosition({
@@ -92,6 +129,12 @@ export default function Location_Picker ({navigation,route}) {
     MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: store_lat, longitude: store_lng }], { edgePadding: DEFAULT_PADDING, animated: true, });
   };
 
+  handleMarkerPress = (event) => {
+    const markerID = event.nativeEvent.title
+    //const markertitle = event.nativeEvent
+    console.log(markerID)
+  };
+
   const CustomProgressBar = ({ visible }) => (
     <Modal onRequestClose={() => null} visible={visible} transparent={true}>
       <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
@@ -130,13 +173,36 @@ return (
             onDragEnd={(e) => onMarkerDragEnd(e.nativeEvent.coordinate)}
         />
         
+        {StoreArray[0] != null && StoreArray.map((marker, index) => (
+            <MapView.Marker
+                key = {index}
+                coordinate = {{
+                    latitude: parseFloat(marker.latitude),
+                    longitude: parseFloat(marker.longitude)
+                }}
+                title = { marker.branch_name }
+                pinColor="violet"
+            />
+          ))
+        }
+
         <Marker
+            identifier={"5"}
             title={"Store"}
             pinColor="violet"
             style={{height: 10, width:10 }}
             coordinate={{latitude: store_lat, longitude: store_lng}}
             tracksViewChanges={false}
-        />
+            // onPress={(e) => handleMarkerPress(e)}
+        >
+          <MapView.Callout tooltip>
+            <TouchableHighlight onPress= {() => handleMarkerPress()} underlayColor='#dddddd'>
+                <View style={styles.calloutText}>
+                    {/* <Text>{marker.title}{"\n"}{marker.description}</Text> */}
+                </View>
+            </TouchableHighlight>
+          </MapView.Callout>
+        </Marker>
 
         <MapViewDirections
             origin={origin}
@@ -171,6 +237,7 @@ return (
   </View>
   </View>
 
+  <Text style={{padding:5, marginTop:5, color:"black", fontSize:15, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
       <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Duration: "+duration+" min"}</Text>
       <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Distance: "+distance+" km"}</Text>
