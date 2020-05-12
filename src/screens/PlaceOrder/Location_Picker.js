@@ -237,10 +237,10 @@ return (
   </View>
   </View>
 
-  <Text style={{padding:5, marginTop:5, color:"black", fontSize:15, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
+  <Text style={{paddingTop:5, marginTop:5, color:"black", fontSize:15.5, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
   </View>
 
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
