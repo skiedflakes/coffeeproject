@@ -125,8 +125,10 @@ export default function Location_Picker ({navigation,route}) {
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
-
-    MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: store_lat, longitude: store_lng }], { edgePadding: DEFAULT_PADDING, animated: true, });
+    moveFitMarkerScreen(store_lat,store_lng,user_lat,user_lng);
+    // if (store_lat != null) {
+    //   MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: parseFloat(store_lat), longitude: parseFloat(store_lng) }], { edgePadding: DEFAULT_PADDING, animated: true, });
+    // }
   };
 
   handleMarkerPress = (marker) => {
@@ -137,7 +139,14 @@ export default function Location_Picker ({navigation,route}) {
     setSelectedStore(store_name);
     setStoreLat(store_latitude);
     setStoreLongi(store_longitude);
+    moveFitMarkerScreen(store_latitude,store_longitude,Draglatitude,Draglongitude);
   };
+
+  function moveFitMarkerScreen(store_latitude, store_longitude, user_latitude, user_longitude){
+    if (store_latitude != null) {
+      MapRef.fitToCoordinates([{ latitude: user_latitude, longitude: user_longitude }, { latitude: parseFloat(store_latitude), longitude: parseFloat(store_longitude) }], { edgePadding: DEFAULT_PADDING, animated: true, });
+    }
+  }
 
   const CustomProgressBar = ({ visible }) => (
     <Modal onRequestClose={() => null} visible={visible} transparent={true}>
@@ -191,7 +200,7 @@ return (
           ))
         }
 
-        <MapViewDirections
+        {store_lat != null && <MapViewDirections
             origin={origin}
             destination={destination}
             apikey={global.GOOGLE_MAPS_APIKEY}
@@ -200,12 +209,14 @@ return (
             onStart={(params) => {
               setSpinnerMSG('Calculating');
               setSpinner(true);
+              setDuration('...');
+              setDistance('...');
               console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
             }}
             onReady={result => {
               setSpinner(false);
-              setDistance(Math.round(result.distance))
-              setDuration(Math.round(result.duration))
+              setDistance(Math.round(result.distance)+" km")
+              setDuration(Math.round(result.duration)+" min")
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
             }}
@@ -214,6 +225,8 @@ return (
               console.log('GOT AN ERROR');
             }}
           />
+        }
+        
     </MapView>}
 
   </View>
@@ -226,8 +239,8 @@ return (
 
   <Text style={{padding:5, marginTop:5, color:"black", fontSize:15, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Duration: "+duration+" min"}</Text>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Distance: "+distance+" km"}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
   </View>
 
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
