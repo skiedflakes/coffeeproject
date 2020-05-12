@@ -18,8 +18,8 @@ export default function Location_Picker ({navigation,route}) {
   const [spinnerMSG, setSpinnerMSG] = React.useState("Getting user location");
 
   // STORE location
-  const store_lat = 10.627794; 
-  const store_lng = 122.965016;
+  const [store_lat, setStoreLat] = useState();
+  const [store_lng, setStoreLongi] = useState();
 
   // Zoom level
   const latDelta = 0.0922;
@@ -34,7 +34,7 @@ export default function Location_Picker ({navigation,route}) {
   const [Draglongitude, setDragLongitude] = useState(0);
   const [getUserLocation, setgetUserLocation] = useState(false);
 
-  const [selectedStore, setSelectedStore] = useState('Test');
+  const [selectedStore, setSelectedStore] = useState('');
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
@@ -129,10 +129,14 @@ export default function Location_Picker ({navigation,route}) {
     MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: store_lat, longitude: store_lng }], { edgePadding: DEFAULT_PADDING, animated: true, });
   };
 
-  handleMarkerPress = (event) => {
-    const markerID = event.nativeEvent.title
-    //const markertitle = event.nativeEvent
-    console.log(markerID)
+  handleMarkerPress = (marker) => {
+    const store_latitude = marker.latitude
+    const store_longitude = marker.longitude 
+    const store_name = marker.branch_name
+    const store_id = marker.branch_id
+    setSelectedStore(store_name);
+    setStoreLat(store_latitude);
+    setStoreLongi(store_longitude);
   };
 
   const CustomProgressBar = ({ visible }) => (
@@ -181,28 +185,11 @@ return (
                     longitude: parseFloat(marker.longitude)
                 }}
                 title = { marker.branch_name }
-                pinColor="violet"
+                pinColor="violet" 
+                onPress={() => handleMarkerPress(marker)}
             />
           ))
         }
-
-        <Marker
-            identifier={"5"}
-            title={"Store"}
-            pinColor="violet"
-            style={{height: 10, width:10 }}
-            coordinate={{latitude: store_lat, longitude: store_lng}}
-            tracksViewChanges={false}
-            // onPress={(e) => handleMarkerPress(e)}
-        >
-          <MapView.Callout tooltip>
-            <TouchableHighlight onPress= {() => handleMarkerPress()} underlayColor='#dddddd'>
-                <View style={styles.calloutText}>
-                    {/* <Text>{marker.title}{"\n"}{marker.description}</Text> */}
-                </View>
-            </TouchableHighlight>
-          </MapView.Callout>
-        </Marker>
 
         <MapViewDirections
             origin={origin}
