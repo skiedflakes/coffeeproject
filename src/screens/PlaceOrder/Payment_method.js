@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function PlaceOrderScreen ({navigation,route}) {
+export default function Payment_method ({navigation,route}) {
 const {TotalCartPrice,Draglatitude,Draglongitude,distance,duration} = route.params;
 const [selectedValue, setSelectedValue] = useState("Payment Type");
 const [longitude, setlongitude] = useState('');
@@ -50,6 +50,14 @@ useFocusEffect(
   }, [])
 );
 
+const selectedPayment = (itemValue) =>{
+  setSelectedValue(itemValue)
+  if(itemValue=="GCASH"){
+    navigation.navigate("GcashScreen");
+  }else if(itemValue=="Google Pay"){
+    navigation.navigate("GooglepayScreen");
+  }
+}
 
 GetLocation.getCurrentPosition({
     enableHighAccuracy: true,
@@ -84,7 +92,7 @@ GetLocation.getCurrentPosition({
   //DELETE ITEM STORAGE
   const removeItems  = async (key) => {
     await AsyncStorage.removeItem(key);
-  }
+  } 
 
 
 const confirm = () =>{
@@ -102,19 +110,15 @@ const confirm = () =>{
       'Content-Type': 'multipart/form-data'
     },
     body: formData
-
   }).then((response) => response.json())
     .then((responseJson) => {
       console.log(responseJson);
       if(responseJson=="success"){
         //clear async
         remove_cart_items();
-
         //navigate
         navigation.popToTop()
         navigation.navigate('User Transactions');
-
-
       }else{
         Alert.alert("failed");
       }
@@ -122,29 +126,22 @@ const confirm = () =>{
       console.error(error);
     });
 
-    // fetch(global.global_url+'placeorder/test.php', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'multipart/form-data'
-    //   },
-    //   body: formData
-  
-    // }).then((response) => response.json())
-    //   .then((responseJson) => {
-    //     console.log(responseJson);
-  
-    //   }).catch((error) => {
-    //     console.error(error);
-    //   });
+
 }
 
 return(
   <SafeAreaView style={styles.container}>
-    <Text style={styles.item}>Estimated Time of Arrival is {duration} minutes</Text>
-    <Text style={styles.item}>Delivery Fee: </Text>
-    <Text style={styles.item}>Cart: {TotalCartPrice}</Text>
-    <Text style={styles.item}>Total: {TotalCartPrice}</Text>
+    <Picker
+        selectedValue={selectedValue}
+        style={{ height: 50, width: 250,alignItems:"center",alignItems:"center",alignSelf:"center"}}
+        onValueChange={(itemValue, itemIndex) => selectedPayment(itemValue)}
+      >
+        <Picker.Item label="Payment Type" value="Payment Type" />
+        <Picker.Item label="GCASH" value="GCASH" />
+        <Picker.Item label="Google Pay" value="Google Pay" />
+        <Picker.Item label="Apple Pay" value="Apple Pay" />
+    </Picker>
+
     <Button onPress={() => confirm()} style={{}} title="Confirm"></Button>
   </SafeAreaView>
   )

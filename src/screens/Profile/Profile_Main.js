@@ -5,14 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 //import components
 import { useFocusEffect } from '@react-navigation/native';
 export default function Profile_Main({route,navigation}) {
-    // //get values from route
-    // var { name,user_id,user_type_id } = route.params;
-    // if(name==''){
-    //     name = global.g_name;
-    // }
-
     var [name,set_name] = useState('');
-
     useFocusEffect(
         React.useCallback(() => {
             set_name(global.g_name);

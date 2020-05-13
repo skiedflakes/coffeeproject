@@ -9,9 +9,9 @@ import Content_DetailsScreen from './Menu/Content_details';
 import LoginScreen from './LoginScreen';
 
 //PlaceOrder
-import PlaceOrderScreen from './PlaceOrder/PlaceOrderScreen';
+import Payment_method from './PlaceOrder/Payment_method';
 import LocationPicker from './PlaceOrder/Location_Picker';
-import Payment_methods from './PlaceOrder/Payment_methods';
+
 
 //payments 
 import GCashScreen from './Payments/Ayden/GCashScreen';
@@ -60,20 +60,14 @@ export default class MenuScreen extends React.Component {
 
 {/* PLACEORDER */}
       <Stack.Screen
-        name="Place Order"
-        component={PlaceOrderScreen}
+        name="Payment Methods"
+        component={Payment_method}
       />
 
       <Stack.Screen
         name="Location Picker"
         component={LocationPicker}
       />
-
-      <Stack.Screen
-        name="Payment Methods"
-        component={Payment_methods}
-      />
-
   
 {/* PLACEORDER END*/}
 {/* Payment methods */}
