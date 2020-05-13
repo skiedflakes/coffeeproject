@@ -185,7 +185,7 @@ const minus_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,
     setListData(newData);
     update_cart(id,added_qty,'minus');
   }else{ //delete
-    deleteRow(rowKey,id);
+    //deleteRow(rowKey,id);
   }
 };
 

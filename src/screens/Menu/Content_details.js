@@ -73,7 +73,6 @@ export default function Content_details ({navigation: { goBack },route}) {
               }else if(item.required==0&& item.max_limit>0){ //show max
                 mymessage= 'optional max '+ item.max_limit;
               }else {
-
               }
 
               return {
