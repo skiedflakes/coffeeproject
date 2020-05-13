@@ -1,5 +1,5 @@
 import React,{useState,useRef,useEffect} from 'react';
-import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal } from 'react-native';
+import { StyleSheet,Button, Text, View, TouchableOpacity, Alert,Image, Modal,TouchableHighlight } from 'react-native';
 import MapView, { PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,14 +12,21 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
 
+  const [StoreArray, setStoreArray] = useState('');
+
   const [spinner, setSpinner] = React.useState(true);
   const [spinnerMSG, setSpinnerMSG] = React.useState("Getting user location");
 
   // STORE location
-  const store_lat = 10.627794; 
-  const store_lng = 122.965016;
+  const [store_lat, setStoreLat] = useState();
+  const [store_lng, setStoreLongi] = useState();
 
-  // user location
+  // Zoom level
+  const latDelta = 0.0922;
+  const lngDelta = 0.0421;
+  const DEFAULT_PADDING = { top: 200, right: 50, bottom: 50, left: 50 };
+
+  // User location
   const [UserOriginlatitude, setUserOriginLatitude] = useState(0);
   const [UserOriginlongitude, setUserOriginLongitude] = useState(0);
 
@@ -27,19 +34,56 @@ export default function Location_Picker ({navigation,route}) {
   const [Draglongitude, setDragLongitude] = useState(0);
   const [getUserLocation, setgetUserLocation] = useState(false);
 
+  const [selectedStore, setSelectedStore] = useState('');
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
-  const [MapRef, setMapRef] = useState('');
+  const [MapRef, setMapRef] = useState();
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
 
   useFocusEffect(
     React.useCallback(() => {
-      getUserLoc();
       console.log("test")
+      if (!getUserLocation) {
+        getUserLoc();
+        getchStoreLocation();
+      }
     })
   );
+
+  function getchStoreLocation(){
+    const formData = new FormData();
+    formData.append('product_category_id', "id");
+    fetch(global.global_url+'location_picker/fetchStoreLocation.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data'
+      },
+      body: formData
+
+    }).then((response) => response.json())
+      .then((responseJson) => {
+
+            //get current data
+            var data = responseJson.array_store.map(function(item,index) {
+                return {
+                branch_id:item.branch_id,
+                branch_name: item.branch_name,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                };
+                });
+                
+                setStoreArray(data);
+
+                console.log(StoreArray)
+
+      }).catch((error) => {
+        console.error(error);
+      });
+  }
 
   function getUserLoc(){
     GetLocation.getCurrentPosition({
@@ -47,7 +91,6 @@ export default function Location_Picker ({navigation,route}) {
       timeout: 15000,
     })
     .then(location => {
-      if (!getUserLocation) {
         setSpinner(false);
         setgetUserLocation(true);
         setDragLatitude(location.latitude);
@@ -55,9 +98,8 @@ export default function Location_Picker ({navigation,route}) {
 
         setUserOriginLatitude(location.latitude);
         setUserOriginLongitude(location.longitude);
-      }
       
-      console.log("longitude - "+location.longitude)
+        console.log("longitude - "+location.longitude)
     })
     .catch(error => {
         const { code, message } = error;
@@ -68,7 +110,14 @@ export default function Location_Picker ({navigation,route}) {
   function returnToOriginLoc(){
     setDragLatitude(UserOriginlatitude);
     setDragLongitude(UserOriginlongitude);
-    MapRef.initialRegion
+   
+    let r = {
+      latitude: UserOriginlatitude,
+      longitude: UserOriginlongitude,
+      latitudeDelta: latDelta,
+      longitudeDelta: lngDelta,
+    };
+    MapRef.animateToRegion(r, 1000);
   }
 
   onMarkerDragEnd = (coord) => {
@@ -76,7 +125,28 @@ export default function Location_Picker ({navigation,route}) {
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
+    moveFitMarkerScreen(store_lat,store_lng,user_lat,user_lng);
+    // if (store_lat != null) {
+    //   MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: parseFloat(store_lat), longitude: parseFloat(store_lng) }], { edgePadding: DEFAULT_PADDING, animated: true, });
+    // }
   };
+
+  handleMarkerPress = (marker) => {
+    const store_latitude = marker.latitude
+    const store_longitude = marker.longitude 
+    const store_name = marker.branch_name
+    const store_id = marker.branch_id
+    setSelectedStore(store_name);
+    setStoreLat(store_latitude);
+    setStoreLongi(store_longitude);
+    moveFitMarkerScreen(store_latitude,store_longitude,Draglatitude,Draglongitude);
+  };
+
+  function moveFitMarkerScreen(store_latitude, store_longitude, user_latitude, user_longitude){
+    if (store_latitude != null) {
+      MapRef.fitToCoordinates([{ latitude: user_latitude, longitude: user_longitude }, { latitude: parseFloat(store_latitude), longitude: parseFloat(store_longitude) }], { edgePadding: DEFAULT_PADDING, animated: true, });
+    }
+  }
 
   const CustomProgressBar = ({ visible }) => (
     <Modal onRequestClose={() => null} visible={visible} transparent={true}>
@@ -99,13 +169,13 @@ return (
       ref={(ref) => {setMapRef(ref)}}
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
       style={{flex: 1, marginBottom: 1}}
-      showsMyLocationButton={true}
+      showsMyLocationButton={false}
       showsTraffic={true}
       initialRegion={{
         latitude: Draglatitude,
         longitude: Draglongitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,}}>
+        latitudeDelta: latDelta,
+        longitudeDelta: lngDelta,}}>
 
         <Marker
             title={"You"}
@@ -116,15 +186,21 @@ return (
             onDragEnd={(e) => onMarkerDragEnd(e.nativeEvent.coordinate)}
         />
         
-        <Marker
-            title={"Store"}
-            pinColor="violet"
-            style={{height: 10, width:10 }}
-            coordinate={{latitude: store_lat, longitude: store_lng}}
-            tracksViewChanges={false}
-        />
+        {StoreArray[0] != null && StoreArray.map((marker, index) => (
+            <MapView.Marker
+                key = {index}
+                coordinate = {{
+                    latitude: parseFloat(marker.latitude),
+                    longitude: parseFloat(marker.longitude)
+                }}
+                title = { marker.branch_name }
+                pinColor="violet" 
+                onPress={() => handleMarkerPress(marker)}
+            />
+          ))
+        }
 
-        <MapViewDirections
+        {store_lat != null && <MapViewDirections
             origin={origin}
             destination={destination}
             apikey={global.GOOGLE_MAPS_APIKEY}
@@ -133,12 +209,14 @@ return (
             onStart={(params) => {
               setSpinnerMSG('Calculating');
               setSpinner(true);
+              setDuration('...');
+              setDistance('...');
               console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
             }}
             onReady={result => {
               setSpinner(false);
-              setDistance(Math.round(result.distance))
-              setDuration(Math.round(result.duration))
+              setDistance(Math.round(result.distance)+" km")
+              setDuration(Math.round(result.duration)+" min")
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
             }}
@@ -147,6 +225,8 @@ return (
               console.log('GOT AN ERROR');
             }}
           />
+        }
+        
     </MapView>}
 
   </View>
@@ -157,15 +237,16 @@ return (
   </View>
   </View>
 
+  <Text style={{paddingTop:5, marginTop:5, color:"black", fontSize:15.5, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"blue"}}>{"Duration: "+duration+" min"}</Text>
-      <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"blue"}}>{"Distance: "+distance+" km"}</Text>
-      {/* <Icon name="ios-person" size={30} color="#4F8EF7" /> */}
-    </View>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
   </View>
 
-  <Button style={{}} title="Confirm" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
+  <Button title="Proceed" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <Button color="#ff5c5c" title="Cancel" onPress={() => navigation.goBack(null)}></Button>
+  </View>
   {spinner && <CustomProgressBar />}
   </>
   );
