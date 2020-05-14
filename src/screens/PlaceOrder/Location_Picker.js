@@ -17,6 +17,9 @@ export default function Location_Picker ({navigation,route}) {
   const [spinner, setSpinner] = React.useState(true);
   const [spinnerMSG, setSpinnerMSG] = React.useState("Getting user location");
 
+  const [isLocationFar, setIsLocationFar] = React.useState(false);
+  const [TextDistanceColor, setTextDistanceColor] = React.useState('black');
+
   // STORE location
   const [store_lat, setStoreLat] = useState();
   const [store_lng, setStoreLongi] = useState();
@@ -37,6 +40,8 @@ export default function Location_Picker ({navigation,route}) {
   const [selectedStore, setSelectedStore] = useState('');
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
+  const [BranchName, setBranchName] = useState('');
+  const [BranchID, setBranchID] = useState('');
 
   const [MapRef, setMapRef] = useState();
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
@@ -136,6 +141,8 @@ export default function Location_Picker ({navigation,route}) {
     const store_longitude = marker.longitude 
     const store_name = marker.branch_name
     const store_id = marker.branch_id
+    setBranchID(store_id);
+    setBranchName(store_name);
     setSelectedStore(store_name);
     setStoreLat(store_latitude);
     setStoreLongi(store_longitude);
@@ -215,10 +222,18 @@ return (
             }}
             onReady={result => {
               setSpinner(false);
-              setDistance(Math.round(result.distance)+" km")
-              setDuration(Math.round(result.duration)+" min")
+              setDistance(Math.round(result.distance))
+              setDuration(Math.round(result.duration))
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
+
+              if (result.distance > 4) {
+                setIsLocationFar(true); 
+                setTextDistanceColor('red');
+              } else {
+                setIsLocationFar(false);
+                setTextDistanceColor('black');
+              }
             }}
             onError={(errorMessage) => {
               setSpinner(false);
@@ -240,34 +255,40 @@ return (
   <Text style={{paddingTop:5, marginTop:5, color:"black", fontSize:15.5, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
       <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
+      <Text style={{padding:5, margin:5, color:TextDistanceColor, fontSize:15.5, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
   </View>
 
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-  <Button title="Proceed" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)}></Button>
+  <Button title="Proceed" onPress={() => dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName)}></Button>
   <Button color="#ff5c5c" title="Cancel" onPress={() => navigation.goBack(null)}></Button>
   </View>
   {spinner && <CustomProgressBar />}
   </>
   );
-}
 
-function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
-  Alert.alert(
-    'Confirm Location',
-    'Are you sure this is your current location?',
-    [
-      {text: 'OK', onPress: () => confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration)},
-      {text: 'NO', onPress: () => console.log('NO Pressed'), 
-      style: 'cancel'},
-    ],
-    { cancelable: false }
-  );
-}
-
-function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration){
-  navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration});
+  function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName){
+    if (distance == '') {
+      alert('Please select store');
+    }
+    else if (isLocationFar) {
+      alert('Distanct is more then 5 km');
+    } else {
+      Alert.alert(
+        'Confirm Location',
+        'Are you sure this is your current location?',
+        [
+          {text: 'OK', onPress: () => confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName)},
+          {text: 'NO', onPress: () => console.log('NO Pressed'), 
+          style: 'cancel'},
+        ],
+        { cancelable: false }
+      );
+    }
+  }
   
+  function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName){
+    navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName});
+  }
 }
 
 const styles = StyleSheet.create({
