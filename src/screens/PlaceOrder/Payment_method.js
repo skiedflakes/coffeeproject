@@ -15,7 +15,7 @@ import GetLocation from 'react-native-get-location';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function Payment_method ({navigation,route}) {
-const {TotalCartPrice,Draglatitude,Draglongitude,distance,duration} = route.params;
+const {TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName} = route.params;
 const [selectedValue, setSelectedValue] = useState("Payment Type");
 const [longitude, setlongitude] = useState('');
 const [latitude, setlatitude] = useState('');
@@ -102,8 +102,10 @@ const confirm = () =>{
   formData.append('latitude', JSON.stringify(Draglatitude));
   formData.append('longitude', JSON.stringify(Draglongitude));
   formData.append('data', JSON.stringify(cart_data));
+  formData.append('branch_id', JSON.stringify(BranchID));
+  formData.append('duration', JSON.stringify(duration));
 
-  fetch(global.global_url+'placeorder/insert_place_order.php', {
+  fetch(global.global_url+'placeorder/insert_place_order2.php', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -125,8 +127,6 @@ const confirm = () =>{
     }).catch((error) => {
       console.error(error);
     });
-
-
 }
 
 return(
