@@ -61,7 +61,7 @@ const loginFetch = (userName,password,navigation) =>{
         .then((responseJson) => {
 
           const first = responseJson.login_response[0]
-    
+          console.log(first);
           if(first.status == 'success'){
             //call function multiset to save data to async storage
             setItemStorage('user_details',{'user_details':1,'user_id':first.user_id,'name': first.name,'user_type_id':first.user_type_id})

@@ -1,14 +1,36 @@
 import React, { useState, useEffect,} from 'react';
-import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image,BackHandler} from 'react-native';
+import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image,BackHandler,Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 //import components
 import { useFocusEffect } from '@react-navigation/native';
+
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
+
+
 export default function Profile_Main({route,navigation}) {
     var [name,set_name] = useState('');
+    var [user_id,setuser_id] = useState(''); 
+    var [user_type_id,setuser_type_id] = useState(''); 
+
     useFocusEffect(
         React.useCallback(() => {
-            set_name(global.g_name);
+          
+            AsyncStorage.getAllKeys((err, keys) => {
+                AsyncStorage.multiGet(keys, (err, stores) => {
+                    stores.map((result, i, store) => {
+                      let key = store[i][0];
+                      var jsonPars = JSON.parse(store[i][1]);
+                      if(jsonPars.user_details==1){
+                        setuser_id(jsonPars.user_id);
+                        set_name(jsonPars.name);
+                        setuser_type_id(jsonPars.user_type_id);
+                      }else{
+                      }
+                    });
+                  });
+                });
         }, [])
       );
 
@@ -42,7 +64,6 @@ export default function Profile_Main({route,navigation}) {
                                             </View>
                                             </TouchableOpacity>
                                         </View>
-                                    
                             </View>
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
@@ -142,10 +163,6 @@ function signed_out(navigation){
             });
           });
         });
-
-    global.g_name = '';
-    global.g_user_id='';
-    global.g_user_type_id='';
     BackHandler.exitApp();
 }
 
