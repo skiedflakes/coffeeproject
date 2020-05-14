@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View,Alert,StyleSheet,TouchableOpacity,TouchableHighlight,FlatList,Modal,SectionList } from 'react-native';
+import { Text, View,Alert,StyleSheet,TouchableOpacity,TouchableHighlight,FlatList,Modal,SectionList,Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -118,20 +121,20 @@ export default function MainUserTransactions ({navigation}) {
     <View style={styles.main}>
 
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
-          clear_modal()
+      
         }}
       > 
         <View style={[styles.centeredView, modalVisible ? {backgroundColor: 'rgba(0,0,0,0.4)'} : '']}>
           <View style={styles.modalView}>
-                  <View style={{flexDirection:"row-reverse",width:300}}>
+                  <View style={{width:(deviceWidth*0.7),flexDirection:"row-reverse"}}>
                   <Text style={{fontSize:20}}>P {modal_total_price}</Text>
                   </View>
-                <View style={{flexDirection:"column",height:350,width:300,alignSelf:"center"}}>
+                <View style={{flexDirection:"column",height:(deviceHeight*0.5),width:(deviceWidth*0.7),alignSelf:"center"}}>
                  
                   <SectionList
                   showsHorizontalScrollIndicator={false}
