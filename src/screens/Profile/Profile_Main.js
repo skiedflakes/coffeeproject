@@ -1,106 +1,41 @@
 import React, { useState, useEffect,} from 'react';
-import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image,BackHandler} from 'react-native';
+import { StyleSheet,Alert, Text, View,TouchableOpacity,ScrollView,Image,BackHandler,Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 //import components
 import { useFocusEffect } from '@react-navigation/native';
+
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
+
+
 export default function Profile_Main({route,navigation}) {
     var [name,set_name] = useState('');
+    var [user_id,setuser_id] = useState(''); 
+    var [user_type_id,setuser_type_id] = useState(''); 
+
     useFocusEffect(
         React.useCallback(() => {
-            set_name(global.g_name);
+          
+            AsyncStorage.getAllKeys((err, keys) => {
+                AsyncStorage.multiGet(keys, (err, stores) => {
+                    stores.map((result, i, store) => {
+                      let key = store[i][0];
+                      var jsonPars = JSON.parse(store[i][1]);
+                      if(jsonPars.user_details==1){
+                        setuser_id(jsonPars.user_id);
+                        set_name(jsonPars.name);
+                        setuser_type_id(jsonPars.user_type_id);
+                      }else{
+                      }
+                    });
+                  });
+                });
         }, [])
       );
 
     return (
         <View style={{flex:6,backgroundColor: '#ffff',}}>
-               {global.g_user_id>0?
-                          <View style={{flex:6,backgroundColor: '#ffff',}}>
-                          <View style={{flex:1.3,backgroundColor: '#3490DD',}}>
-                          <View style={{ flexDirection:'row-reverse',padding:5}} >
-                          <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                          <Icon name="comments" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => navigation.navigate('My Orders')}>
-                          <Icon name="cart-plus" size={25} color={"#ffff"} style={{paddingLeft:10,paddingTop:10,paddingRight:10}}/>
-                          </TouchableOpacity>
-                          </View>
-                          <View style={{  flexDirection: 'row', padding:10,}} >
-                              <View style={{ flexDirection: 'row',flex:2, marginLeft:10}}>
-                                <Icon name="user-circle" size={40} color={"#ffff"}/>
-                                <Text style={{fontSize: 19,fontWeight: 'bold',color:'white',textAlign:'center',marginLeft:10}}>{name}</Text>
-                              </View>
-                            </View>
-                          </View>
-                              <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
-                              <ScrollView style={{marginTop:5}}>
-                              <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                                      <View style={styles.scrollViews}>
-                                          <View style={styles.scrollViews_1}>
-                                              <Icon name="tasks" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
-                                              <Text style={styles.scrollText}>Transaction Logs</Text>
-                                          </View>
-                                          <View style={styles.scrollViews_2} >
-                                              <Icon name="caret-right" size={20} color={"#4D4E4F"} style={styles.scrollIcon} />
-                                          </View>
-                                      </View>
-                                      
-                                  </TouchableOpacity>
-                  
-                                  <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                                      <View style={styles.scrollViews}>
-                                          <View style={styles.scrollViews_1}>
-                                              <Icon name="shopping-bag" size={20} color={"#269FE3"} style={styles.scrollIcon}/>
-                                              <Text style={styles.scrollText}>My Purchases</Text>
-                                          </View>
-                                          <View style={styles.scrollViews_2} >
-                                              <Icon name="caret-right" size={20} color={"#4D4E4F"} style={styles.scrollIcon} />
-                                          </View>
-                                      </View>
-                                  </TouchableOpacity>
-                  
-                                  <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                                      <View style={styles.scrollViews}>
-                                          <View style={styles.scrollViews_1}>
-                                              <Icon name="heart" size={20} color={"#F5A2BD"} style={styles.scrollIcon}/>
-                                              <Text style={styles.scrollText}>Favorites</Text>
-                                          </View>
-                                          <View style={styles.scrollViews_2} >
-                                              <Icon name="caret-right" size={20} color={"#4D4E4F"} style={styles.scrollIcon} />
-                                          </View>
-                                      </View>
-                                  </TouchableOpacity>
-                  
-                                  <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                                      <View style={styles.scrollViews}>
-                                          <View style={styles.scrollViews_1}>
-                                              <Icon name="tags" size={20} color={"#BF1818"} style={styles.scrollIcon}/>
-                                              <Text style={styles.scrollText}>My Vouchers</Text>
-                                          </View>
-                                          <View style={styles.scrollViews_2} >
-                                              <Icon name="caret-right" size={20} color={"#4D4E4F"} style={styles.scrollIcon} />
-                                          </View>
-                                      </View>
-                                  </TouchableOpacity>
-                  
-                                  <TouchableOpacity onPress={()=>signed_out(navigation)} style={{marginTop:20}}>
-                                      <View style={styles.scrollViews}>
-                                          <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
-                                          <Text style={styles.scrollText}>Sign Out</Text>
-                                      </View>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => Alert.alert('Simple Button pressed')}>
-                  
-                                      <View style={styles.scrollViews}>
-                                      <Icon name="gear" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
-                                          <Text style={styles.scrollText}>Account Settings</Text>
-                                      </View>
-                                  </TouchableOpacity>
-                              
-                              </ScrollView>
-                          </View>
-                          </View>
-                          :     // not logged in
                             <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:1.3,backgroundColor: '#3490DD',}}>
                             <View style={{ flexDirection:'row-reverse',padding:5}} >
@@ -129,7 +64,6 @@ export default function Profile_Main({route,navigation}) {
                                             </View>
                                             </TouchableOpacity>
                                         </View>
-                                    
                             </View>
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
@@ -200,7 +134,6 @@ export default function Profile_Main({route,navigation}) {
                               </ScrollView>
                           </View>
                           </View>
-                        }
         </View>
     );
 }
@@ -230,10 +163,6 @@ function signed_out(navigation){
             });
           });
         });
-
-    global.g_name = '';
-    global.g_user_id='';
-    global.g_user_type_id='';
     BackHandler.exitApp();
 }
 
