@@ -50,9 +50,10 @@ export default function Profile_Main({route,navigation}) {
                                 <View style={{ flexDirection: 'row',flex:2, marginLeft:10}}>
                                 <Icon name="user-circle" size={40} color={"#ffff"}/>
                       
-                              <Text>{name}</Text>
+                              <Text style={{marginLeft:20,fontSize:25,color:"#ffff"}}>{name}</Text>
                                 </View>
-                                        <View style={{ flexDirection: 'row', alignItems:'stretch'}} >
+                                 {user_id < 0?                                                                  
+                                            <View style={{ flexDirection: 'row', alignItems:'stretch'}} >
                                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                             <View style={styles.button2}  >
                                             <Text style={styles.buttonText2}>Log In</Text>      
@@ -63,7 +64,7 @@ export default function Profile_Main({route,navigation}) {
                                             <Text style={styles.buttonText1}>Sign-up</Text>
                                             </View>
                                             </TouchableOpacity>
-                                        </View>
+                                            </View>: null }
                             </View>
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
@@ -93,7 +94,7 @@ export default function Profile_Main({route,navigation}) {
                                       </View>
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity >
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="heart" size={20} color={"#F5A2BD"} style={styles.scrollIcon}/>
@@ -116,7 +117,6 @@ export default function Profile_Main({route,navigation}) {
                                           </View>
                                       </View>
                                   </TouchableOpacity>
-                  
                                   <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                       <View style={styles.scrollViews}>
                                           <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
@@ -129,11 +129,10 @@ export default function Profile_Main({route,navigation}) {
                                       <Icon name="gear" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Account Settings</Text>
                                       </View>
-                                  </TouchableOpacity>
-                              
-                              </ScrollView>
-                          </View>
-                          </View>
+                            </TouchableOpacity>
+                        </ScrollView>
+                </View>
+            </View>
         </View>
     );
 }
