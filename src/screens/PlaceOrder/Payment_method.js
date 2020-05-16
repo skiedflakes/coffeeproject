@@ -33,14 +33,11 @@ useFocusEffect(
             // setItemStorage(n.toString(),{'id':n.toString(),'selected_additions':0,'add_to_cart':1,'product_id':product_id,'product_name': product_name,'qty':current_qty,'price':current_price})
               return jsonPars;
           }else{
-           
           }
-        
         });
         try{
           var filtered_newData = newData.filter(e => e != null);
           var final_total = filtered_newData.map(item => item.price).reduce((prev, next) => +prev + +next);
-          console.log(filtered_newData);
           setcart_data(filtered_newData);
         }catch(error){}
       });
@@ -98,6 +95,7 @@ GetLocation.getCurrentPosition({
 const confirm = () =>{
   TotalCartPrice,Draglatitude,Draglongitude,distance,duration
   const formData = new FormData();
+  formData.append('user_id', global.g_user_id);
   formData.append('cart_price', JSON.stringify(TotalCartPrice));
   formData.append('latitude', JSON.stringify(Draglatitude));
   formData.append('longitude', JSON.stringify(Draglongitude));

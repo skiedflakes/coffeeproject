@@ -23,12 +23,19 @@ export default function MainUserTransactions ({navigation}) {
   useFocusEffect(
     React.useCallback(() => {
         const fetchUser = async () => {
-            fetch(global.global_url+'transaction_history/get_order_header.php')
-            .then((response) => response.json())
+          const formData = new FormData();
+          formData.append('user_id',global.g_user_id);
+
+          fetch(global.global_url+'transaction_history/get_order_header_v2.php', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+              },
+              body: formData
+          }).then((response) => response.json()) 
                   .then((responseJson) => {
                     var data = responseJson.order_header.map(function(item) {
-                     
-
                       if(item.status == 0){
                         var status_name = 'Pending Order';
                       }else if(item.status == 1){
@@ -56,6 +63,40 @@ export default function MainUserTransactions ({navigation}) {
                   }).catch((error) => {
                     console.error(error);
         });
+
+        //     fetch(global.global_url+'transaction_history/get_order_header.php')
+        //     .then((response) => response.json())
+        //           .then((responseJson) => {
+        //             var data = responseJson.order_header.map(function(item) {
+                     
+
+        //               if(item.status == 0){
+        //                 var status_name = 'Pending Order';
+        //               }else if(item.status == 1){
+        //                 var status_name = 'Order Accepted';
+        //               }else if(item.status == 2){
+        //                 var status_name = 'Order Prepared';
+        //               }else if(item.status == 3){
+        //                 var status_name = 'Delivering Oder';
+        //               }else if(item.status == 4){
+        //                 var status_name = 'Order Delivered';
+        //               }else if(item.status == 5){
+        //                 var status_name = 'Order Complete';
+        //               }
+        //               return {
+        //                 order_id:item.order_id,
+        //                 ref_no: item.reference_no,
+        //                 duration: item.duration,
+        //                 total_amount: item.total_amount,
+        //                 all_product:item.all_product,
+        //                 date_added:item.date_added,
+        //                 status_name: status_name,
+        //               };
+        //             });
+        //             set_order_list(data);
+        //           }).catch((error) => {
+        //             console.error(error);
+        // });
       }
       fetchUser();
     }, [])
