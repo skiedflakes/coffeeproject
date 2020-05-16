@@ -32,6 +32,16 @@ export default function Profile_Main({route,navigation}) {
                 });
         }, [])
       );
+
+      const sign_out = () =>{
+        AsyncStorage.clear();
+        setuser_id(0);
+        set_name('');
+        global.g_user_id = '';
+        global.g_name = '';
+        global.g_user_type_id = '';
+      }
+
 return (
         <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:6,backgroundColor: '#ffff',}}>
@@ -116,7 +126,7 @@ return (
                                           </View>
                                       </View>
                                   </TouchableOpacity>
-                                <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
+                                <TouchableOpacity onPress={() => {user_id>0?sign_out():navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Sign Out</Text>
@@ -143,7 +153,7 @@ function onpress(){
     Alert.alert('Simple Button pressed');
 }
 
-function signed_out(navigation){
+function signed_out(){
     const removeItems  = async (key) => {
         console.log('main == ',key)
         await AsyncStorage.removeItem(key);
@@ -161,7 +171,6 @@ function signed_out(navigation){
             });
           });
         });
-    BackHandler.exitApp();
 }
 
 const styles = StyleSheet.create({
