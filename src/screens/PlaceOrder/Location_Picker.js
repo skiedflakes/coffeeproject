@@ -103,16 +103,10 @@ export default function Location_Picker ({navigation,route}) {
 
         setUserOriginLatitude(location.latitude);
         setUserOriginLongitude(location.longitude);
-      
-        let r = {
-          latitude: location.latitude,
-          longitude: location.longitude,
-          latitudeDelta: latDelta,
-          longitudeDelta: lngDelta,
-        };
-        MapRef.animateToRegion(r, 1000);
-
-        console.log("longitude - "+location.longitude)
+        
+        focusToMarker(location.latitude,location.longitude);
+        
+        console.log(global.g_user_id+" longitude - "+location.longitude)
     })
     .catch(error => {
         const { code, message } = error;
@@ -120,13 +114,10 @@ export default function Location_Picker ({navigation,route}) {
     })
   }
 
-  function returnToOriginLoc(){
-    //setDragLatitude(UserOriginlatitude);
-    //setDragLongitude(UserOriginlongitude);
-   
+  function focusToMarker(store_latitude, store_longitude){
     let r = {
-      latitude: Draglatitude, //UserOriginlatitude 
-      longitude: Draglongitude, //UserOriginlongitude
+      latitude: store_latitude,
+      longitude: store_longitude,
       latitudeDelta: latDelta,
       longitudeDelta: lngDelta,
     };
@@ -139,9 +130,6 @@ export default function Location_Picker ({navigation,route}) {
     setDragLatitude(user_lat);
     setDragLongitude(user_lng);
     moveFitMarkerScreen(store_lat,store_lng,user_lat,user_lng);
-    // if (store_lat != null) {
-    //   MapRef.fitToCoordinates([{ latitude: user_lat, longitude: user_lng }, { latitude: parseFloat(store_lat), longitude: parseFloat(store_lng) }], { edgePadding: DEFAULT_PADDING, animated: true, });
-    // }
   };
 
   const handleMarkerPress = (marker) => {
@@ -275,7 +263,19 @@ return (
   );
 
   function dialogBox(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName){
-    if (distance == '') {
+    if (global.g_user_id == '') {
+      Alert.alert(
+        'Account required',
+        'Please login to proceed',
+        [
+          {text: 'OK', onPress: () => goToLogin()},
+          {text: 'NO', onPress: () => console.log('NO Pressed'), 
+          style: 'cancel'},
+        ],
+        { cancelable: false }
+      );
+    }
+    else if (distance == '') {
       alert('Please select store');
     }
     else if (isLocationFar) {
@@ -296,6 +296,10 @@ return (
   
   function confirmLocation(navigation,TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName){
     navigation.navigate("Payment Methods",{TotalCartPrice,Draglatitude,Draglongitude,distance,duration,BranchID,BranchName});
+  }
+
+  function goToLogin(){
+    console.log('login ')
   }
 }
 
