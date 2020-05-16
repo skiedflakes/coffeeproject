@@ -10,7 +10,7 @@ const deviceHeight = Dimensions.get('window').height;
 
 export default function Profile_Main({route,navigation}) {
     var [name,set_name] = useState('');
-    var [user_id,setuser_id] = useState(0); 
+    var [user_id,setuser_id] = useState('0'); 
     var [user_type_id,setuser_type_id] = useState(''); 
     useFocusEffect(
         React.useCallback(() => {
@@ -20,7 +20,7 @@ export default function Profile_Main({route,navigation}) {
                       let key = store[i][0];
                       var jsonPars = JSON.parse(store[i][1]);
                       if(jsonPars.user_details==1){
-                        console.log(jsonParsrr);
+                        console.log(jsonPars);
                         setuser_id(jsonPars.user_id);
                         set_name(jsonPars.name);
                         console.log(jsonPars.name);
@@ -50,11 +50,11 @@ return (
                       
                               <Text style={{marginLeft:20,fontSize:25,color:"#ffff"}}>{name}</Text>
                                 </View>
-                                 {user_id < 0?                                                                  
+                                          {user_id==0?                                   
                                             <View style={{ flexDirection: 'row', alignItems:'stretch'}} >
                                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                             <View style={styles.button2}  >
-                                            <Text style={styles.buttonText2}>Log In</Text>      
+                                              <Text style={styles.buttonText2}>Log In</Text>      
                                             </View>
                                             </TouchableOpacity>
                                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -62,7 +62,8 @@ return (
                                             <Text style={styles.buttonText1}>Sign-up</Text>
                                             </View>
                                             </TouchableOpacity>
-                                            </View>: null }
+                                            </View>
+                                            :null}   
                             </View>
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
