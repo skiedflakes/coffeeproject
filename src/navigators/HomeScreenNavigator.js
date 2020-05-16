@@ -28,10 +28,10 @@ export default class HomeScreenNavigator extends React.Component{
     // google map key
     global.GOOGLE_MAPS_APIKEY = 'AIzaSyCwrEeL9t4q1kOmU4TEElsZf9nBEboe_JI';
     //online
-    global.global_url = 'http://projects.skiedflakes.site/cafeproject/';
+    // global.global_url = 'http://projects.skiedflakes.site/cafeproject/';
 
     //local
-    // global.global_url = 'http://192.168.1.105/cafeproject/';
+    global.global_url = 'http://192.168.1.105/cafeproject/';
   }
 
     render(){

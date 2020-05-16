@@ -8,23 +8,22 @@ import { useFocusEffect } from '@react-navigation/native';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-
 export default function Profile_Main({route,navigation}) {
     var [name,set_name] = useState('');
-    var [user_id,setuser_id] = useState(''); 
+    var [user_id,setuser_id] = useState(0); 
     var [user_type_id,setuser_type_id] = useState(''); 
-
     useFocusEffect(
         React.useCallback(() => {
-          
             AsyncStorage.getAllKeys((err, keys) => {
                 AsyncStorage.multiGet(keys, (err, stores) => {
                     stores.map((result, i, store) => {
                       let key = store[i][0];
                       var jsonPars = JSON.parse(store[i][1]);
                       if(jsonPars.user_details==1){
+                        console.log(jsonParsrr);
                         setuser_id(jsonPars.user_id);
                         set_name(jsonPars.name);
+                        console.log(jsonPars.name);
                         setuser_type_id(jsonPars.user_type_id);
                       }else{
                       }
@@ -33,8 +32,7 @@ export default function Profile_Main({route,navigation}) {
                 });
         }, [])
       );
-
-    return (
+return (
         <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:1.3,backgroundColor: '#3490DD',}}>
@@ -117,7 +115,6 @@ export default function Profile_Main({route,navigation}) {
                                           </View>
                                       </View>
                                   </TouchableOpacity>
-
                                 <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
@@ -130,12 +127,12 @@ export default function Profile_Main({route,navigation}) {
                                       <Icon name="gear" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Account Settings</Text>
                                       </View>
-                                </TouchableOpacity>
-                        </ScrollView>
+                    </TouchableOpacity>
+                  </ScrollView>
                 </View>
-            </View>
+              </View>
         </View>
-    );
+);
 }
  
 
