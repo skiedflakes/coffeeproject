@@ -94,7 +94,7 @@ GetLocation.getCurrentPosition({
 
 const confirm = () =>{
   const formData = new FormData();
-  formData.append('user_id', JSON.stringify(global.g_user_id));
+  formData.append('user_id', global.g_user_id);
   formData.append('cart_price', JSON.stringify(TotalCartPrice));
   formData.append('latitude', JSON.stringify(Draglatitude));
   formData.append('longitude', JSON.stringify(Draglongitude));

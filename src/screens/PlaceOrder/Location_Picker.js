@@ -250,7 +250,7 @@ return (
 
   <Text style={{paddingTop:5, marginTop:5, color:"black", fontSize:15.5, fontWeight:"bold", alignSelf:"center"}}>{"Store: "+selectedStore}</Text>
   <View style={{flexDirection:"row-reverse", alignSelf:"center"}}>
-      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"Duration: "+duration}</Text>
+      <Text style={{padding:5, margin:5, color:"black", fontSize:15.5, fontWeight:"bold"}}>{"est. arrival time: "+duration}</Text>
       <Text style={{padding:5, margin:5, color:TextDistanceColor, fontSize:15.5, fontWeight:"bold"}}>{"Distance: "+distance}</Text>
   </View>
 
