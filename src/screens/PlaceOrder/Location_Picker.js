@@ -7,7 +7,7 @@ import { Marker } from "react-native-maps";
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import { ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Location_Picker ({navigation,route}) {
   const {TotalCartPrice,} = route.params;
@@ -104,6 +104,14 @@ export default function Location_Picker ({navigation,route}) {
         setUserOriginLatitude(location.latitude);
         setUserOriginLongitude(location.longitude);
       
+        let r = {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: latDelta,
+          longitudeDelta: lngDelta,
+        };
+        MapRef.animateToRegion(r, 1000);
+
         console.log("longitude - "+location.longitude)
     })
     .catch(error => {
@@ -113,19 +121,19 @@ export default function Location_Picker ({navigation,route}) {
   }
 
   function returnToOriginLoc(){
-    setDragLatitude(UserOriginlatitude);
-    setDragLongitude(UserOriginlongitude);
+    //setDragLatitude(UserOriginlatitude);
+    //setDragLongitude(UserOriginlongitude);
    
     let r = {
-      latitude: UserOriginlatitude,
-      longitude: UserOriginlongitude,
+      latitude: Draglatitude, //UserOriginlatitude 
+      longitude: Draglongitude, //UserOriginlongitude
       latitudeDelta: latDelta,
       longitudeDelta: lngDelta,
     };
     MapRef.animateToRegion(r, 1000);
   }
 
-  onMarkerDragEnd = (coord) => {
+  const onMarkerDragEnd = (coord) => {
     const user_lat = coord.latitude;
     const user_lng = coord.longitude;
     setDragLatitude(user_lat);
@@ -136,7 +144,7 @@ export default function Location_Picker ({navigation,route}) {
     // }
   };
 
-  handleMarkerPress = (marker) => {
+  const handleMarkerPress = (marker) => {
     const store_latitude = marker.latitude
     const store_longitude = marker.longitude 
     const store_name = marker.branch_name
@@ -247,8 +255,8 @@ return (
   </View>
   
   <View style={{flexDirection:"row-reverse"}}>
-    {/* <Icon style={{backgroundColor:"#4784ed", borderRadius:50, padding:3, margin:5, color:"white"}} onPress={() => returnToOriginLoc()} name="ios-person" size={25} color="#4F8EF7" /> */}
-    <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, margin:5, color:"white"}} onPress={() => returnToOriginLoc()}>Origin</Text>
+    <Icon style={{backgroundColor:"#707070", padding:3, margin:5, color:"white"}} onPress={() => getUserLoc()} name="crosshairs-gps" size={25} color="#4F8EF7" />
+    {/* <Text style={{backgroundColor:"#4784ed", borderRadius:20, padding:5, margin:5, color:"white"}} onPress={() => getUserLoc()}>Origin</Text> */}
   </View>
   </View>
 
