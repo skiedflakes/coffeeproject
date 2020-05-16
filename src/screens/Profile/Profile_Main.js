@@ -20,10 +20,8 @@ export default function Profile_Main({route,navigation}) {
                       let key = store[i][0];
                       var jsonPars = JSON.parse(store[i][1]);
                       if(jsonPars.user_details==1){
-                        console.log(jsonPars);
                         setuser_id(jsonPars.user_id);
                         set_name(jsonPars.name);
-                        console.log(jsonPars.name);
                         setuser_type_id(jsonPars.user_type_id);
                       }else{
                       }
@@ -155,7 +153,6 @@ function onpress(){
 
 function signed_out(){
     const removeItems  = async (key) => {
-        console.log('main == ',key)
         await AsyncStorage.removeItem(key);
       }
       

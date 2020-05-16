@@ -26,7 +26,6 @@ export default function Main ({route,navigation,body_content}) {
 
   useFocusEffect(
     React.useCallback(() => {
-      
       AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (err, stores) => {
           const newData= stores.map((result, i, store) => {

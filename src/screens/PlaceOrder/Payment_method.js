@@ -7,7 +7,9 @@ import {
   Button,
   Picker,
   TouchableOpacity,
-  Alert
+  Alert,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -21,6 +23,9 @@ const [longitude, setlongitude] = useState('');
 const [latitude, setlatitude] = useState('');
 
 const [cart_data, setcart_data] = useState('');
+const [spinner, setSpinner] = React.useState(false);
+
+
 useFocusEffect(
   React.useCallback(() => {
    //remove selected items
@@ -93,8 +98,9 @@ GetLocation.getCurrentPosition({
 
 
 const confirm = () =>{
+  setSpinner(true)
   const formData = new FormData();
-  formData.append('user_id', JSON.stringify(global.g_user_id));
+  formData.append('user_id', global.g_user_id);
   formData.append('cart_price', JSON.stringify(TotalCartPrice));
   formData.append('latitude', JSON.stringify(Draglatitude));
   formData.append('longitude', JSON.stringify(Draglongitude));
@@ -111,10 +117,10 @@ const confirm = () =>{
     body: formData
   }).then((response) => response.json())
     .then((responseJson) => {
-      console.log(responseJson);
       if(responseJson=="success"){
         //clear async
         remove_cart_items();
+        setSpinner(false)
         //navigate
         navigation.popToTop()
         navigation.navigate('User Transactions');
@@ -126,8 +132,20 @@ const confirm = () =>{
     });
 }
 
+const CustomProgressBar = ({ visible }) => (
+  <Modal onRequestClose={() => null} visible={visible} transparent={true}>
+    <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
+      <View style={{ borderRadius: 10, backgroundColor: '#f0f0f0', padding: 25 }}>
+     
+        <ActivityIndicator size="large" />
+      </View>
+    </View>
+  </Modal>
+);
+
 return(
   <SafeAreaView style={styles.container}>
+    {spinner && <CustomProgressBar />}
     <Picker
         selectedValue={selectedValue}
         style={{ height: 50, width: 250,alignItems:"center",alignItems:"center",alignSelf:"center"}}
