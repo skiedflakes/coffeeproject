@@ -94,13 +94,13 @@ GetLocation.getCurrentPosition({
 
 const confirm = () =>{
   const formData = new FormData();
-  formData.append('user_id', global.g_user_id);
-  formData.append('cart_price', TotalCartPrice);
-  formData.append('latitude', Draglatitude);
-  formData.append('longitude', Draglongitude);
-  formData.append('data', cart_data);
-  formData.append('branch_id', BranchID);
-  formData.append('duration', duration);
+  formData.append('user_id', JSON.stringify(global.g_user_id));
+  formData.append('cart_price', JSON.stringify(TotalCartPrice));
+  formData.append('latitude', JSON.stringify(Draglatitude));
+  formData.append('longitude', JSON.stringify(Draglongitude));
+  formData.append('data', JSON.stringify(cart_data));
+  formData.append('branch_id', JSON.stringify(BranchID));
+  formData.append('duration', JSON.stringify(duration));
 
   fetch(global.global_url+'placeorder/insert_place_order2.php', {
     method: 'POST',
