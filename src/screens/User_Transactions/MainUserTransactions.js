@@ -45,6 +45,7 @@ export default function MainUserTransactions ({navigation}) {
                       return {
                         order_id:item.order_id,
                         ref_no: item.reference_no,
+                        duration: item.duration,
                         total_amount: item.total_amount,
                         all_product:item.all_product,
                         date_added:item.date_added,
@@ -183,7 +184,7 @@ export default function MainUserTransactions ({navigation}) {
 
     </View>
     <View style={{ flex:6,  flexDirection: 'row', padding:2,}} >
-      <Text style={{color:'black',alignSelf:'center',marginLeft:20,fontSize:20}}>Transaction</Text>
+      <Text style={{color:'black',alignSelf:'center',marginLeft:20,fontSize:20}}>Your Order</Text>
     </View>
     </View>
     <View style={styles.body}>
@@ -205,6 +206,7 @@ export default function MainUserTransactions ({navigation}) {
               date_added = {item.date_added}
               status_name={item.status_name}
               showModal = {showModal}
+              duration = {item.duration}
               />
               }
               keyExtractor={item => item.order_id.toString()}
@@ -232,7 +234,7 @@ function Modal_Item ({order_details_dropdown_id,h_name,d_name,price}){
 }
 
 
-function RowItem ({navigation,order_id,ref_no,total_amount,all_product,date_added,status_name,showModal}) {
+function RowItem ({navigation,order_id,ref_no,total_amount,all_product,date_added,status_name,showModal,duration}) {
     return (
         <View>
             <View style={styles.item}>
@@ -262,7 +264,7 @@ function RowItem ({navigation,order_id,ref_no,total_amount,all_product,date_adde
             <View style={styles.item2}>
                 <View style={{flex:3,flexDirection:'row',alignItems:"center",alignContent:"center",alignSelf:"center"}}> 
                     <Entypo name="back-in-time" size={25} color={"#4A4A4A"} style={{alignSelf:"center"}}/>
-                    <Text style={styles.details}>8 minutes Arrival</Text>
+                    <Text style={styles.details}>{duration} minutes Arrival</Text>
                 </View>
 
             </View>

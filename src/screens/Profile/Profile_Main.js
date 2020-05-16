@@ -8,23 +8,22 @@ import { useFocusEffect } from '@react-navigation/native';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-
 export default function Profile_Main({route,navigation}) {
     var [name,set_name] = useState('');
-    var [user_id,setuser_id] = useState(''); 
+    var [user_id,setuser_id] = useState(0); 
     var [user_type_id,setuser_type_id] = useState(''); 
-
     useFocusEffect(
         React.useCallback(() => {
-          
             AsyncStorage.getAllKeys((err, keys) => {
                 AsyncStorage.multiGet(keys, (err, stores) => {
                     stores.map((result, i, store) => {
                       let key = store[i][0];
                       var jsonPars = JSON.parse(store[i][1]);
                       if(jsonPars.user_details==1){
+                        console.log(jsonParsrr);
                         setuser_id(jsonPars.user_id);
                         set_name(jsonPars.name);
+                        console.log(jsonPars.name);
                         setuser_type_id(jsonPars.user_type_id);
                       }else{
                       }
@@ -33,8 +32,7 @@ export default function Profile_Main({route,navigation}) {
                 });
         }, [])
       );
-
-    return (
+return (
         <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:6,backgroundColor: '#ffff',}}>
                             <View style={{flex:1.3,backgroundColor: '#3490DD',}}>
@@ -50,9 +48,10 @@ export default function Profile_Main({route,navigation}) {
                                 <View style={{ flexDirection: 'row',flex:2, marginLeft:10}}>
                                 <Icon name="user-circle" size={40} color={"#ffff"}/>
                       
-                              <Text>{name}</Text>
+                              <Text style={{marginLeft:20,fontSize:25,color:"#ffff"}}>{name}</Text>
                                 </View>
-                                        <View style={{ flexDirection: 'row', alignItems:'stretch'}} >
+                                 {user_id < 0?                                                                  
+                                            <View style={{ flexDirection: 'row', alignItems:'stretch'}} >
                                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                                             <View style={styles.button2}  >
                                             <Text style={styles.buttonText2}>Log In</Text>      
@@ -63,12 +62,12 @@ export default function Profile_Main({route,navigation}) {
                                             <Text style={styles.buttonText1}>Sign-up</Text>
                                             </View>
                                             </TouchableOpacity>
-                                        </View>
+                                            </View>: null }
                             </View>
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
                               <ScrollView style={{marginTop:5}}>
-                              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                              <TouchableOpacity  onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="tasks" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
@@ -81,7 +80,7 @@ export default function Profile_Main({route,navigation}) {
                                       
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="shopping-bag" size={20} color={"#269FE3"} style={styles.scrollIcon}/>
@@ -93,7 +92,7 @@ export default function Profile_Main({route,navigation}) {
                                       </View>
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="heart" size={20} color={"#F5A2BD"} style={styles.scrollIcon}/>
@@ -105,7 +104,7 @@ export default function Profile_Main({route,navigation}) {
                                       </View>
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="tags" size={20} color={"#BF1818"} style={styles.scrollIcon}/>
@@ -116,26 +115,24 @@ export default function Profile_Main({route,navigation}) {
                                           </View>
                                       </View>
                                   </TouchableOpacity>
-                  
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Sign Out</Text>
                                       </View>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                   
                                       <View style={styles.scrollViews}>
                                       <Icon name="gear" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Account Settings</Text>
                                       </View>
-                                  </TouchableOpacity>
-                              
-                              </ScrollView>
-                          </View>
-                          </View>
+                    </TouchableOpacity>
+                  </ScrollView>
+                </View>
+              </View>
         </View>
-    );
+);
 }
  
 
