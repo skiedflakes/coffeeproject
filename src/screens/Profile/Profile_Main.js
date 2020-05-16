@@ -69,7 +69,7 @@ export default function Profile_Main({route,navigation}) {
                             </View>
                               <View style={{flex:4.7,backgroundColor: '#DADCDC'}}>
                               <ScrollView style={{marginTop:5}}>
-                              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                              <TouchableOpacity  onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="tasks" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
@@ -82,7 +82,7 @@ export default function Profile_Main({route,navigation}) {
                                       
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="shopping-bag" size={20} color={"#269FE3"} style={styles.scrollIcon}/>
@@ -94,7 +94,7 @@ export default function Profile_Main({route,navigation}) {
                                       </View>
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity >
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="heart" size={20} color={"#F5A2BD"} style={styles.scrollIcon}/>
@@ -106,7 +106,7 @@ export default function Profile_Main({route,navigation}) {
                                       </View>
                                   </TouchableOpacity>
                   
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                  <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <View style={styles.scrollViews_1}>
                                               <Icon name="tags" size={20} color={"#BF1818"} style={styles.scrollIcon}/>
@@ -117,19 +117,20 @@ export default function Profile_Main({route,navigation}) {
                                           </View>
                                       </View>
                                   </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+
+                                <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                                       <View style={styles.scrollViews}>
                                           <Icon name="sign-out" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Sign Out</Text>
                                       </View>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => {user_id>0?null:navigation.navigate('Login')}}>
                   
                                       <View style={styles.scrollViews}>
                                       <Icon name="gear" size={20} color={"#4D4E4F"} style={styles.scrollIcon}/>
                                           <Text style={styles.scrollText}>Account Settings</Text>
                                       </View>
-                            </TouchableOpacity>
+                                </TouchableOpacity>
                         </ScrollView>
                 </View>
             </View>
