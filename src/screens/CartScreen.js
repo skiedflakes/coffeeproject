@@ -50,7 +50,7 @@ export default function CartScreen ({navigation}) {
             var counter =-1;
               var data = filtered_newData.map(function(item2) {
               var data_title = filtered_newData.map(function(item) {
-              
+                
                 if(item2.id==item.id){
                   ++counter;
                   return {
@@ -77,14 +77,14 @@ export default function CartScreen ({navigation}) {
               };
             });
             setListData(data);
-          }catch(error){}
+          }catch(error){
+            console.log("catch ~ "+error)
+          }
          
         });
       });
 
-
       return () => {
-
         
       };
     }, [])
@@ -243,73 +243,79 @@ const renderHiddenItem = (data, rowMap) => (
   </View>
 );
 
+function renderLayout(){
+    if (listData != null && listData.length > 0) {
+      return <View style={{flex:1}}>
+      <SectionList
+        sections={listData}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({ item,section }) =>
+        <Item 
+        header_name = {item.header_name}
+        title={item.name} 
+        price={item.price} 
+        required={section.required}
+        />
+        }
+        renderSectionHeader={({ section: { title,data_title } }) => (
+        <View>
+          <SwipeListView
+              
+              data={data_title}
+              renderItem={({ item }) => 
+              <RowItem
+                section={item.section}
+                minus_qty={minus_qty}
+                add_qty={add_qty}
+                qty={item.qty}
+                title={item.product_name}
+                id={item.id}
+                price = {item.price}
+                base_price = {item.base_price}
+                add_on_price = {item.add_on_price}
+                />
+              }
+              rightOpenValue={-225}
+              previewOpenValue={-40}
+              previewOpenDelay={0}
+              renderHiddenItem={renderHiddenItem}
+              keyExtractor={item => item.id+item.product_name}
+              onRowDidOpen={onRowDidOpen}
+          />
+        </View>
+        )}
+      />
+      <TouchableOpacity
+      onPress={() => cart_nav({navigation,TotalCartPrice})}
+       style={styles.place_order}>
+       <View style={{flex:6,flexDirection:"row"}}>
+    
+          <View style={{flex:3}}>
+            <Text style={{
+                padding:8,
+                fontSize: 18,
+                color:"#FFFFFF",
+                marginLeft:20
+              }}>Place Order</Text>
+            </View>
+        <Text style={{
+            padding:8,
+            fontSize: 18,
+            color:"#FFFFFF",
+            marginRight:20,
+          }}>{TotalCartPrice}</Text>
+       </View>
+      </TouchableOpacity>
+    </View>;
+    } else {
+      return <View  style={{backgroundColor:"#2366c4", flex:1, alignContent:"center"}}><Text>not</Text></View>;
+    }
+  };
+
   return(
     <View style={styles.container}>
- <View style={{flex:6}}>
-    <SectionList
-      sections={listData}
-      keyExtractor={(item, index) => item + index}
-      renderItem={({ item,section }) =>
-       <Item 
-       header_name = {item.header_name}
-       title={item.name} 
-       price={item.price} 
-       required={section.required}
-       />
-      }
-      renderSectionHeader={({ section: { title,data_title } }) => (
-       <View>
-        <SwipeListView
-            
-            data={data_title}
-            renderItem={({ item }) => 
-            <RowItem
-              section={item.section}
-              minus_qty={minus_qty}
-              add_qty={add_qty}
-              qty={item.qty}
-              title={item.product_name}
-              id={item.id}
-              price = {item.price}
-              base_price = {item.base_price}
-              add_on_price = {item.add_on_price}
-              />
-            }
-            rightOpenValue={-225}
-            previewOpenValue={-40}
-            previewOpenDelay={0}
-            renderHiddenItem={renderHiddenItem}
-            keyExtractor={item => item.id+item.product_name}
-            onRowDidOpen={onRowDidOpen}
-        />
-   </View>
-      )}
-    />
+      {renderLayout()}
     </View>
-    <View>
-      <TouchableOpacity
-        onPress={() => cart_nav({navigation,TotalCartPrice})}
-         style={styles.place_order}>
-         <View style={{flex:6,flexDirection:"row"}}>
-      
-            <View style={{flex:3}}>
-              <Text style={{
-                  padding:8,
-                  fontSize: 18,
-                  color:"#FFFFFF",
-                  marginLeft:20
-                }}>Place Order</Text>
-              </View>
-          <Text style={{
-              padding:8,
-              fontSize: 18,
-              color:"#FFFFFF",
-              marginRight:20,
-            }}>{TotalCartPrice}</Text>
-         </View>
-        </TouchableOpacity>
-        </View>
-  </View>
   )
 }
 
