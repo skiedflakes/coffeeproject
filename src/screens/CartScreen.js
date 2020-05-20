@@ -25,10 +25,12 @@ import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 export default function CartScreen ({navigation}) {
   const [listData, setListData] = useState(null);
   const [TotalCartPrice, setTotalCartPrice] = useState('0');
+  const [LoadingScreen, setLoadingScreen] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
      //remove selected items
+     setLoadingScreen(true);
      AsyncStorage.getAllKeys((err, keys) => {
       AsyncStorage.multiGet(keys, (err, stores) => {
         const newData= stores.map((result, i, store) => {
@@ -77,8 +79,10 @@ export default function CartScreen ({navigation}) {
               };
             });
             setListData(data);
+            setLoadingScreen(false);
           }catch(error){
             console.log("catch ~ "+error)
+            setLoadingScreen(false);
           }
          
         });
@@ -308,13 +312,13 @@ function renderLayout(){
       </TouchableOpacity>
     </View>;
     } else {
-      return <View  style={{backgroundColor:"#2366c4", flex:1, alignContent:"center"}}><Text>not</Text></View>;
+      return <View  style={{flex:1, justifyContent:"center", alignItems: 'center'}}><Text style={{color:"#1355bf", fontWeight:"bold", fontSize:20}}>Empty cart</Text></View>;
     }
   };
 
   return(
     <View style={styles.container}>
-      {renderLayout()}
+      {LoadingScreen ? <View style={{flex:1, justifyContent:"center", alignItems: 'center'}}><Text style={{fontWeight:"bold", fontSize:18}}>Loading cart...</Text></View> : renderLayout()}
     </View>
   )
 }
@@ -328,30 +332,30 @@ function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,mi
   return (
     //   <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,allow_nav,true)}>
  
-          <View style={styles.row_item}>
-            <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
+      <View style={styles.row_item}>
+        <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
 
-            <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
-              <Text style={{fontSize:18}}>-</Text>
-            </TouchableNativeFeedback>
+        <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+          <Text style={{fontSize:18}}>-</Text>
+        </TouchableNativeFeedback>
 
-            <Text style={styles.title}>{qty}x</Text>
-            <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
-              <Text style={{fontSize:18}}>+</Text>
-            </TouchableNativeFeedback>
+        <Text style={styles.title}>{qty}x</Text>
+        <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+          <Text style={{fontSize:18}}>+</Text>
+        </TouchableNativeFeedback>
 
 
 
-            </View>
-            <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
-            <Text style={styles.row_title}>{title}</Text>
-            </View>
+        </View>
+        <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
+        <Text style={styles.row_title}>{title}</Text>
+        </View>
 
-            <View style={{flex:1.5,flexDirection:'row',alignItems:"center",marginRight:10}}>
-            <Text style={styles.title}>{t_price}</Text>
-            <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
-            </View>
-          </View>
+        <View style={{flex:1.5,flexDirection:'row',alignItems:"center",marginRight:10}}>
+        <Text style={styles.title}>{t_price}</Text>
+        <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
+        </View>
+      </View>
   );
 }
 
