@@ -104,7 +104,6 @@ const closeRow = (rowMap, rowKey) => {
 const deleteRow = (rowKey,id) => {
   const newData = [...listData];
   const prevIndex = listData.findIndex(item => item.id === id);
-  console.log(prevIndex+" rowKey " +rowKey + "id "+id);
   newData.splice(prevIndex, 1);
    
     //ASYNC STORAGE REMOVE ALL PRE-SELECTED ADDITIONS
@@ -122,12 +121,6 @@ const deleteRow = (rowKey,id) => {
             });
           });
       });
-
-      // const newData = [...listData];
-      // const prevIndex = listData.findIndex(item => item.id === rowKey);
-      // console.log(newData);
-      // newData.splice(prevIndex, 1);
-    
       setListData(newData);
 };
 
@@ -149,9 +142,6 @@ const add_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,qt
   const newData = [...listData];
   const prevIndex = listData.findIndex(item => item.id === id);
   var added_qty = ++qty;
-
-
-  console.log(base_price + "/ " + add_on_price +" /"+added_qty)
   var t_price = (+base_price + +add_on_price)* +added_qty;
   newData[section].data_title.splice(0, 1,
     { 
@@ -174,9 +164,6 @@ const minus_qty = (section,rowKey,id,product_name,price,base_price,add_on_price,
 
   if(added_qty>0){
     var t_price = (+base_price * +add_on_price)* +added_qty;
-
-    console.log(base_price + "/ " + add_on_price +" /"+added_qty)
-  
     newData[section].data_title.splice(prevIndex, 1,
       { 
         section: section,

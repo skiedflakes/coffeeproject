@@ -38,12 +38,9 @@ export default function View_Details ({navigation,route}) {
                 data:item.data,
               };
             }); 
-            console.log(data)
-
             setListData(data);
             }).catch((error) => {
             console.error(error);
-        
           });
 
       return () => {
