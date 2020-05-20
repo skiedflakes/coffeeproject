@@ -25,10 +25,12 @@ import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 export default function CartScreen ({navigation}) {
   const [listData, setListData] = useState(null);
   const [TotalCartPrice, setTotalCartPrice] = useState('0');
+  const [LoadingScreen, setLoadingScreen] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
      //remove selected items
+     setLoadingScreen(true);
      AsyncStorage.getAllKeys((err, keys) => {
       AsyncStorage.multiGet(keys, (err, stores) => {
         const newData= stores.map((result, i, store) => {
@@ -50,7 +52,7 @@ export default function CartScreen ({navigation}) {
             var counter =-1;
               var data = filtered_newData.map(function(item2) {
               var data_title = filtered_newData.map(function(item) {
-              
+                
                 if(item2.id==item.id){
                   ++counter;
                   return {
@@ -77,14 +79,16 @@ export default function CartScreen ({navigation}) {
               };
             });
             setListData(data);
-          }catch(error){}
+            setLoadingScreen(false);
+          }catch(error){
+            console.log("catch ~ "+error)
+            setLoadingScreen(false);
+          }
          
         });
       });
 
-
       return () => {
-
         
       };
     }, [])
@@ -230,73 +234,79 @@ const renderHiddenItem = (data, rowMap) => (
   </View>
 );
 
+function renderLayout(){
+    if (listData != null && listData.length > 0) {
+      return <View style={{flex:1}}>
+      <SectionList
+        sections={listData}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({ item,section }) =>
+        <Item 
+        header_name = {item.header_name}
+        title={item.name} 
+        price={item.price} 
+        required={section.required}
+        />
+        }
+        renderSectionHeader={({ section: { title,data_title } }) => (
+        <View>
+          <SwipeListView
+              
+              data={data_title}
+              renderItem={({ item }) => 
+              <RowItem
+                section={item.section}
+                minus_qty={minus_qty}
+                add_qty={add_qty}
+                qty={item.qty}
+                title={item.product_name}
+                id={item.id}
+                price = {item.price}
+                base_price = {item.base_price}
+                add_on_price = {item.add_on_price}
+                />
+              }
+              rightOpenValue={-225}
+              previewOpenValue={-40}
+              previewOpenDelay={0}
+              renderHiddenItem={renderHiddenItem}
+              keyExtractor={item => item.id+item.product_name}
+              onRowDidOpen={onRowDidOpen}
+          />
+        </View>
+        )}
+      />
+      <TouchableOpacity
+      onPress={() => cart_nav({navigation,TotalCartPrice})}
+       style={styles.place_order}>
+       <View style={{flex:6,flexDirection:"row"}}>
+    
+          <View style={{flex:3}}>
+            <Text style={{
+                padding:8,
+                fontSize: 18,
+                color:"#FFFFFF",
+                marginLeft:20
+              }}>Place Order</Text>
+            </View>
+        <Text style={{
+            padding:8,
+            fontSize: 18,
+            color:"#FFFFFF",
+            marginRight:20,
+          }}>{TotalCartPrice}</Text>
+       </View>
+      </TouchableOpacity>
+    </View>;
+    } else {
+      return <View  style={{flex:1, justifyContent:"center", alignItems: 'center'}}><Text style={{color:"#1355bf", fontWeight:"bold", fontSize:20}}>Empty cart</Text></View>;
+    }
+  };
+
   return(
     <View style={styles.container}>
- <View style={{flex:6}}>
-    <SectionList
-      sections={listData}
-      keyExtractor={(item, index) => item + index}
-      renderItem={({ item,section }) =>
-       <Item 
-       header_name = {item.header_name}
-       title={item.name} 
-       price={item.price} 
-       required={section.required}
-       />
-      }
-      renderSectionHeader={({ section: { title,data_title } }) => (
-       <View>
-        <SwipeListView
-            
-            data={data_title}
-            renderItem={({ item }) => 
-            <RowItem
-              section={item.section}
-              minus_qty={minus_qty}
-              add_qty={add_qty}
-              qty={item.qty}
-              title={item.product_name}
-              id={item.id}
-              price = {item.price}
-              base_price = {item.base_price}
-              add_on_price = {item.add_on_price}
-              />
-            }
-            rightOpenValue={-225}
-            previewOpenValue={-40}
-            previewOpenDelay={0}
-            renderHiddenItem={renderHiddenItem}
-            keyExtractor={item => item.id+item.product_name}
-            onRowDidOpen={onRowDidOpen}
-        />
-   </View>
-      )}
-    />
+      {LoadingScreen ? <View style={{flex:1, justifyContent:"center", alignItems: 'center'}}><Text style={{fontWeight:"bold", fontSize:18}}>Loading cart...</Text></View> : renderLayout()}
     </View>
-    <View>
-      <TouchableOpacity
-        onPress={() => cart_nav({navigation,TotalCartPrice})}
-         style={styles.place_order}>
-         <View style={{flex:6,flexDirection:"row"}}>
-      
-            <View style={{flex:3}}>
-              <Text style={{
-                  padding:8,
-                  fontSize: 18,
-                  color:"#FFFFFF",
-                  marginLeft:20
-                }}>Place Order</Text>
-              </View>
-          <Text style={{
-              padding:8,
-              fontSize: 18,
-              color:"#FFFFFF",
-              marginRight:20,
-            }}>{TotalCartPrice}</Text>
-         </View>
-        </TouchableOpacity>
-        </View>
-  </View>
   )
 }
 
@@ -309,30 +319,30 @@ function RowItem ({section,title,id,price,qty,base_price,add_on_price,add_qty,mi
   return (
     //   <TouchableNativeFeedback onPress={() => navigate_side_details(navigation,title,id,allow_nav,true)}>
  
-          <View style={styles.row_item}>
-            <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
+      <View style={styles.row_item}>
+        <View style={{flex:2,flexDirection:'row',alignItems:"center"}}>
 
-            <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
-              <Text style={{fontSize:18}}>-</Text>
-            </TouchableNativeFeedback>
+        <TouchableNativeFeedback style={styles.add_plus} onPress={() =>minus_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+          <Text style={{fontSize:18}}>-</Text>
+        </TouchableNativeFeedback>
 
-            <Text style={styles.title}>{qty}x</Text>
-            <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
-              <Text style={{fontSize:18}}>+</Text>
-            </TouchableNativeFeedback>
+        <Text style={styles.title}>{qty}x</Text>
+        <TouchableNativeFeedback style={styles.add_plus}  onPress={() =>add_qty(section,id+title,id,title,price,base_price,add_on_price,qty) }>
+          <Text style={{fontSize:18}}>+</Text>
+        </TouchableNativeFeedback>
 
 
 
-            </View>
-            <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
-            <Text style={styles.row_title}>{title}</Text>
-            </View>
+        </View>
+        <View style={{flex:3.5,flexDirection:'row',alignItems:"center",marginLeft:10}}>
+        <Text style={styles.row_title}>{title}</Text>
+        </View>
 
-            <View style={{flex:1.5,flexDirection:'row',alignItems:"center",marginRight:10}}>
-            <Text style={styles.title}>{t_price}</Text>
-            <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
-            </View>
-          </View>
+        <View style={{flex:1.5,flexDirection:'row',alignItems:"center",marginRight:10}}>
+        <Text style={styles.title}>{t_price}</Text>
+        <MaterialIcons style={{alignSelf:'center'}} name="keyboard-arrow-right" size={25} color={"#393737"}/>
+        </View>
+      </View>
   );
 }
 
