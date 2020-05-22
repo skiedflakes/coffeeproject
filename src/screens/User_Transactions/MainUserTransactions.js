@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View,Alert,StyleSheet,TouchableOpacity,TouchableHighlight,FlatList,Modal,SectionList,Dimensions } from 'react-native';
+import { ProgressBarAndroid,Text, View,Alert,StyleSheet,TouchableOpacity,TouchableHighlight,FlatList,Modal,SectionList,Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -271,7 +271,10 @@ function RowItem ({navigation,order_id,ref_no,total_amount,all_product,date_adde
             <View style={styles.item2}>
                 <View style={{flex:3,flexDirection:'row',alignItems:"center",alignContent:"center",alignSelf:"center"}}> 
                     <Entypo name="back-in-time" size={25} color={"#4A4A4A"} style={{alignSelf:"center"}}/>
-                    <Text style={styles.details}>{duration} minutes Arrival</Text>
+                    <View style={styles.details,{flexDirection:'column',marginLeft:15}}>
+                      <Text >{duration} minutes Arrival</Text>
+                      <ProgressBarAndroid styleAttr="Horizontal" color="#2196F3" />
+                    </View>
                 </View>
 
             </View>
