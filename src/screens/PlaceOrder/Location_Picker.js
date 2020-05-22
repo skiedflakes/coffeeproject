@@ -43,6 +43,8 @@ export default function Location_Picker ({navigation,route}) {
   const [BranchName, setBranchName] = useState('');
   const [BranchID, setBranchID] = useState('');
 
+  const [Added_duration_time, setAdded_duration_time] = useState('');
+
   const [MapRef, setMapRef] = useState();
   const origin = {latitude: Draglatitude, longitude: Draglongitude};
   const destination = {latitude: store_lat, longitude: store_lng};
@@ -133,6 +135,22 @@ export default function Location_Picker ({navigation,route}) {
   };
 
   const handleMarkerPress = (marker) => {
+    const formData = new FormData();
+    formData.append('branch_id',marker.branch_id);
+  
+    fetch(global.global_url+'placeorder/check_branch_orders.php', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        },
+        body: formData
+    }).then((response) => response.json())
+          .then((responseJson) => {
+            setAdded_duration_time(responseJson);
+            console.log('php response  ',responseJson)
+
+
     const store_latitude = marker.latitude
     const store_longitude = marker.longitude 
     const store_name = marker.branch_name
@@ -143,6 +161,15 @@ export default function Location_Picker ({navigation,route}) {
     setStoreLat(store_latitude);
     setStoreLongi(store_longitude);
     moveFitMarkerScreen(store_latitude,store_longitude,Draglatitude,Draglongitude);
+    
+
+    
+            }).catch((error) => {
+            console.error(error);
+            setSpinner(false)
+    });
+
+
   };
 
   function moveFitMarkerScreen(store_latitude, store_longitude, user_latitude, user_longitude){
@@ -219,7 +246,7 @@ return (
             onReady={result => {
               setSpinner(false);
               setDistance(Math.round(result.distance))
-              setDuration(Math.round(result.duration))
+              setDuration(Math.round(result.duration+Added_duration_time))
               console.log(`Distance: ${result.distance} km`)
               console.log(`Duration: ${result.duration} min.`)
 
