@@ -135,10 +135,15 @@ export default function Location_Picker ({navigation,route}) {
   };
 
   const handleMarkerPress = (marker) => {
+
+    const store_latitude = marker.latitude
+    const store_longitude = marker.longitude 
+    const store_name = marker.branch_name
+    const store_id = marker.branch_id
+
     const formData = new FormData();
     formData.append('branch_id',marker.branch_id);
-  
-    fetch(global.global_url+'placeorder/check_branch_orders2.php', {
+    fetch(global.global_url+'placeorder/check_branch_orders.php', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -146,27 +151,22 @@ export default function Location_Picker ({navigation,route}) {
         },
         body: formData
     }).then((response) => response.json())
-          .then((responseJson) => {
-            setAdded_duration_time(responseJson);
-            console.log('php response  ',responseJson)
+    .then((responseJson) => {
 
-    const store_latitude = marker.latitude
-    const store_longitude = marker.longitude 
-    const store_name = marker.branch_name
-    const store_id = marker.branch_id
+        setAdded_duration_time(responseJson);
+        console.log('php response  ',responseJson)
+
+    }).catch((error) => {
+        console.error(error);
+        setSpinner(false)
+    });
+
     setBranchID(store_id);
     setBranchName(store_name);
     setSelectedStore(store_name);
     setStoreLat(store_latitude);
     setStoreLongi(store_longitude);
     moveFitMarkerScreen(store_latitude,store_longitude,Draglatitude,Draglongitude);
-
-            }).catch((error) => {
-            console.error(error);
-            setSpinner(false)
-    });
-
-
   };
 
   function moveFitMarkerScreen(store_latitude, store_longitude, user_latitude, user_longitude){
