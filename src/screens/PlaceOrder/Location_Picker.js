@@ -138,7 +138,7 @@ export default function Location_Picker ({navigation,route}) {
     const formData = new FormData();
     formData.append('branch_id',marker.branch_id);
   
-    fetch(global.global_url+'placeorder/check_branch_orders.php', {
+    fetch(global.global_url+'placeorder/check_branch_orders2.php', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -150,7 +150,6 @@ export default function Location_Picker ({navigation,route}) {
             setAdded_duration_time(responseJson);
             console.log('php response  ',responseJson)
 
-
     const store_latitude = marker.latitude
     const store_longitude = marker.longitude 
     const store_name = marker.branch_name
@@ -161,9 +160,7 @@ export default function Location_Picker ({navigation,route}) {
     setStoreLat(store_latitude);
     setStoreLongi(store_longitude);
     moveFitMarkerScreen(store_latitude,store_longitude,Draglatitude,Draglongitude);
-    
 
-    
             }).catch((error) => {
             console.error(error);
             setSpinner(false)
@@ -177,7 +174,6 @@ export default function Location_Picker ({navigation,route}) {
       MapRef.fitToCoordinates([{ latitude: user_latitude, longitude: user_longitude }, { latitude: parseFloat(store_latitude), longitude: parseFloat(store_longitude) }], { edgePadding: DEFAULT_PADDING, animated: true, });
     }
   }
-
   const CustomProgressBar = ({ visible }) => (
     <Modal onRequestClose={() => null} visible={visible} transparent={true}>
       <View style={{ alignItems: 'center', justifyContent: 'center',flex: 1 }}>
@@ -188,12 +184,10 @@ export default function Location_Picker ({navigation,route}) {
       </View>
     </Modal>
   );
-
 return (
     <>
   <View style={{flex: 1,flexDirection: 'column',}}>
   <View  style={styles.container}>
-
   {getUserLocation && 
   <MapView
       ref={(ref) => {setMapRef(ref)}}

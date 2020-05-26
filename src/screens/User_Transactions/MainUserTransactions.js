@@ -272,7 +272,7 @@ function RowItem ({navigation,order_id,ref_no,total_amount,all_product,date_adde
                 <View style={{flex:3,flexDirection:'row',alignItems:"center",alignContent:"center",alignSelf:"center"}}> 
                     <Entypo name="back-in-time" size={25} color={"#4A4A4A"} style={{alignSelf:"center"}}/>
                     <View style={styles.details,{flexDirection:'column',marginLeft:15}}>
-                      <Text >{duration} minutes Arrival</Text>
+                      <Text >{duration>0?duration+" minutes Arrival": "Waiting to Complete Order"} </Text>
                       <ProgressBarAndroid styleAttr="Horizontal" color="#2196F3" />
                     </View>
                 </View>
